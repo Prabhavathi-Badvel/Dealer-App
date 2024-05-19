@@ -6,12 +6,16 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dlerin.application.dto.ProfileDto;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.exception.DlerNotFoundException;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.repository.DlerProfileRepo;
 import com.dlerin.application.service.DlerProfileService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 public class DlerProfileServiceImpl implements DlerProfileService {
@@ -21,14 +25,18 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
+
 
 	@Override
-	public DlerProfile addDler(DlerProfile dProfile, String dlerId) throws DlerNotFoundException {
-		Optional<DlerBusinessLogin> dlerOptional = dlerBusinessLoginRepo.findById(dlerId);
+	public DlerProfile addDler(DlerProfile dProfile) throws DlerNotFoundException {
+		Optional<DlerBusinessLogin> dlerOptional = dlerBusinessLoginRepo.findById(dProfile.getDlerId());
 		if (dlerOptional.isPresent()) {
 			return dlerProfileRepo.save(dProfile);
 		} else {
-			throw new DlerNotFoundException("Dler not found for given Dler ID: " + dlerId);
+			throw new DlerNotFoundException("Dler not found for given Dler ID: " + dProfile.getDlerId());
 		}
 	}
 
@@ -54,13 +62,20 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 
 	}
 
-	@Override
-	public List<DlerProfile> getProfile( String dlerBusinessName,String dlerBusinessLocation,String dlerBusinessContactPerson,
-			String dlerBusinessContactNo) {
-
-		return dlerProfileRepo.findByDlerBusinessNameOrDlerBusinessLocationOrDlerBusinessContactPersonOrDlerBusinessContactNo(dlerBusinessName,
-				dlerBusinessLocation, dlerBusinessContactPerson, dlerBusinessContactNo);
-
+    @Override
+	public List<DlerProfile> getProfile(ProfileDto profile){
+		
+		Optional<DlerBusinessLogin> isExists = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(profile.getDlerId(),profile.getEmail(), profile.getMobile()));
+		if(isExists.isPresent()) {
+			
+			Optional<List<DlerProfile>> dlerPresent = Optional.ofNullable(dlerProfileRepo.findByDlerId(isExists.get().getDlerUserId()));
+			if( !dlerPresent.isEmpty()) {
+				profile.setEmail(isExists.get().getDlerEmailId());
+				profile.setMobile(isExists.get().getDlerMobileNo());
+				return dlerPresent.get();
+			}
+		}
+		return null;
+		
 	}
-
 }

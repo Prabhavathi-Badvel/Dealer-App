@@ -1,8 +1,5 @@
 package com.dlerin.application.repository;
 
-import java.util.List;
-import java.util.Optional;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -12,19 +9,15 @@ import com.dlerin.application.entity.DlerBusinessLogin;
 public interface DlerBusinessLoginRepo extends JpaRepository<DlerBusinessLogin, String> {
 
 	DlerBusinessLogin findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(String dlerUserId, String dlerEmailId,
-			long dlerMobileNo);
+			String dlerMobileNo);
 
 	DlerBusinessLogin findByDlerEmailId(String dlerEmailId);
 
-	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, long dlerMobileNo);
+	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
 
-	List<DlerBusinessLogin> findByDlerMobileNo(Long dlerMobileNo);
+	DlerBusinessLogin findByDlerMobileNo(String dlerMobileNo);
 
-	List<DlerBusinessLogin> findByDlerUserId(String dlerUserId);
+	DlerBusinessLogin findByDlerUserIdOrDlerEmailId(String dlerUserId, String dlerEmailId);
 
-	List<DlerBusinessLogin> findByDlerName(String dlerName);
-
-	DlerBusinessLogin findByDlerUserIdOrDlerEmailIdOrDlerMobileNoOrDlerName(String dlerUserId, String dlerEmailId,
-			Long dlerMobileNo, String dlerName);
-
+	DlerBusinessLogin findByDlerUserId(String userId);
 }

@@ -1,17 +1,17 @@
 package com.dlerin.application.entity;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
+import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,8 +22,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "dler_business_login")
-@Builder
-public class DlerBusinessLogin {
+public class DlerBusinessLogin implements UserDetails {
 
 	@Id
 	@Column(name = "dler_user_id")
@@ -31,7 +30,7 @@ public class DlerBusinessLogin {
 	@Column(name = "dler_email_id")
 	private String dlerEmailId;
 	@Column(name = "dler_mobile_no")
-	private long dlerMobileNo;
+	private String dlerMobileNo;
 	@Column(name = "dler_name")
 	private String dlerName;
 	@Column(name = "dler_password")
@@ -51,18 +50,22 @@ public class DlerBusinessLogin {
 	private String dlerMobileVerify;
 
 	@Column(name = "dler_status")
-	@Builder.Default
-	private String dlerStatus = "active";
+
+	private String dlerStatus;
 	@Column(name = "dler_status_updated_by")
 	private String dlerStatusUpdatedBy;
 	@UpdateTimestamp
 	@Column(name = "dler_password_updated_date")
 	private String dlerPasswordUpdatedDate;
 
+	@Column(name = "user_type")
+	private String userType;
+
 	@PrePersist
 	private void prePersist() {
 		long sequenceNumber = generateRandomSixDigitNumber();
 		this.dlerUserId = "DL" + sequenceNumber;
+		this.dlerStatusUpdatedBy = dlerUserId;
 	}
 
 	private static final Random random = new Random();
@@ -71,5 +74,42 @@ public class DlerBusinessLogin {
 
 		long randomLong = random.nextLong(9000000L) + 1000000L;
 		return randomLong;
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+
+		return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + getUserType()));
+	}
+
+	@Override
+	public String getPassword() {
+
+		return this.dlerPassword;
+	}
+
+	@Override
+	public String getUsername() {
+		return this.dlerEmailId;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 }

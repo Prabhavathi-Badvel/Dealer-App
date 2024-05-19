@@ -1,5 +1,6 @@
 package com.dlerin.application.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,11 +12,21 @@ import com.dlerin.application.entity.AdminBrandMaster;
 import com.dlerin.application.repository.AdminBrandMasterRepo;
 import com.dlerin.application.service.AdminBrandMasterService;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+
 @Service
 public class AdminBrandMasterImpl implements AdminBrandMasterService {
 
 	@Autowired
 	AdminBrandMasterRepo admindBrandMaterRepo;
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Override
 	public AdminBrandMaster addBrand(AdminBrandMaster adminBrand) {
@@ -27,47 +38,46 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 		return null;
 	}
 
-
-	
+	@Override
 	public boolean updateBrands(AdminBrandMaster adminBrand) {
-	    Optional<AdminBrandMaster> brandOpt = Optional.ofNullable(admindBrandMaterRepo.findByBrandCatSubCat(adminBrand.getBrandCatSubCat()));
+		Optional<AdminBrandMaster> brandOpt = Optional
+				.ofNullable(admindBrandMaterRepo.findByBrandCatSubCat(adminBrand.getBrandCatSubCat()));
 
-	    if (brandOpt.isPresent()) {
-	        AdminBrandMaster brandDb = brandOpt.get();
-	        
-	        brandDb.setBrandId(adminBrand.getBrandId());
-	        brandDb.setBrandName(adminBrand.getBrandName());
-	        brandDb.setBrandCategory(adminBrand.getBrandCategory());
-	        brandDb.setBrandSubcategory(adminBrand.getBrandSubcategory());
-	        
-	        admindBrandMaterRepo.save(brandDb);
-	         return true;
-	    } else {
-	        return false; 
-	    }
+		if (brandOpt.isPresent()) {
+			AdminBrandMaster brandDb = brandOpt.get();
+
+			brandDb.setBrandId(adminBrand.getBrandId());
+			brandDb.setBrandName(adminBrand.getBrandName());
+			brandDb.setBrandCategory(adminBrand.getBrandCategory());
+			brandDb.setBrandSubcategory(adminBrand.getBrandSubcategory());
+
+			admindBrandMaterRepo.save(brandDb);
+			return true;
+		} else {
+			return false;
+		}
 	}
 
-	
-
 	@Override
-	public List<AdminBrandMaster> getBrands(String brandName, String brandCategory, String brandSubcategory) {
+	public List<AdminBrandMaster> getBrands(AdminBrandDto admin) {
 
-		if (brandName != null && brandCategory != null) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<AdminBrandMaster> query = cb.createQuery(AdminBrandMaster.class);
+		Root<AdminBrandMaster> root = query.from(AdminBrandMaster.class);
+		List<Predicate> predicates = new ArrayList<>();
 
-			List<AdminBrandMaster> user = admindBrandMaterRepo.findByBrandNameAndBrandCategory(brandName, brandCategory);
-			return user;
-		}else if(brandName != null && brandSubcategory != null) {
-			List<AdminBrandMaster> user = admindBrandMaterRepo.findByBrandNameAndBrandSubcategory(brandName,brandSubcategory);
-			return user;
-		}else if(brandCategory != null && brandSubcategory != null) {
-			List<AdminBrandMaster> user = admindBrandMaterRepo.findByBrandCategoryAndBrandSubcategory(brandCategory,brandSubcategory);
-			return user;
-		}else if(  brandName!=null   &&  brandCategory != null && brandSubcategory != null) {
-			List<AdminBrandMaster> user = admindBrandMaterRepo.findByBrandNameAndBrandCategoryAndBrandSubcategory(brandName,brandCategory,brandSubcategory);
-			return user;
+		if (admin.getBrandName() != null) {
+			predicates.add(cb.equal(root.get("brandName"), admin.getBrandName()));
 		}
-		return null;
+		if (admin.getBrandCategory() != null) {
+			predicates.add(cb.equal(root.get("brandCategory"), admin.getBrandCategory()));
+		}
+		if (admin.getBrandSubcategory() != null) {
+			predicates.add(cb.equal(root.get("brandSubcategory"), admin.getBrandSubcategory()));
+		}
 
+		query.where(predicates.toArray(new Predicate[0]));
 
+		return entityManager.createQuery(query).getResultList();
 	}
 }

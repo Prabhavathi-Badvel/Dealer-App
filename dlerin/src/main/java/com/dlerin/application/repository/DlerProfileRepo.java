@@ -15,7 +15,5 @@ public interface DlerProfileRepo extends JpaRepository<DlerProfile, String> {
 
 	DlerProfile findByDlerBusinessIdOrDlerBusinessContactNo(String dlerBusinessId, String dlerBusinessContactNo);
 
-	List<DlerProfile> findByDlerBusinessNameOrDlerBusinessLocationOrDlerBusinessContactPersonOrDlerBusinessContactNo(
-			String dlerBusinessName, String dlerBusinessLocation, String dlerBusinessContactPerson,
-			String dlerBusinessContactNo);
+	List<DlerProfile> findByDlerId(String dlerId);
 }

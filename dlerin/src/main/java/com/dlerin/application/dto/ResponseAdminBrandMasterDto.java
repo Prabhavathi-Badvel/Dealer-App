@@ -2,13 +2,13 @@ package com.dlerin.application.dto;
 
 import com.dlerin.application.entity.AdminBrandMaster;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
+
+@Data
 public class ResponseAdminBrandMasterDto {
 
 	private String message;
+	private boolean status;
 	private AdminBrandMaster brandsData;
 }

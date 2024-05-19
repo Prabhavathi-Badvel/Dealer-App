@@ -8,6 +8,6 @@ import lombok.Setter;
 public class AdminLoginRequestDto {
 
 	String emailId;
-	long mobileNo;
+	String mobileNo;
 	String password;
 }

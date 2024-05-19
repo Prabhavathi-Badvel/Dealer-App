@@ -5,9 +5,9 @@ import lombok.Setter;
 
 @Getter
 @Setter
+public class ProfileDto {
 
-public class ResponseAdminLoginRetunDetailsDto {
-
-	String msge;
-	AdminLoginDto logData;
+	private String dlerId;
+	private String email;
+	private String mobile;
 }

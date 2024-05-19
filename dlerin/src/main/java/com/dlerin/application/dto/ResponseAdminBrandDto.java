@@ -4,13 +4,13 @@ import java.util.List;
 
 import com.dlerin.application.entity.AdminBrandMaster;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class ResponseAdminBrandGetDto {
+
+@Data
+public class ResponseAdminBrandDto {
 
 	private String massege;
+	private boolean status;
 	private List<AdminBrandMaster> getBrands;
 }

@@ -3,6 +3,7 @@ package com.dlerin.application.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -11,82 +12,94 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.dlerin.application.dto.AdminChangeForgotdto;
 import com.dlerin.application.dto.AdminLoginDto;
-import com.dlerin.application.dto.AdminLoginRequestDto;
+import com.dlerin.application.dto.AdminLoginDto1;
+import com.dlerin.application.dto.LoginDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto;
-import com.dlerin.application.dto.ResponseAdminLoginRetunDetailsDto;
+import com.dlerin.application.dto.ResponseAdminLoginDto1;
+import com.dlerin.application.dto.ResponseAdminLoginDto2;
+import com.dlerin.application.dto.ResponseMessageDto;
 import com.dlerin.application.entity.AdminLogin;
-import com.dlerin.application.serviceimpl.AdminLoginServiceImpl;
+import com.dlerin.application.service.AdminLoginService;
+
+import jakarta.annotation.security.PermitAll;
 
 @RestController
+@PermitAll
 public class AdminLoginController {
 
 	@Autowired
-	AdminLoginServiceImpl adminLoginServiceImpl;
+	AdminLoginService adminLoginService;
 
+	ResponseAdminLoginDto response = new ResponseAdminLoginDto();
+	
+	ResponseAdminLoginDto1 response1 = new ResponseAdminLoginDto1();
+	ResponseAdminLoginDto2 response2 = new ResponseAdminLoginDto2();
+	
+	ResponseMessageDto message = new ResponseMessageDto();
+	
 	@PostMapping("/dlerin-register-adminlogin")
 	public ResponseEntity<?> saveAdminLogin(@RequestBody AdminLogin adminLoginDto) {
 		try {
 
-			AdminLoginDto savedLogin = adminLoginServiceImpl.saveAdminDetails(adminLoginDto);
+			AdminLoginDto1 savedLogin = adminLoginService.saveAdminDetails(adminLoginDto);
 			if (savedLogin != null) {
-				ResponseAdminLoginDto responseAdminLoginDto = new ResponseAdminLoginDto();
-				responseAdminLoginDto.setMessage("Details added successfully");
-				responseAdminLoginDto.setAdminData(savedLogin);
-				return new ResponseEntity<>(responseAdminLoginDto, HttpStatus.OK);
+				
+				response.setMessage("Admin registered successfully");
+				response.setStatus(true);
+				response.setAdminData(savedLogin);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 
 			}
-			return new ResponseEntity<>("user already exists", HttpStatus.BAD_REQUEST);
+			response.setMessage("admin already exists");
+			response.setStatus(false);
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
-			ResponseAdminLoginDto errorResponseDto = new ResponseAdminLoginDto();
-			errorResponseDto.setMessage("Failed to add  ");
-			return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+			response.setMessage("Failed to add");
+			response.setStatus(false);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 	}
-
+	
 	@PostMapping("/dlerin-login-adminlogin")
-	public ResponseEntity<?> login(@RequestBody AdminLoginRequestDto login) {
-		String emailId = login.getEmailId();
-		long mobileNo = login.getMobileNo();
-		String password = login.getPassword();
-		try {
-			if (adminLoginServiceImpl.loginDetails(emailId, mobileNo, password).equals("login")) {
-				ResponseAdminLoginRetunDetailsDto rs = new ResponseAdminLoginRetunDetailsDto();
-				rs.setMsge("Login successful....");
-				rs.setLogData(adminLoginServiceImpl.getLoginDto(emailId, mobileNo));
-				return new ResponseEntity<>(rs, HttpStatus.OK);
-
-			} else if (adminLoginServiceImpl.loginDetails(emailId, mobileNo, password).equals("InvalidPassword")) {
-				return new ResponseEntity<>("Invalid Password,Please enter correct password", HttpStatus.UNAUTHORIZED);
-			} else if (adminLoginServiceImpl.loginDetails(emailId, mobileNo, password).equals("inactive")) {
-				return new ResponseEntity<>("Please Verify Email Before Login.", HttpStatus.UNAUTHORIZED);
-			}
-
-			return new ResponseEntity<>("Invalid User....!", HttpStatus.BAD_REQUEST);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	public ResponseEntity<?> login(@RequestBody LoginDto login) {
+		String userEmail = login.getEmail();
+		String userMobile = login.getMobileNo();
+		String userPassword = login.getPassword();
+		ResponseAdminLoginDto2 response=adminLoginService.loginDetails(userEmail, userMobile, userPassword);
+		if(response.getJwtToken()!=null) {
+			return new ResponseEntity<ResponseAdminLoginDto2>(response, HttpStatus.OK);
 		}
+		return new ResponseEntity<ResponseAdminLoginDto2>(response, HttpStatus.UNAUTHORIZED);
+
 	}
 
+	@PreAuthorize("hasAuthority('Admin')")
 	@GetMapping("/dlerin-get-adminlogin-profile")
 	public ResponseEntity<?> getAdminProfile(@RequestBody AdminLoginDto adLoginDto) {
 		String emailId = adLoginDto.getEmailId();
-		long mobileNo = adLoginDto.getMobileNo();
+		String mobileNo = adLoginDto.getMobileNo();
 		String empId = adLoginDto.getEmpId();
+		
 		try {
-			if (adminLoginServiceImpl.getAdminLoginDetails(emailId, mobileNo, empId) == null) {
-				return new ResponseEntity<>("Invalid credentials....!", HttpStatus.BAD_REQUEST);
+			AdminLoginDto details=adminLoginService.getAdminLoginDetails(emailId, mobileNo, empId);
+			if ( details == null) {
+				response2.setMessage("Invalid credentials....!");
+				response2.setStatus(false);
+				return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
 			}
-
-			return new ResponseEntity<>(adminLoginServiceImpl.getAdminLoginDetails(emailId, mobileNo, empId),
-					HttpStatus.OK);
+			response2.setMessage("admin details");
+			response2.setStatus(true);
+			response2.setAdminData(details);
+			return new ResponseEntity<>(response2,HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
 	}
 
+	
 	@PostMapping("/dlerin-change-password")
-	public ResponseEntity<String> changeCustomerPassword(@RequestBody AdminChangeForgotdto cfPwd) {
+	public ResponseEntity<?> changeCustomerPassword(@RequestBody AdminChangeForgotdto cfPwd) {
 
 		String emailId = cfPwd.getEmailId();
 		String oldPassword = cfPwd.getOldPassword();
@@ -94,35 +107,48 @@ public class AdminLoginController {
 		String confirmPassword = cfPwd.getConfirmPassword();
 
 		try {
-			if (adminLoginServiceImpl.changePassword(emailId, oldPassword, newPassword, confirmPassword) == "changed") {
-				return new ResponseEntity<>("Password Changed Successfully..", HttpStatus.OK);
-			} else if (adminLoginServiceImpl.changePassword(emailId, oldPassword, newPassword,
+			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword) == "changed") {
+				message.setMessage("Password Changed Successfully..");
+				message.setStatus(true);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
 					confirmPassword) == "notMatched") {
-				return new ResponseEntity<>("New Passwords Not Matched.!", HttpStatus.BAD_REQUEST);
-			} else if (adminLoginServiceImpl.changePassword(emailId, oldPassword, newPassword,
+				message.setMessage("New Passwords Not Matched.!");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
 					confirmPassword) == "incorrect") {
-				return new ResponseEntity<>("Old Password is Incorrect", HttpStatus.UNAUTHORIZED);
+				message.setMessage("Old Password is Incorrect");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
 			}
 		} catch (Exception e) {
-			e.getMessage();
-			return new ResponseEntity<>("Invalid User.!", HttpStatus.NOT_FOUND);
+			message.setMessage(e.getMessage());
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
 		}
-		return new ResponseEntity<>("Invalid User.!", HttpStatus.NOT_FOUND);
+		message.setMessage("Invalid User.!");
+		message.setStatus(false);
+		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 	}
 
+	@PreAuthorize("hasAuthority('Admin')")
 	@PutMapping("/dlerin-update-adminlogin")
 	public ResponseEntity<?> updateAdminProfile(@RequestBody AdminLogin adminLogin) {
 
 		String empId = adminLogin.getEmpId();
 
-		AdminLogin update = adminLoginServiceImpl.updateprofile(adminLogin, empId);
+		AdminLogin update = adminLoginService.updateprofile(adminLogin, empId);
 		try {
 			if (update == null) {
-				return new ResponseEntity<>("invalid Employee id", HttpStatus.BAD_REQUEST);
+				response1.setMessage("invalid Employee id");
+				response1.setStatus(false);
+				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
 
 			} else {
-				String successMessage = "Profile updated successfully";
-				return ResponseEntity.ok().body(successMessage);
+				response1.setMessage("Profile updated successfully");
+				response1.setStatus(true);
+				response1.setUpdatedData(update);
+				return ResponseEntity.ok().body(response1);
 			}
 
 		} catch (Exception e) {
@@ -131,13 +157,18 @@ public class AdminLoginController {
 	}
 
 	@PostMapping("/dlerin-forget-pwd-send-otp")
-	public ResponseEntity<String> sendOtpForPasswordChange(@RequestBody AdminChangeForgotdto cfPwd) {
-		String emailId = cfPwd.getEmailId();
+	public ResponseEntity<?> sendOtpForPasswordChange(@RequestBody AdminChangeForgotdto password) {
+		String emailId = password.getEmailId();
 		try {
-			if (adminLoginServiceImpl.sendMail(emailId) != null) {
-				return new ResponseEntity<String>("OTP Sent to Registered EmailId.", HttpStatus.OK);
+			if (adminLoginService.sendMail(emailId) != null) {
+				message.setMessage("OTP Sent to Registered EmailId");
+				message.setStatus(true);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+				
 			}
-			return new ResponseEntity<>("Invalid EmailId..!", HttpStatus.NOT_FOUND);
+			message.setMessage("Invalid EmailId..!");
+			message.setStatus(false);
+			return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
@@ -145,7 +176,7 @@ public class AdminLoginController {
 	}
 
 	@PostMapping("/dlerin-forget-pwd-change")
-	public ResponseEntity<String> verifyOtpForPasswordChange(@RequestBody AdminChangeForgotdto cfPwd) {
+	public ResponseEntity<?> verifyOtpForPasswordChange(@RequestBody AdminChangeForgotdto cfPwd) {
 
 		String emailId = cfPwd.getEmailId();
 		String otp = cfPwd.getOtp();
@@ -153,17 +184,26 @@ public class AdminLoginController {
 		String confirmPassword = cfPwd.getConfirmPassword();
 
 		try {
-			if (adminLoginServiceImpl.forgetPassword(emailId, otp, newPassword, confirmPassword) == "changed") {
-				return new ResponseEntity<>("Password Changed Successfully..", HttpStatus.OK);
-			} else if (adminLoginServiceImpl.forgetPassword(emailId, otp, newPassword,
+			if (adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword) == "changed") {
+				message.setMessage("Password Changed Successfully..");
+				message.setStatus(true);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+				
+			} else if (adminLoginService.forgetPassword(emailId, otp, newPassword,
 					confirmPassword) == "notMatched") {
-				return new ResponseEntity<>("New Passwords Not Matched.!", HttpStatus.BAD_REQUEST);
-			} else if (adminLoginServiceImpl.forgetPassword(emailId, otp, newPassword,
+				message.setMessage("New Passwords Not Matched.!");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+				
+			} else if (adminLoginService.forgetPassword(emailId, otp, newPassword,
 					confirmPassword) == "incorrect") {
-				return new ResponseEntity<>("Invalid OTP..!", HttpStatus.UNAUTHORIZED);
+				message.setMessage("Invalid OTP..!");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
 			}
-
-			return new ResponseEntity<>("Invalid EmailId..!", HttpStatus.NOT_FOUND);
+			message.setMessage("Invalid EmailId..!");
+			message.setStatus(false);
+			return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

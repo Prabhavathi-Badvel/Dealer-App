@@ -8,11 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
+
+
 @Service
 public class OtpGenerationServiceImpl {
 
 	@Autowired
 	EmailServiceImpl mailService;
+	
+	@Autowired
+	SmsService smsService;
 	
 	LocalTime local=LocalTime.now();
 	
@@ -32,4 +37,18 @@ public class OtpGenerationServiceImpl {
         return storedOtp != null && storedOtp.equals(enteredOtp);
     }
 
+    
+    
+	public String generateMobileOtp(String mobile) {
+		int randomNum = (int) (Math.random() * 900000) + 100000;
+		String otp = String.valueOf(randomNum);
+		otpStorage.put(mobile, otp);
+		smsService.sendSMSMessage(mobile, otp);
+		return otp;
+	}
+	
+	public boolean verifyMobileOtp(String mobile, String enteredOtp) {
+		String storedOtp = otpStorage.get(mobile);
+		return storedOtp != null && storedOtp.equals(enteredOtp);
+	}
 }

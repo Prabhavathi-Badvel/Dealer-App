@@ -1,13 +1,12 @@
 package com.dlerin.application.dto;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-public class ResponseDlerBusinessLoginAddDto {
+@Data
+public class ResponseDlerBusinessLoginDto {
 
 	private String message;
+	private boolean status;
 	private DlerBusinessLoginDto DlerProfile;
 	
 }

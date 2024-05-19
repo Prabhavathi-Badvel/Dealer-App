@@ -8,19 +8,12 @@ import lombok.Setter;
 public class AdminLoginDto {
 
 	private String empId;
-
 	private String emailId;
-
-	private long mobileNo;
-
+	private String mobileNo;
 	private String name;
-
 	private String address;
-
-	private String role;
-
 	private String registeredDate;
-
 	private String updatedBy;
+	private String userType;
 
 }

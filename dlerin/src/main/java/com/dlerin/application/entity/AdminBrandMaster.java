@@ -61,16 +61,16 @@ public class AdminBrandMaster {
 		updateBrandCatSubCat();
 
 	}
-	
-	@PreUpdate
-    private void preUpdate() {
-		if (brandName != null || brandCategory != null || brandSubcategory != null) {
-            updateBrandCatSubCat();
-        }
-    }
 
-    private void updateBrandCatSubCat() {
-        this.brandCatSubCat = brandName + "_" + brandCategory + "_" + brandSubcategory;
-        
-    }
+	@PreUpdate
+	private void preUpdate() {
+		if (brandName != null || brandCategory != null || brandSubcategory != null) {
+			updateBrandCatSubCat();
+		}
+	}
+
+	private void updateBrandCatSubCat() {
+		this.brandCatSubCat = brandName + "_" + brandCategory + "_" + brandSubcategory;
+
+	}
 }

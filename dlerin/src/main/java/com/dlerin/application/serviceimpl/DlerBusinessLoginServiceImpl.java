@@ -7,8 +7,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.dlerin.application.dto.DlerBusinessLoginDto;
+import com.dlerin.application.dto.DlerBusinessLoginDto1;
+import com.dlerin.application.dto.DlerBusinessLoginDto2;
+import com.dlerin.application.dto.ResponseDlerLoginDto;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+import com.dlerin.application.securities.JwtService;
 import com.dlerin.application.service.DlerBusinessLoginService;
 
 @Service
@@ -16,6 +20,12 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
+
+	@Autowired
+	BCryptPasswordEncoder byCrypt;
+
+	@Autowired
+	JwtService jwtService;
 
 	@Override
 	public DlerBusinessLoginDto addDlerBusinessProfile(DlerBusinessLogin dbl) {
@@ -29,23 +39,19 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			dbl.setDlerEmailOtp(null);
 			dbl.setDlerEmailVerify("no");
 			dbl.setDlerMobileOtp(null);
-			dbl.setDlerMobileVerify("yes");
+			dbl.setDlerMobileVerify("no");
+			dbl.setDlerStatus("active");
+			dbl.setUserType("Dealer");
 
 			DlerBusinessLogin saved = dlerBusinessLoginRepo.save(dbl);
 
 			DlerBusinessLoginDto dblDto = new DlerBusinessLoginDto();
 
 			dblDto.setDlerEmailId(dbl.getDlerEmailId());
-			dblDto.setDlerEmailOtp(dbl.getDlerEmailOtp());
-			dblDto.setDlerEmailVerify(dbl.getDlerEmailVerify());
 			dblDto.setDlerMobileNo(dbl.getDlerMobileNo());
-			dblDto.setDlerMobileOtp(dbl.getDlerMobileOtp());
-			dblDto.setDlerMobileVerify(dbl.getDlerMobileVerify());
 			dblDto.setDlerName(dbl.getDlerName());
-			dblDto.setDlerPasswordUpdatedDate(dbl.getDlerPasswordUpdatedDate());
 			dblDto.setDlerRegDate(dbl.getDlerRegDate());
-			dblDto.setDlerStatus(dbl.getDlerStatus());
-			dblDto.setDlerStatusUpdatedBy(dbl.getDlerStatusUpdatedBy());
+			dblDto.setUserType(dbl.getUserType());
 			dblDto.setDlerUserId(dbl.getDlerUserId());
 
 			return dblDto;
@@ -55,6 +61,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 
 	@Override
 	public String isEmailExists(String dlerEmailId) {
+
 		if (dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId) != null) {
 			return dlerEmailId;
 		} else {
@@ -66,9 +73,10 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 	@Override
 	public DlerBusinessLogin updateData(String otp, String dlerEmailId) {
 		Optional<DlerBusinessLogin> existedById = Optional.of(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
-		if (existedById.isPresent()) {
-			existedById.get().setDlerEmailOtp(otp);
 
+		if (existedById.isPresent()) {
+
+			existedById.get().setDlerEmailOtp(otp);
 			existedById.get().setDlerEmailVerify("yes");
 
 			return dlerBusinessLoginRepo.save(existedById.get());
@@ -77,76 +85,54 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 	}
 
 	@Override
-	public String DlerloginDetails(String dlerEmailId, long dlerMobileNo, String dlerPassword) {
-		BCryptPasswordEncoder byCrypt = new BCryptPasswordEncoder();
+	public ResponseDlerLoginDto DlerloginDetails(String dlerEmailId, String dlerMobileNo, String dlerPassword) {
+		ResponseDlerLoginDto response = new ResponseDlerLoginDto();
 
-		DlerBusinessLogin dblDblogin = dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(dlerEmailId, dlerMobileNo);
+		DlerBusinessLogin login = dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(dlerEmailId, dlerMobileNo);
+		if (login != null && login.getDlerStatus().equalsIgnoreCase("active")) {
 
-		if (dblDblogin != null) {
-			String status = dblDblogin.getDlerStatus();
+			if ((dlerEmailId != null && login.getDlerEmailVerify().equalsIgnoreCase("yes"))
+					|| (dlerMobileNo != null && login.getDlerMobileVerify().equalsIgnoreCase("yes"))) {
+				if (byCrypt.matches(dlerPassword, login.getDlerPassword())) {
 
-			if (status != null && status.equalsIgnoreCase("active")) {
-				if (dlerEmailId != null && dlerMobileNo == 0) {
-					if (dblDblogin.getDlerEmailVerify().equalsIgnoreCase("yes")) {
-						if (byCrypt.matches(dlerPassword, dblDblogin.getDlerPassword())) {
-							return "login";
-						} else {
-							return "InvalidPassword";
-						}
-					} else {
-						return "verifyEmail";
-					}
-				} else if (dlerEmailId == null && dlerMobileNo != 0) {
-					if (dblDblogin.getDlerMobileVerify().equalsIgnoreCase("yes")) {
-						if (byCrypt.matches(dlerPassword, dblDblogin.getDlerPassword())) {
-							return "login";
-						} else {
-							return "InvalidPassword";
-						}
-					} else {
-						return "verifyMobile";
-					}
+					String jwtToken = jwtService.generateToken(login.getDlerEmailId(), login.getUserType());
+					response.setMessage("Login Successful");
+					response.setStatus(true);
+					response.setJwtToken(jwtToken);
+					response.setLoginDetails(getDlerBusinessLoginDto(login.getDlerUserId()));
+					return response;
+				} else {
+					response.setMessage("Invalid Password");
+					response.setStatus(false);
 				}
 			} else {
-				return "inactive";
+				response.setMessage("Please verify your email/mobile first");
+				response.setStatus(false);
 			}
 		} else {
-			return "invalid user";
+			response.setMessage("Invalid User or Inactive User");
+			response.setStatus(false);
 		}
-		return null;
+		return response;
 	}
 
 	@Override
-	public DlerBusinessLoginDto getDlerBusinessLoginDto(String dlerEmailId, long dlerMobileNo) {
-		Optional<DlerBusinessLogin> isEmailOrMobileExists = Optional
-				.ofNullable(dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(dlerEmailId, dlerMobileNo));
+	public DlerBusinessLoginDto1 getDlerBusinessLoginDto(String userId) {
+		DlerBusinessLoginDto1 loginDto = new DlerBusinessLoginDto1();
 
-		if (isEmailOrMobileExists.isPresent()) {
-			DlerBusinessLogin dlerDb = isEmailOrMobileExists.get();
+		Optional<DlerBusinessLogin> loginOptional = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerUserId(userId));
 
-			DlerBusinessLoginDto getDblDto = new DlerBusinessLoginDto();
+		loginDto.setDlerUserId(loginOptional.get().getDlerUserId());
+		loginDto.setDlerEmailId(loginOptional.get().getDlerEmailId());
+		loginDto.setDlerMobileNo(loginOptional.get().getDlerMobileNo());
+		loginDto.setDlerName(loginOptional.get().getDlerName());
+		loginDto.setDlerUserId(loginOptional.get().getDlerUserId());
 
-			getDblDto.setDlerEmailId(dlerDb.getDlerEmailId());
-			getDblDto.setDlerEmailOtp(dlerDb.getDlerEmailOtp());
-			getDblDto.setDlerEmailVerify(dlerDb.getDlerEmailVerify());
-			getDblDto.setDlerMobileNo(dlerDb.getDlerMobileNo());
-			getDblDto.setDlerMobileOtp(dlerDb.getDlerMobileOtp());
-			getDblDto.setDlerMobileVerify(dlerDb.getDlerMobileVerify());
-			getDblDto.setDlerName(dlerDb.getDlerName());
-			getDblDto.setDlerPasswordUpdatedDate(dlerDb.getDlerPasswordUpdatedDate());
-			getDblDto.setDlerRegDate(dlerDb.getDlerRegDate());
-			getDblDto.setDlerStatus(dlerDb.getDlerStatus());
-			getDblDto.setDlerStatusUpdatedBy(dlerDb.getDlerStatusUpdatedBy());
-			getDblDto.setDlerUserId(dlerDb.getDlerUserId());
-
-			return getDblDto;
-		}
-
-		return null;
+		return loginDto;
 	}
 
 	@Override
-	public DlerBusinessLoginDto getBusinessProfile(String dlerEmailId, long dlerMobileNo, String dlerUserId) {
+	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId) {
 
 		Optional<DlerBusinessLogin> dp = Optional.ofNullable(dlerBusinessLoginRepo
 				.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(dlerUserId, dlerEmailId, dlerMobileNo));
@@ -154,7 +140,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 		if (dp.isPresent()) {
 			DlerBusinessLogin loginDb = dp.get();
 
-			DlerBusinessLoginDto dto = new DlerBusinessLoginDto();
+			DlerBusinessLoginDto2 dto = new DlerBusinessLoginDto2();
 			dto.setDlerEmailId(loginDb.getDlerEmailId());
 			dto.setDlerEmailOtp(loginDb.getDlerEmailOtp());
 			dto.setDlerEmailVerify(loginDb.getDlerEmailVerify());
@@ -167,11 +153,24 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			dto.setDlerStatus(loginDb.getDlerStatus());
 			dto.setDlerStatusUpdatedBy(loginDb.getDlerStatusUpdatedBy());
 			dto.setDlerUserId(loginDb.getDlerUserId());
+			dto.setUserType(loginDb.getUserType());
 
 			return dto;
 		}
 		return null;
 
+	}
+
+	@Override
+	public DlerBusinessLogin updateDataWithMobile(String dlerMobileNo) {
+		Optional<DlerBusinessLogin> existedById = Optional.of(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
+
+		if (existedById.isPresent()) {
+			existedById.get().setDlerMobileVerify("yes");
+			existedById.get().setDlerStatus("active");
+			return dlerBusinessLoginRepo.save(existedById.get());
+		}
+		return null;
 	}
 
 }

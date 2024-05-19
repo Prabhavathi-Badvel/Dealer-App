@@ -6,53 +6,69 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.dlerin.application.dto.AdminMetalMasterDto;
+import com.dlerin.application.dto.ResponseAdminmetalMaterialDto2;
 import com.dlerin.application.dto.ResponseAdminMetalMasterDto;
-import com.dlerin.application.dto.ResponseAdminMaterialGetDto;
+import com.dlerin.application.dto.ResponseAdminMetalMasterDto1;
 import com.dlerin.application.entity.AdminMetalMaster;
 import com.dlerin.application.repository.AdminMetalMasterRepo;
-import com.dlerin.application.serviceimpl.AdminMetalMasterServiceImpl;
+import com.dlerin.application.service.AdminMetalMasterService;
 
 @RestController
+@PreAuthorize("hasAuthority('Admin')")
 public class AdminMetalMasterController {
 
 	@Autowired
-	AdminMetalMasterServiceImpl adminMetalMaterServiceImpl;
+	AdminMetalMasterService adminMetalMaterService;
 
 	@Autowired
 	AdminMetalMasterRepo adminMetalMasterRepo;
 
+	ResponseAdminMetalMasterDto response = new ResponseAdminMetalMasterDto();
+
+	ResponseAdminMetalMasterDto1 response1 = new ResponseAdminMetalMasterDto1();
+
+	ResponseAdminmetalMaterialDto2 response2 = new ResponseAdminmetalMaterialDto2();
+
 	@PostMapping("/dlerin-add-adminmetalmaster")
 	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMasterDto admin) {
 
+		AdminMetalMasterDto add = adminMetalMaterService.addMaterial(admin);
+
 		try {
-			ResponseAdminMetalMasterDto responseADto = new ResponseAdminMetalMasterDto();
-			responseADto.setMessage("Material added successfully");
-			responseADto.setMaterialData(adminMetalMaterServiceImpl.addMaterial(admin));
-			return new ResponseEntity<>(responseADto, HttpStatus.OK);
+
+			response.setMessage("Material added successfully");
+			response.setStatus(true);
+			response.setMaterialData(add);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
-
 			return new ResponseEntity<>("Record alredy exits", HttpStatus.OK);
 		}
 	}
 
 	@PutMapping("/dlerin-update-adminmetalmaster")
-	public ResponseEntity<String> updateAdminMaterial(@RequestBody AdminMetalMaster adminMaterial) {
+	public ResponseEntity<?> updateAdminMaterial(@RequestBody AdminMetalMaster adminMaterial) {
 
 		Optional<AdminMetalMaster> materialIdExists = adminMetalMasterRepo.findById(adminMaterial.getMaterialId());
 		try {
 			if (materialIdExists.isPresent()) {
-
-				AdminMetalMaster updatedMaterial = adminMetalMaterServiceImpl.updateMaterial(adminMaterial);
-				return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
+				AdminMetalMaster updatedMaterial = adminMetalMaterService.updateMaterial(adminMaterial);
+				response1.setMessage("Updated successfully");
+				response1.setStatus(true);
+				response1.setMaterialData(updatedMaterial);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>("Please check your material id", HttpStatus.BAD_REQUEST);
+				response1.setMessage("Please check your material id");
+				response1.setStatus(false);
+				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
@@ -66,17 +82,21 @@ public class AdminMetalMasterController {
 		String materialId = adMaterialDto.getMaterialId();
 		String materialType = adMaterialDto.getMaterialType();
 		String materialShape = adMaterialDto.getMaterialShape();
-		List<AdminMetalMaster> materialIdExists = adminMetalMasterRepo.findByMaterialIdOrMaterialTypeOrMaterialShape(materialId,
-				materialType, materialShape);
+		List<AdminMetalMaster> materialIdExists = adminMetalMasterRepo
+				.findByMaterialIdOrMaterialTypeOrMaterialShape(materialId, materialType, materialShape);
 		try {
 			if (materialIdExists != null) {
-				List<AdminMetalMaster> materialDto = adminMetalMaterServiceImpl.getMaterial(materialId, materialType, materialShape);
-				ResponseAdminMaterialGetDto getDto = new ResponseAdminMaterialGetDto();
-				getDto.setMessage("Successfully received the data from table");
-				getDto.setGetData(adminMetalMaterServiceImpl.getMaterial(materialId, materialType, materialShape));
-				return new ResponseEntity<>(getDto, HttpStatus.OK);
+				List<AdminMetalMaster> materialDto = adminMetalMaterService.getMaterial(materialId, materialType,
+						materialShape);
+
+				response2.setMessage("Successfully received metals");
+				response2.setStatus(true);
+				response2.setGetData(materialDto);
+				return new ResponseEntity<>(response2, HttpStatus.OK);
 			}
-			return new ResponseEntity<>("invalid material id", HttpStatus.BAD_REQUEST);
+			response2.setMessage("invalid material id");
+			response2.setStatus(false);
+			return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}

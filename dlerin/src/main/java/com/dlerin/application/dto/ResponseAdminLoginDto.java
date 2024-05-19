@@ -1,14 +1,16 @@
 package com.dlerin.application.dto;
 
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
+import lombok.Data;
 
+
+
+@Data
 public class ResponseAdminLoginDto {
 
 	private String message;
-	private AdminLoginDto adminData;
+	private boolean status;
+	private String jwtToken;
+	private AdminLoginDto1 adminData;
 
 }

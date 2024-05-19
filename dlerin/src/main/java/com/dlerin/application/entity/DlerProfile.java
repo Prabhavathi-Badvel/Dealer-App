@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,24 +15,22 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="dler_profile")
+@Table(name = "dler_profile")
 public class DlerProfile {
 
 	@Id
-	@Column(name="dler_business_id")
+	@Column(name = "dler_business_id")
 	private String dlerBusinessId;
-	@Column(name="dler_id")
+	@Column(name = "dler_id")
 	private String dlerId;
-	@Column(name="dler_business_name")
+	@Column(name = "dler_business_name")
 	private String dlerBusinessName;
-	@Column(name="dler_business_location")
+	@Column(name = "dler_business_location")
 	private String dlerBusinessLocation;
-	@Column(name="dler_business_contact_person")
+	@Column(name = "dler_business_contact_person")
 	private String dlerBusinessContactPerson;
-	@Column(name="dler_business_contact_no")
+	@Column(name = "dler_business_contact_no")
 	private String dlerBusinessContactNo;
-	
-	
 
-	
+
 }
