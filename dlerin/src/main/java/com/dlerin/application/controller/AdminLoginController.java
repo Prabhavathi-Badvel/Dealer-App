@@ -84,7 +84,7 @@ public class AdminLoginController {
 		try {
 			AdminLoginDto details=adminLoginService.getAdminLoginDetails(emailId, mobileNo, empId);
 			if ( details == null) {
-				response2.setMessage("Invalid credentials....!");
+				response2.setMessage("Invalid credentials");
 				response2.setStatus(false);
 				return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
 			}
@@ -97,36 +97,37 @@ public class AdminLoginController {
 		}
 	}
 
-	
-	@PostMapping("/dlerin-change-password")
-	public ResponseEntity<?> changeCustomerPassword(@RequestBody AdminChangeForgotdto cfPwd) {
-
-		String emailId = cfPwd.getEmailId();
-		String oldPassword = cfPwd.getOldPassword();
-		String newPassword = cfPwd.getNewPassword();
-		String confirmPassword = cfPwd.getConfirmPassword();
+	@PreAuthorize("hasAuthority('Admin')")
+	@PostMapping("/change/AdminPassword")
+	public ResponseEntity<?> changeAdminPassword(@RequestBody AdminChangeForgotdto changePassword) {
+		String emailId = changePassword.getEmailId();
+		String oldPassword = changePassword.getOldPassword();
+		String newPassword = changePassword.getNewPassword();
+		String confirmPassword = changePassword.getConfirmPassword();
+		String mobileNo = changePassword.getMobileNo();
 
 		try {
-			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword) == "changed") {
-				message.setMessage("Password Changed Successfully..");
+			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,mobileNo) == "changed") {
+				message.setMessage("Password Changed Successfully");
 				message.setStatus(true);
 				return new ResponseEntity<>(message, HttpStatus.OK);
 			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
-					confirmPassword) == "notMatched") {
+					confirmPassword,mobileNo) == "notMatched") {
 				message.setMessage("New Passwords Not Matched.!");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
 			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
-					confirmPassword) == "incorrect") {
+					confirmPassword,mobileNo) == "incorrect") {
 				message.setMessage("Old Password is Incorrect");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
 			}
 		} catch (Exception e) {
 			message.setMessage(e.getMessage());
+			message.setStatus(false);
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
 		}
-		message.setMessage("Invalid User.!");
+		message.setMessage("Invalid Admin");
 		message.setStatus(false);
 		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 	}
@@ -140,7 +141,7 @@ public class AdminLoginController {
 		AdminLogin update = adminLoginService.updateprofile(adminLogin, empId);
 		try {
 			if (update == null) {
-				response1.setMessage("invalid Employee id");
+				response1.setMessage("Invalid Employee id");
 				response1.setStatus(false);
 				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
 
@@ -156,57 +157,78 @@ public class AdminLoginController {
 		}
 	}
 
-	@PostMapping("/dlerin-forget-pwd-send-otp")
-	public ResponseEntity<?> sendOtpForPasswordChange(@RequestBody AdminChangeForgotdto password) {
+	@PostMapping("/admin/forgetPassword/sendOtp")
+	public ResponseEntity<?> sendOtpForgotPassword(@RequestBody AdminChangeForgotdto password) {
 		String emailId = password.getEmailId();
+		String mobileNo= password.getMobileNo();
 		try {
-			if (adminLoginService.sendMail(emailId) != null) {
-				message.setMessage("OTP Sent to Registered EmailId");
-				message.setStatus(true);
-				return new ResponseEntity<>(message, HttpStatus.OK);
-				
+			if(emailId!=null&& mobileNo==null) {
+				if (adminLoginService.sendMail(emailId) != null) {
+					message.setMessage("OTP Sent to Registered EmailId");
+					message.setStatus(true);
+					return new ResponseEntity<>(message, HttpStatus.OK);
+				}
+				message.setMessage("Invalid EmailId");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+			}else {
+				if (adminLoginService.sendSms(mobileNo) != null) {
+					message.setMessage("OTP Sent to Registered Mobile Number");
+					message.setStatus(true);
+					return new ResponseEntity<>(message, HttpStatus.OK);
+				}
+				message.setMessage("Invalid Mobile Number");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
 			}
-			message.setMessage("Invalid EmailId..!");
+			
+		} catch (Exception e) {
+			message.setMessage("Invalid EmailId");
 			message.setStatus(false);
 			return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
 		}
+		
 
 	}
 
-	@PostMapping("/dlerin-forget-pwd-change")
-	public ResponseEntity<?> verifyOtpForPasswordChange(@RequestBody AdminChangeForgotdto cfPwd) {
+	@PostMapping("/admin/forgetPassword/verifyOtpAndChangePassword")
+	public ResponseEntity<?> verifyOtpForgotPassword(@RequestBody AdminChangeForgotdto forgotPwd) {
 
-		String emailId = cfPwd.getEmailId();
-		String otp = cfPwd.getOtp();
-		String newPassword = cfPwd.getNewPassword();
-		String confirmPassword = cfPwd.getConfirmPassword();
+		String emailId = forgotPwd.getEmailId();
+		String otp = forgotPwd.getOtp();
+		String newPassword = forgotPwd.getNewPassword();
+		String confirmPassword = forgotPwd.getConfirmPassword();
+		String mobileNo = forgotPwd.getMobileNo();
+		
 
 		try {
-			if (adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword) == "changed") {
-				message.setMessage("Password Changed Successfully..");
-				message.setStatus(true);
-				return new ResponseEntity<>(message, HttpStatus.OK);
-				
-			} else if (adminLoginService.forgetPassword(emailId, otp, newPassword,
-					confirmPassword) == "notMatched") {
-				message.setMessage("New Passwords Not Matched.!");
+			 String data = adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword,mobileNo);
+			 if (data == "changed") {
+				 message.setMessage("Password Changed Successfully");
+				 message.setStatus(true);
+					return new ResponseEntity<>(message, HttpStatus.OK);
+				} else if (data == "notMatched") {
+					message.setMessage("New Passwords Not Matched");
+					message.setStatus(false);
+					return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+				} else if (data== "incorrect") {
+					message.setMessage("Invalid OTP");
+					message.setStatus(false);
+					return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+				}else if (data== "incorrectEmail") {
+					message.setMessage("Invalid Email ID");
+					message.setStatus(false);
+					return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+				}else {
+					message.setMessage("Invalid Mobile Number");
+					message.setStatus(false);
+					return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+				}
+			} catch (Exception e) {
+				message.setMessage(e.getMessage());
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
-				
-			} else if (adminLoginService.forgetPassword(emailId, otp, newPassword,
-					confirmPassword) == "incorrect") {
-				message.setMessage("Invalid OTP..!");
-				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
 			}
-			message.setMessage("Invalid EmailId..!");
-			message.setStatus(false);
-			return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-		}
 
 	}
 }

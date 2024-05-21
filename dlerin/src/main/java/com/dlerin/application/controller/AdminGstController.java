@@ -55,8 +55,9 @@ public class AdminGstController {
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			e.getMessage();
-			return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+			response.setMessage(e.getMessage());
+			response.setStatus(false);
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 	}
@@ -88,6 +89,7 @@ public class AdminGstController {
 	@GetMapping("/dlerin-get-AdminGst")
 	public ResponseEntity<?> getDealerBrands(@RequestBody AdminGst adminGst) {
 
+	try {	
 		List<AdminGst> getBrand = adminGstService.getDetails(adminGst);
 		ResponseAdminGstDto2 response2 = new ResponseAdminGstDto2();
 		response2.setMessage("dealer brands details");
@@ -96,6 +98,8 @@ public class AdminGstController {
 
 		return new ResponseEntity<>(response2, HttpStatus.OK);
 
+	}catch (Exception e) {
+		return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 	}
-
+ }
 }

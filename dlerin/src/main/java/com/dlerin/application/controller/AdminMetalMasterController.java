@@ -38,20 +38,23 @@ public class AdminMetalMasterController {
 	ResponseAdminmetalMaterialDto2 response2 = new ResponseAdminmetalMaterialDto2();
 
 	@PostMapping("/dlerin-add-adminmetalmaster")
-	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMasterDto admin) {
+	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMaster admin) {
 
-		AdminMetalMasterDto add = adminMetalMaterService.addMaterial(admin);
-
+	
 		try {
+			AdminMetalMaster add = adminMetalMaterService.addMaterial(admin);
 
-			response.setMessage("Material added successfully");
-			response.setStatus(true);
-			response.setMaterialData(add);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-
+				response.setMessage("Material added successfully");
+				response.setStatus(true);
+				response.setMaterialData(add);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			
 		} catch (Exception e) {
-			return new ResponseEntity<>("Record alredy exits", HttpStatus.OK);
+			response.setMessage("Record alredy exists");
+			response.setStatus(false);
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		}
+		
 	}
 
 	@PutMapping("/dlerin-update-adminmetalmaster")
@@ -66,39 +69,28 @@ public class AdminMetalMasterController {
 				response1.setMaterialData(updatedMaterial);
 				return new ResponseEntity<>(response1, HttpStatus.OK);
 			} else {
-				response1.setMessage("Please check your material id");
+				response1.setMessage("Failed to update/Please check your material id");
 				response1.setStatus(false);
 				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 
 	}
 
 	@GetMapping("/dlerin-get-adminmetalmaster")
-	public ResponseEntity<?> getAdminMaterial(@RequestBody AdminMetalMasterDto adMaterialDto) {
+	public ResponseEntity<?> getAdminMaterial(@RequestBody AdminMetalMaster materials) {
 
-		String materialId = adMaterialDto.getMaterialId();
-		String materialType = adMaterialDto.getMaterialType();
-		String materialShape = adMaterialDto.getMaterialShape();
-		List<AdminMetalMaster> materialIdExists = adminMetalMasterRepo
-				.findByMaterialIdOrMaterialTypeOrMaterialShape(materialId, materialType, materialShape);
+		
 		try {
-			if (materialIdExists != null) {
-				List<AdminMetalMaster> materialDto = adminMetalMaterService.getMaterial(materialId, materialType,
-						materialShape);
-
+				List<AdminMetalMaster> material = adminMetalMaterService.getMaterial(materials);
 				response2.setMessage("Successfully received metals");
 				response2.setStatus(true);
-				response2.setGetData(materialDto);
+				response2.setGetData(material);
 				return new ResponseEntity<>(response2, HttpStatus.OK);
-			}
-			response2.setMessage("invalid material id");
-			response2.setStatus(false);
-			return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
 		}
 
 	}

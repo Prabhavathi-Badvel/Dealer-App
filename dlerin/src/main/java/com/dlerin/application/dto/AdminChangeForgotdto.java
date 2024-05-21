@@ -12,4 +12,5 @@ public class AdminChangeForgotdto {
 	String newPassword;
 	String confirmPassword;
 	String oldPassword;
+	String mobileNo;
 }

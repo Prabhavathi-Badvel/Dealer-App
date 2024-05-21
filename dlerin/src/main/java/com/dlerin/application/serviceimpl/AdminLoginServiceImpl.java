@@ -5,10 +5,8 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.dlerin.application.dto.AdminLoginDto;
 import com.dlerin.application.dto.AdminLoginDto1;
-import com.dlerin.application.dto.ResponseAdminLoginDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto2;
 import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.repository.AdminLoginRepo;
@@ -26,6 +24,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 	@Autowired
 	JwtService jwtService;
+	
 	@Autowired
 	BCryptPasswordEncoder byCrypt;
 
@@ -114,8 +113,8 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	}
 
 	@Override
-	public String changePassword(String emailId, String oldPassword, String newPassword, String confirmPassword) {
-		BCryptPasswordEncoder byCrypt = new BCryptPasswordEncoder();
+	public String changePassword(String emailId, String oldPassword, String newPassword, String confirmPassword,String mobile) {
+		
 		Optional<AdminLogin> user = adminLoginRepo.findByEmailId(emailId);
 		if (user.isPresent()) {
 			if (byCrypt.matches(oldPassword, user.get().getPassword())) {
@@ -166,16 +165,27 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	}
 
 	@Override
-	public String forgetPassword(String emailId, String otp, String newPassword, String confirmPassword) {
+	public String sendSms(String mobile) {
+		Optional<AdminLogin> userOp = Optional.ofNullable(adminLoginRepo.findByMobileNo(mobile));
+		if (userOp.isPresent()) {
+			otpService.generateMobileOtp(mobile);
+			return "otp";
+		}
+		return null;
+	}
+	
+	@Override
+	public String forgetPassword(String emailId, String otp, String newPassword, String confirmPassword,String mobileNo) {
 		BCryptPasswordEncoder byCrypt = new BCryptPasswordEncoder();
 
-		Optional<AdminLogin> userOp = adminLoginRepo.findByEmailId(emailId);
-		if (userOp.isPresent()) {
+		Optional<AdminLogin> userEmail = adminLoginRepo.findByEmailId(emailId);
+		Optional<AdminLogin> userMobile = Optional.ofNullable(adminLoginRepo.findByMobileNo(mobileNo));
+		if (userEmail.isPresent()) {
 			if (otpService.verifyOtp(emailId, otp)) {
 				if (newPassword.equals(confirmPassword)) {
 					String encryptPassword = byCrypt.encode(confirmPassword);
-					userOp.get().setPassword(encryptPassword);
-					adminLoginRepo.save(userOp.get());
+					userEmail.get().setPassword(encryptPassword);
+					adminLoginRepo.save(userEmail.get());
 					return "changed";
 				} else {
 					return "notMatched";
@@ -183,6 +193,22 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 			} else {
 				return "incorrect";
 			}
+		}else if(userMobile.isPresent()) {
+			if (otpService.verifyMobileOtp(mobileNo, otp)) {
+				if (newPassword.equals(confirmPassword)) {
+					String encryptPassword = byCrypt.encode(confirmPassword);
+					userMobile.get().setPassword(encryptPassword);
+					adminLoginRepo.save(userMobile.get());
+					return "changed";
+				} else {
+					return "notMatched";
+				}
+			} else {
+				return "incorrect";
+			}
+		}
+		else if(!userEmail.isPresent()&& userMobile.isPresent()) {
+			return "incorrectEmail";
 		}
 		return null;
 

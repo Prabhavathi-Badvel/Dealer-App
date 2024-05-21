@@ -68,7 +68,7 @@ public class DealerBrandsController {
 				response.setData(updateDealer);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				response.setMessage("Please check your  brand_id_dler_id");
+				response.setMessage("Failed to update/Please check your  brand_id_dler_id");
 				response.setStatus(false);
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}

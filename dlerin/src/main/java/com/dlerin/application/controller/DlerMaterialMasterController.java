@@ -46,12 +46,12 @@ public class DlerMaterialMasterController {
 		        } else {
 		        	response.setMessage("Failed to add/dler not present");
 		        	response.setStatus(false);
-		            return new ResponseEntity<>(response, HttpStatus.OK);
+		            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 		        }
 
 		    } catch (Exception e) {
 		        e.getMessage();
-		        return new ResponseEntity<>("Record already exists", HttpStatus.INTERNAL_SERVER_ERROR);
+		        return new ResponseEntity<>("Record already exists", HttpStatus.BAD_REQUEST);
 		    }
 
 	}

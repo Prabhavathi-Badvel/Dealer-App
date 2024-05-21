@@ -12,7 +12,6 @@ import com.dlerin.application.entity.DlerMaterialPrice;
 public interface DlerMaterialPriceRepo extends JpaRepository<DlerMaterialPrice, String> {
 
 	DlerMaterialPrice findByMaterialIdPriceId(String materialIdPriceId);
-
 	List<DlerMaterialPrice> findByDlerIdMaterialId(String dlerIdMaterialId);
 
 }

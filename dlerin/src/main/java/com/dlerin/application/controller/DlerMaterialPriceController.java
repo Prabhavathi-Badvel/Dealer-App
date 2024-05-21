@@ -47,13 +47,13 @@ public class DlerMaterialPriceController {
 				response.setAddData(addedPrices);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				response.setMessage("Failed to add/given DlerIdMaterialId not found ");
+				response.setMessage("Failed to add/given DlerIdMaterialId not found");
 				response.setStatus(false);
 				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 			}
 		} catch (Exception e) {
-			return new ResponseEntity<>("Error occurred while processing the records",
-					HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>("Record alredy exists",
+					HttpStatus.BAD_REQUEST);
 		}
 	}
 

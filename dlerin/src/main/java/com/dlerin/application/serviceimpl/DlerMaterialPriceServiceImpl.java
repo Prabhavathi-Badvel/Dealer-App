@@ -50,14 +50,17 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 				.ofNullable(dlerMaterialMasterRepo.findByDlerIdMaterialId(price.getDlerIdMaterialId()));
 		if (dleridMaterialidExists.isPresent()) {
 			DlerMaterialMaster dlerDb = dleridMaterialidExists.get();
-			price.setCurrency("INR");
-			price.setMaterialId(dlerDb.getMaterialId());
-			price.setDlerIdMaterialId(dlerDb.getDlerIdMaterialId());
-			price.setPriceUpdatedBy(dlerDb.getDlerId());
-			return dlerMaterialPriceRepo.save(price);
-		} else {
-			throw new Exception("DlerMaterialMaster with given DlerIdMaterialId not found");
+			Optional<DlerMaterialPrice> idExists = Optional
+					.ofNullable(dlerMaterialPriceRepo.findByMaterialIdPriceId(price.getMaterialIdPriceId()));
+			if (!idExists.isPresent()) {
+				price.setCurrency("INR");
+				price.setMaterialId(dlerDb.getMaterialId());
+				price.setDlerIdMaterialId(dlerDb.getDlerIdMaterialId());
+				price.setPriceUpdatedBy(dlerDb.getDlerId());
+				return dlerMaterialPriceRepo.save(price);
+			}
 		}
+		return null;
 	}
 
 	@Override

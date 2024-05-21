@@ -21,4 +21,6 @@ public interface AdminLoginRepo extends JpaRepository<AdminLogin, String> {
 
 	AdminLogin findByEmailIdOrMobileNo(String emailId, String mobileNo);
 
+	AdminLogin findByMobileNo(String mobile);
+
 }

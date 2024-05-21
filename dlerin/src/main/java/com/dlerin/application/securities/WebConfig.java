@@ -57,7 +57,7 @@ public class WebConfig {
 		http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
 				.exceptionHandling((exception) -> exception.authenticationEntryPoint(new JwtAuthEntryPoint()))
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/dlerin-registration","/dlerin-login-dlerbusinesslogin","/dlerin-send-otp-verify-email","/dlerin-verify-otp-verify-email","/sendmobileOtp","/verifySmsOtp","/dlerin-register-adminlogin","/dlerin-login-adminlogin","/dlerin-forget-pwd-send-otp","/dlerin-forget-pwd-change").permitAll()
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/dlerin-registration","/dlerin-login-dlerbusinesslogin","/dlerin-send-otp-verify-email","/dlerin-verify-otp-verify-email","/sendmobileOtp","/verifySmsOtp","/dlerin-register-adminlogin","/dlerin-login-adminlogin","/admin/forgetPassword/sendOtp","/admin/forgetPassword/verifyOtpAndChangePassword","/dlerforgetPassword/sendOtp","/dler/forgetPassword/verification").permitAll()
 						.anyRequest().authenticated());
 
 		http.authenticationProvider(customDaoAuthenticationProvider());
