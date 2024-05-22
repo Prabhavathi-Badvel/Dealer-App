@@ -59,7 +59,7 @@ public class DlerBusinessLoginController {
 			} else {
 				response.setMessage("profile already exists");
 				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
@@ -67,7 +67,7 @@ public class DlerBusinessLoginController {
 		}
 		response.setMessage("failed to add");
 		response.setStatus(false);
-		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
 	@PostMapping("/dlerin-send-otp-verify-email")
@@ -78,7 +78,7 @@ public class DlerBusinessLoginController {
 			if (dlerBusinessLoginService.isEmailExists(dlerEmailId) == null) {
 				message.setMessage("Invalid EmailId");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			} else {
 				Optional<DlerBusinessLogin> user = Optional.of(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
 
@@ -90,10 +90,10 @@ public class DlerBusinessLoginController {
 				}
 				message.setMessage("Email already verified");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.CREATED);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 
@@ -110,10 +110,10 @@ public class DlerBusinessLoginController {
 				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
 			message.setMessage("Incorrect OTP, Please enter correct Otp");
-			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(message, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 
@@ -131,7 +131,7 @@ public class DlerBusinessLoginController {
 		} catch (Exception e) {
 			e.getMessage();
 		}
-		return new ResponseEntity<ResponseDlerLoginDto>(response, HttpStatus.UNAUTHORIZED);
+		return new ResponseEntity<ResponseDlerLoginDto>(response, HttpStatus.OK);
 	}
 
 	@PreAuthorize("hasAuthority('Dealer')")
@@ -154,10 +154,10 @@ public class DlerBusinessLoginController {
 			}
 			response1.setMessage("Invalid dler");
 			response1.setStatus(false);
-			return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(response1, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 
@@ -167,7 +167,7 @@ public class DlerBusinessLoginController {
 		try {
 			if (dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo) == null) {
 				message.setMessage("Invalid mobile number");
-				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			} else {
 				Optional<DlerBusinessLogin> user = Optional.of(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
 
@@ -178,10 +178,10 @@ public class DlerBusinessLoginController {
 					return new ResponseEntity<>(message, HttpStatus.OK);
 				}
 				message.setMessage("Mobile number already verified");
-				return new ResponseEntity<>(message, HttpStatus.CREATED);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 
@@ -199,10 +199,10 @@ public class DlerBusinessLoginController {
 
 			}
 			message.setMessage("Incorrect OTP, Please enter correct Otp");
-			return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(message, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 	
@@ -224,20 +224,20 @@ public class DlerBusinessLoginController {
 			} else if (password == "notMatched") {
 				message.setMessage("New Passwords Not Matched");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			} else if (password == "incorrect") {
 				message.setMessage("Old Password is Incorrect");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			message.setMessage(e.getMessage());
 			message.setStatus(false);
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+			return ResponseEntity.status(HttpStatus.OK).body(message);
 		}
 		message.setMessage("Invalid dler");
 		message.setStatus(false);
-		return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
 	
 	
@@ -254,7 +254,7 @@ public class DlerBusinessLoginController {
 				}
 				message.setMessage("Invalid EmailId");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}else {
 				if (dlerBusinessLoginService.sendSms(dlerMobileNo) != null) {
 					message.setMessage("OTP Sent to Registered Mobile Number");
@@ -263,13 +263,13 @@ public class DlerBusinessLoginController {
 				}
 				message.setMessage("Invalid Mobile Number");
 				message.setStatus(false);
-				return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
 			
 		} catch (Exception e) {
 			message.setMessage("Invalid EmailId");
 			message.setStatus(false);
-			return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+			return new ResponseEntity<>(message, HttpStatus.OK);
 		}
 		
 
@@ -295,24 +295,24 @@ public class DlerBusinessLoginController {
 				} else if (data == "notMatched") {
 					message.setMessage("New Passwords Not Matched");
 					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.BAD_REQUEST);
+					return new ResponseEntity<>(message, HttpStatus.OK);
 				} else if (data== "incorrect") {
 					message.setMessage("Invalid OTP");
 					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+					return new ResponseEntity<>(message, HttpStatus.OK);
 				}else if (data== "incorrectEmail") {
 					message.setMessage("Invalid Email ID");
 					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.UNAUTHORIZED);
+					return new ResponseEntity<>(message, HttpStatus.OK);
 				}else {
 					message.setMessage("Invalid Mobile Number");
 					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.NOT_FOUND);
+					return new ResponseEntity<>(message, HttpStatus.OK);
 				}
 			} catch (Exception e) {
 				message.setMessage(e.getMessage());
 				message.setStatus(false);
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+				return ResponseEntity.status(HttpStatus.OK).body(message);
 			}
 
 	}

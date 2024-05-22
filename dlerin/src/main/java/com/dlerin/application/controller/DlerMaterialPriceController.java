@@ -36,26 +36,30 @@ public class DlerMaterialPriceController {
 
 	ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
 
-	@PostMapping("/dlerin-add-DlerMaterialPrices")
-	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
-		try {
-			List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
+	
+	 @PostMapping("/dlerin-add-DlerMaterialPrices")
+	    public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
+	       
+	        try {
+	            List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
 
-			if (!addedPrices.isEmpty()) {
-				response.setMessage("Added successfully");
-				response.setStatus(true);
-				response.setAddData(addedPrices);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Failed to add/given DlerIdMaterialId not found");
-				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-			}
-		} catch (Exception e) {
-			return new ResponseEntity<>("Record alredy exists",
-					HttpStatus.BAD_REQUEST);
-		}
-	}
+	            if (!addedPrices.isEmpty()) {
+	                response.setMessage("Added successfully");
+	                response.setStatus(true);
+	                response.setAddData(addedPrices);
+	                return new ResponseEntity<>(response, HttpStatus.OK);
+	            } else {
+	                response.setMessage("Record already exists or given DlerIdMaterialId not found");
+	                response.setStatus(false);
+	                return new ResponseEntity<>(response, HttpStatus.OK);
+	            }
+	        } catch (Exception e) {
+	            response.setMessage("Failed to add prices");
+	            response.setStatus(false);
+	            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	        }
+	    }
+	
 
 	@PutMapping("/dlerin-update-DlerMaterialPrice")
 	public ResponseEntity<?> updateDlerMaterialPrice(@RequestBody DlerMaterialPrice price) {
@@ -69,10 +73,10 @@ public class DlerMaterialPriceController {
 			} else {
 				response2.setMessage("Failed to update. Material ID not found");
 				response2.setStatus(false);
-				return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response2, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 
 		}
 
@@ -91,10 +95,10 @@ public class DlerMaterialPriceController {
 			} else {
 				response1.setMessage("No user found for the given parameters");
 				response1.setStatus(false);
-				return new ResponseEntity<>(response1, HttpStatus.NOT_FOUND);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 
 		}
 

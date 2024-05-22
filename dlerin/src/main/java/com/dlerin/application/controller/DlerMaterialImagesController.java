@@ -41,7 +41,7 @@ public class DlerMaterialImagesController {
 
 		} catch (Exception e) {
 			e.getMessage();
-			return new ResponseEntity<>("Record alredy exits", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("Record alredy exits", HttpStatus.OK);
 
 		}
 
@@ -59,12 +59,12 @@ public class DlerMaterialImagesController {
 				DlerMaterialImages updateDMM = dlerMaterialImagesServiceImpl.updateImages(image);
 				return new ResponseEntity<>("Updated successfully", HttpStatus.OK);
 			} else {
-				return new ResponseEntity<>("Please check your dler id material id", HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>("Please check your dler id material id", HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
 			e.getMessage();
-			return new ResponseEntity<>("invalid", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("invalid", HttpStatus.OK);
 			
 		}
 	}

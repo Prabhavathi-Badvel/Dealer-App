@@ -44,7 +44,7 @@ public class AdminBrandMasterController {
 			
 			response.setMessage("Record already exists");
 			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
 
@@ -59,10 +59,10 @@ public class AdminBrandMasterController {
 			} else {
 				response.setMessage("Failed to update brand");
 				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 
@@ -77,7 +77,7 @@ public class AdminBrandMasterController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 }

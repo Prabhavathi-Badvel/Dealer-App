@@ -57,7 +57,7 @@ public class AdminGstController {
 		} catch (Exception e) {
 			response.setMessage(e.getMessage());
 			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 
 	}
@@ -77,12 +77,12 @@ public class AdminGstController {
 			} else {
 				response1.setMessage("Failed to update");
 				response1.setStatus(false);
-				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
 			e.getMessage();
-			return new ResponseEntity<>("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>("Internal Server Error", HttpStatus.OK);
 		}
 	}
 

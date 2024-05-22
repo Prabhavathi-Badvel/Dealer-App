@@ -46,12 +46,12 @@ public class DlerMaterialMasterController {
 		        } else {
 		        	response.setMessage("Failed to add/dler not present");
 		        	response.setStatus(false);
-		            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		            return new ResponseEntity<>(response, HttpStatus.OK);
 		        }
 
 		    } catch (Exception e) {
 		        e.getMessage();
-		        return new ResponseEntity<>("Record already exists", HttpStatus.BAD_REQUEST);
+		        return new ResponseEntity<>("Record already exists", HttpStatus.OK);
 		    }
 
 	}
@@ -72,12 +72,12 @@ public class DlerMaterialMasterController {
 			} else {
 				response.setMessage("Please check your dler id material id");
 	        	response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
 			e.getMessage();
-			return new ResponseEntity<>("invalid id", HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>("invalid id", HttpStatus.OK);
 			
 		}
 	}

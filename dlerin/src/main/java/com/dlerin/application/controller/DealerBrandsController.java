@@ -45,12 +45,12 @@ public class DealerBrandsController {
 			} else {
 				response.setMessage("Dealer not present");
 				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			response.setMessage("Record already exist");
 			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
 
@@ -70,13 +70,13 @@ public class DealerBrandsController {
 			} else {
 				response.setMessage("Failed to update/Please check your  brand_id_dler_id");
 				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
 			response.setMessage(e.getMessage());
 			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		}
 	}
@@ -93,7 +93,7 @@ public class DealerBrandsController {
 			return new ResponseEntity<>(response1, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}
 	}
 }

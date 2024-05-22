@@ -52,7 +52,7 @@ public class AdminMetalMasterController {
 		} catch (Exception e) {
 			response.setMessage("Record alredy exists");
 			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 		
 	}
@@ -71,10 +71,10 @@ public class AdminMetalMasterController {
 			} else {
 				response1.setMessage("Failed to update/Please check your material id");
 				response1.setStatus(false);
-				return new ResponseEntity<>(response1, HttpStatus.BAD_REQUEST);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 
 	}
@@ -90,7 +90,7 @@ public class AdminMetalMasterController {
 				response2.setGetData(material);
 				return new ResponseEntity<>(response2, HttpStatus.OK);
 			} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 
 	}

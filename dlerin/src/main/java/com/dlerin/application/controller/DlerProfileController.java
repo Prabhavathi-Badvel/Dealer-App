@@ -58,22 +58,22 @@ public class DlerProfileController {
 					} else {
 						response1.setMessage("Failed to add Dler Profile");
 						response1.setStatus(false);
-						return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response1);
+						return ResponseEntity.status(HttpStatus.OK).body(response1);
 					}
 				} else {
 					response1.setMessage("Record already exists");
 					response1.setStatus(false);
-					return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response1);
+					return ResponseEntity.status(HttpStatus.OK).body(response1);
 				}
 			} else {
 				response1.setMessage("Dler not found for given Dler ID: " + dp.getDlerId());
 				response1.setStatus(false);
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response1);
+				return ResponseEntity.status(HttpStatus.OK).body(response1);
 			}
 		} catch (Exception e) {
 			response1.setMessage(e.getMessage());
 			response1.setStatus(false);
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response1);
+			return ResponseEntity.status(HttpStatus.OK).body(response1);
 		}
 	}
 
@@ -93,7 +93,7 @@ public class DlerProfileController {
 			} else {
 				response1.setMessage("Dler profile doen't exist with : " + dp.getDlerBusinessId());
 				response1.setStatus(false);
-				return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response1);
+				return ResponseEntity.status(HttpStatus.OK).body(response1);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -118,7 +118,7 @@ public class DlerProfileController {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 
 		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
 }
