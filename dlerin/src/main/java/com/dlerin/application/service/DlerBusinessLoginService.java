@@ -9,7 +9,6 @@ import com.dlerin.application.entity.DlerBusinessLogin;
 public interface DlerBusinessLoginService {
 
 	public DlerBusinessLoginDto addDlerBusinessProfile(DlerBusinessLogin dbl);
-	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId);
 	public String isEmailExists(String dlerEmailId);
 	public DlerBusinessLogin updateData(String otp, String dlerEmailId);
 	public ResponseDlerLoginDto DlerloginDetails(String dlerEmailId, String dlerMobileNo, String dlerPassword);
@@ -19,4 +18,5 @@ public interface DlerBusinessLoginService {
 	public String sendMail(String dlerEmailId);
 	public String sendSms(String dlerMobileNo);
 	public String forgetPassword(String dlerEmailId, String otp, String newPassword, String confirmPassword,String dlerMobileNo);
+	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId);
 }

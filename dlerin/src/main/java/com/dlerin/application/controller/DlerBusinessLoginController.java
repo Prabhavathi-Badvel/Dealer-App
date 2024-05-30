@@ -1,7 +1,7 @@
 package com.dlerin.application.controller;
 
-import java.util.Optional;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.dlerin.application.dto.ChangeForgotdto;
 import com.dlerin.application.dto.DlerBusinessLoginDto;
@@ -38,20 +39,20 @@ public class DlerBusinessLoginController {
 
 	@Autowired
 	MobileOtpService MobileOtpService;
-	
+
 	ResponseDlerBusinessLoginDto response = new ResponseDlerBusinessLoginDto();
-	
+
 	ResponseDlerBusinessLoginDto1 response1 = new ResponseDlerBusinessLoginDto1();
-	
+
 	ResponseMessageDto message = new ResponseMessageDto();
-	
+
 	@PostMapping("/dlerin-registration")
 	public ResponseEntity<?> addDlerBusinessLoginProfile(@RequestBody DlerBusinessLogin dlerBusinessl) {
 
 		try {
 			DlerBusinessLoginDto dblDTO = dlerBusinessLoginService.addDlerBusinessProfile(dlerBusinessl);
 			if (dblDTO != null) {
-				
+
 				response.setMessage("Dler added successfully");
 				response.setStatus(true);
 				response.setDlerProfile(dblDTO);
@@ -63,11 +64,11 @@ public class DlerBusinessLoginController {
 			}
 
 		} catch (Exception e) {
-			e.getMessage();
+			response.setMessage("failed to add");
+			response.setStatus(false);
+			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
-		response.setMessage("failed to add");
-		response.setStatus(false);
-		return new ResponseEntity<>(response, HttpStatus.OK);
+
 	}
 
 	@PostMapping("/dlerin-send-otp-verify-email")
@@ -136,26 +137,23 @@ public class DlerBusinessLoginController {
 
 	@PreAuthorize("hasAuthority('Dealer')")
 	@GetMapping("/dlerin-get-dlerbusinesslogin")
-	public ResponseEntity<?> getDlerBusinessProfile(@RequestBody DlerBusinessLoginDto dbl) {
+	public ResponseEntity<?> getDlerBusinessProfile(@RequestParam(required = false) String dlerEmailId,
+			@RequestParam(required = false) String dlerMobileNo, @RequestParam(required = false) String dlerUserId) {
 
-		String dlerEmailId = dbl.getDlerEmailId();
-		String dlerMobileNo = dbl.getDlerMobileNo();
-		String dlerUserId = dbl.getDlerUserId();
-
-		DlerBusinessLoginDto2 dlb = dlerBusinessLoginService.getBusinessProfile(dlerEmailId, dlerMobileNo,
+		DlerBusinessLoginDto2 profile = dlerBusinessLoginService.getBusinessProfile(dlerEmailId, dlerMobileNo,
 				dlerUserId);
 		try {
-			if (dlb != null) {
-				
+			if (profile != null) {
 				response1.setMessage("Dler details");
 				response1.setStatus(true);
-				response1.setGetDlerProfile(dlb);
+				response1.setGetDlerProfile(profile);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
+			} else {
+				response1.setMessage("Invalid dler/check your credentials");
+				response1.setStatus(false);
+				response1.setGetDlerProfile(profile);
 				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
-			response1.setMessage("Invalid dler");
-			response1.setStatus(false);
-			return new ResponseEntity<>(response1, HttpStatus.OK);
-
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
@@ -194,7 +192,7 @@ public class DlerBusinessLoginController {
 
 				MobileOtpService.updateData(otp, mobile);
 				message.setStatus(true);
-				message.setMessage(" Email Verified successful");
+				message.setMessage("mobile Verified successful");
 				return new ResponseEntity<>(message, HttpStatus.OK);
 
 			}
@@ -205,7 +203,7 @@ public class DlerBusinessLoginController {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
-	
+
 	@PreAuthorize("hasAuthority('Dealer')")
 	@PostMapping("/changeDlerPassword")
 	public ResponseEntity<?> changeDlerPassword(@RequestBody ChangeForgotdto changePassword) {
@@ -216,8 +214,9 @@ public class DlerBusinessLoginController {
 		String dlerMobileNo = changePassword.getDlerMobileNo();
 
 		try {
-			String password = dlerBusinessLoginService.changePassword(dlerEmailId, oldPassword, newPassword, confirmPassword,dlerMobileNo);
-			if ( password == "changed") {
+			String password = dlerBusinessLoginService.changePassword(dlerEmailId, oldPassword, newPassword,
+					confirmPassword, dlerMobileNo);
+			if (password == "changed") {
 				message.setMessage("Password Changed Successfully");
 				message.setStatus(true);
 				return new ResponseEntity<>(message, HttpStatus.OK);
@@ -239,14 +238,13 @@ public class DlerBusinessLoginController {
 		message.setStatus(false);
 		return new ResponseEntity<>(message, HttpStatus.OK);
 	}
-	
-	
+
 	@PostMapping("/dlerforgetPassword/sendOtp")
 	public ResponseEntity<?> sendOtpForgotPassword(@RequestBody ChangeForgotdto password) {
 		String dlerEmailId = password.getDlerEmailId();
-		String dlerMobileNo= password.getDlerMobileNo();
+		String dlerMobileNo = password.getDlerMobileNo();
 		try {
-			if(dlerEmailId!=null&& dlerMobileNo == null) {
+			if (dlerEmailId != null && dlerMobileNo == null) {
 				if (dlerBusinessLoginService.sendMail(dlerEmailId) != null) {
 					message.setMessage("OTP Sent to Registered EmailId");
 					message.setStatus(true);
@@ -255,7 +253,7 @@ public class DlerBusinessLoginController {
 				message.setMessage("Invalid EmailId");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
-			}else {
+			} else {
 				if (dlerBusinessLoginService.sendSms(dlerMobileNo) != null) {
 					message.setMessage("OTP Sent to Registered Mobile Number");
 					message.setStatus(true);
@@ -265,17 +263,14 @@ public class DlerBusinessLoginController {
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
-			
+
 		} catch (Exception e) {
 			message.setMessage("Invalid EmailId");
 			message.setStatus(false);
 			return new ResponseEntity<>(message, HttpStatus.OK);
 		}
-		
 
 	}
-
-	
 
 	@PostMapping("/dler/forgetPassword/verification")
 	public ResponseEntity<?> dlerForgotPasswordVerify(@RequestBody ChangeForgotdto forgotPwd) {
@@ -284,38 +279,37 @@ public class DlerBusinessLoginController {
 		String newPassword = forgotPwd.getNewPassword();
 		String confirmPassword = forgotPwd.getConfirmPassword();
 		String mobile = forgotPwd.getDlerMobileNo();
-		
 
 		try {
-			 String data = dlerBusinessLoginService.forgetPassword(dlerEmailId, otp, newPassword, confirmPassword,mobile);
-			 if (data == "changed") {
-				 message.setMessage("Password Changed Successfully");
-				 message.setStatus(true);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				} else if (data == "notMatched") {
-					message.setMessage("New Passwords Not Matched");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				} else if (data== "incorrect") {
-					message.setMessage("Invalid OTP");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}else if (data== "incorrectEmail") {
-					message.setMessage("Invalid Email ID");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}else {
-					message.setMessage("Invalid Mobile Number");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}
-			} catch (Exception e) {
-				message.setMessage(e.getMessage());
+			String data = dlerBusinessLoginService.forgetPassword(dlerEmailId, otp, newPassword, confirmPassword,
+					mobile);
+			if (data == "changed") {
+				message.setMessage("Password Changed Successfully");
+				message.setStatus(true);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "notMatched") {
+				message.setMessage("New Passwords Not Matched");
 				message.setStatus(false);
-				return ResponseEntity.status(HttpStatus.OK).body(message);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "incorrect") {
+				message.setMessage("Invalid OTP");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "incorrectEmail") {
+				message.setMessage("Invalid Email ID");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else {
+				message.setMessage("Invalid Mobile Number");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			message.setMessage(e.getMessage());
+			message.setStatus(false);
+			return ResponseEntity.status(HttpStatus.OK).body(message);
+		}
 
 	}
-	
-	
+
 }

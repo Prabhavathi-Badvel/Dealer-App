@@ -2,15 +2,14 @@ package com.dlerin.application.dto;
 
 import java.util.List;
 
-import com.dlerin.application.entity.AdminBrandMaster;
+import com.dlerin.application.entity.DlerOrderDetails;
 
 import lombok.Data;
 
-
 @Data
-public class ResponseAdminBrandDto {
+public class ResponseListOrderDto {
 
 	private String message;
 	private boolean status;
-	private List<AdminBrandMaster> getBrands;
+	private List<DlerOrderDetails> data;
 }

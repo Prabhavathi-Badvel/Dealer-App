@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dlerin.application.dto.AdminChangeForgotdto;
 import com.dlerin.application.dto.AdminLoginDto;
 import com.dlerin.application.dto.AdminLoginDto1;
@@ -17,6 +17,7 @@ import com.dlerin.application.dto.LoginDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto1;
 import com.dlerin.application.dto.ResponseAdminLoginDto2;
+import com.dlerin.application.dto.ResponseAdminLoginDto3;
 import com.dlerin.application.dto.ResponseMessageDto;
 import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.service.AdminLoginService;
@@ -31,19 +32,18 @@ public class AdminLoginController {
 	AdminLoginService adminLoginService;
 
 	ResponseAdminLoginDto response = new ResponseAdminLoginDto();
-	
 	ResponseAdminLoginDto1 response1 = new ResponseAdminLoginDto1();
-	ResponseAdminLoginDto2 response2 = new ResponseAdminLoginDto2();
-	
+	ResponseAdminLoginDto3 response3 = new ResponseAdminLoginDto3();
+
 	ResponseMessageDto message = new ResponseMessageDto();
-	
+
 	@PostMapping("/dlerin-register-adminlogin")
 	public ResponseEntity<?> saveAdminLogin(@RequestBody AdminLogin adminLoginDto) {
 		try {
 
 			AdminLoginDto1 savedLogin = adminLoginService.saveAdminDetails(adminLoginDto);
 			if (savedLogin != null) {
-				
+
 				response.setMessage("Admin registered successfully");
 				response.setStatus(true);
 				response.setAdminData(savedLogin);
@@ -52,22 +52,20 @@ public class AdminLoginController {
 			}
 			response.setMessage("admin already exists");
 			response.setStatus(false);
+			response.setAdminData(null);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
-			response.setMessage("Failed to add");
-			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 	}
-	
+
 	@PostMapping("/dlerin-login-adminlogin")
 	public ResponseEntity<?> login(@RequestBody LoginDto login) {
 		String userEmail = login.getEmail();
 		String userMobile = login.getMobileNo();
 		String userPassword = login.getPassword();
-		ResponseAdminLoginDto2 response=adminLoginService.loginDetails(userEmail, userMobile, userPassword);
-		if(response.getJwtToken()!=null) {
+		ResponseAdminLoginDto2 response = adminLoginService.loginDetails(userEmail, userMobile, userPassword);
+		if (response.getJwtToken() != null) {
 			return new ResponseEntity<ResponseAdminLoginDto2>(response, HttpStatus.OK);
 		}
 		return new ResponseEntity<ResponseAdminLoginDto2>(response, HttpStatus.OK);
@@ -76,22 +74,22 @@ public class AdminLoginController {
 
 	@PreAuthorize("hasAuthority('Admin')")
 	@GetMapping("/dlerin-get-adminlogin-profile")
-	public ResponseEntity<?> getAdminProfile(@RequestBody AdminLoginDto adLoginDto) {
-		String emailId = adLoginDto.getEmailId();
-		String mobileNo = adLoginDto.getMobileNo();
-		String empId = adLoginDto.getEmpId();
-		
+	public ResponseEntity<?> getAdminProfile(@RequestParam(required = false) String emailId,
+			@RequestParam(required = false) String mobileNo, @RequestParam(required = false) String empId) {
 		try {
-			AdminLoginDto details=adminLoginService.getAdminLoginDetails(emailId, mobileNo, empId);
-			if ( details == null) {
-				response2.setMessage("Invalid credentials");
-				response2.setStatus(false);
-				return new ResponseEntity<>(response2, HttpStatus.OK);
+			AdminLoginDto details = adminLoginService.getAdminLoginDetails(emailId, mobileNo, empId);
+			if (details != null) {
+				response3.setMessage("admin details");
+				response3.setStatus(true);
+				response3.setAdminData(details);
+				return new ResponseEntity<>(response3, HttpStatus.OK);
+
+			} else {
+				response3.setMessage("Invalid admin/check your credentials");
+				response3.setStatus(false);
+				response3.setAdminData(null);
+				return new ResponseEntity<>(response3, HttpStatus.OK);
 			}
-			response2.setMessage("admin details");
-			response2.setStatus(true);
-			response2.setAdminData(details);
-			return new ResponseEntity<>(response2,HttpStatus.OK);
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
@@ -107,17 +105,18 @@ public class AdminLoginController {
 		String mobileNo = changePassword.getMobileNo();
 
 		try {
-			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,mobileNo) == "changed") {
+			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,
+					mobileNo) == "changed") {
 				message.setMessage("Password Changed Successfully");
 				message.setStatus(true);
 				return new ResponseEntity<>(message, HttpStatus.OK);
-			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
-					confirmPassword,mobileNo) == "notMatched") {
+			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,
+					mobileNo) == "notMatched") {
 				message.setMessage("New Passwords Not Matched.!");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
-			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword,
-					confirmPassword,mobileNo) == "incorrect") {
+			} else if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,
+					mobileNo) == "incorrect") {
 				message.setMessage("Old Password is Incorrect");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
@@ -141,15 +140,14 @@ public class AdminLoginController {
 		AdminLogin update = adminLoginService.updateprofile(adminLogin, empId);
 		try {
 			if (update == null) {
-				response1.setMessage("Invalid Employee id");
+				response1.setMessage("Invalid Admin employee id");
 				response1.setStatus(false);
 				return new ResponseEntity<>(response1, HttpStatus.OK);
 
 			} else {
 				response1.setMessage("Profile updated successfully");
 				response1.setStatus(true);
-				response1.setUpdatedData(update);
-				return ResponseEntity.ok().body(response1);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 
 		} catch (Exception e) {
@@ -160,9 +158,9 @@ public class AdminLoginController {
 	@PostMapping("/admin/forgetPassword/sendOtp")
 	public ResponseEntity<?> sendOtpForgotPassword(@RequestBody AdminChangeForgotdto password) {
 		String emailId = password.getEmailId();
-		String mobileNo= password.getMobileNo();
+		String mobileNo = password.getMobileNo();
 		try {
-			if(emailId!=null&& mobileNo==null) {
+			if (emailId != null && mobileNo == null) {
 				if (adminLoginService.sendMail(emailId) != null) {
 					message.setMessage("OTP Sent to Registered EmailId");
 					message.setStatus(true);
@@ -171,7 +169,7 @@ public class AdminLoginController {
 				message.setMessage("Invalid EmailId");
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
-			}else {
+			} else {
 				if (adminLoginService.sendSms(mobileNo) != null) {
 					message.setMessage("OTP Sent to Registered Mobile Number");
 					message.setStatus(true);
@@ -181,13 +179,12 @@ public class AdminLoginController {
 				message.setStatus(false);
 				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
-			
+
 		} catch (Exception e) {
 			message.setMessage("Invalid EmailId");
 			message.setStatus(false);
 			return new ResponseEntity<>(message, HttpStatus.OK);
 		}
-		
 
 	}
 
@@ -199,36 +196,35 @@ public class AdminLoginController {
 		String newPassword = forgotPwd.getNewPassword();
 		String confirmPassword = forgotPwd.getConfirmPassword();
 		String mobileNo = forgotPwd.getMobileNo();
-		
 
 		try {
-			 String data = adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword,mobileNo);
-			 if (data == "changed") {
-				 message.setMessage("Password Changed Successfully");
-				 message.setStatus(true);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				} else if (data == "notMatched") {
-					message.setMessage("New Passwords Not Matched");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				} else if (data== "incorrect") {
-					message.setMessage("Invalid OTP");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}else if (data== "incorrectEmail") {
-					message.setMessage("Invalid Email ID");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}else {
-					message.setMessage("Invalid Mobile Number");
-					message.setStatus(false);
-					return new ResponseEntity<>(message, HttpStatus.OK);
-				}
-			} catch (Exception e) {
-				message.setMessage(e.getMessage());
+			String data = adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword, mobileNo);
+			if (data == "changed") {
+				message.setMessage("Password Changed Successfully");
+				message.setStatus(true);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "notMatched") {
+				message.setMessage("New Passwords Not Matched");
 				message.setStatus(false);
-				return ResponseEntity.status(HttpStatus.OK).body(message);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "incorrect") {
+				message.setMessage("Invalid OTP");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else if (data == "incorrectEmail") {
+				message.setMessage("Invalid Email ID");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
+			} else {
+				message.setMessage("Invalid Mobile Number");
+				message.setStatus(false);
+				return new ResponseEntity<>(message, HttpStatus.OK);
 			}
+		} catch (Exception e) {
+			message.setMessage(e.getMessage());
+			message.setStatus(false);
+			return ResponseEntity.status(HttpStatus.OK).body(message);
+		}
 
 	}
 }

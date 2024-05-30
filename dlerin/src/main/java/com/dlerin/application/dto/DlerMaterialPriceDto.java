@@ -12,7 +12,7 @@ public class DlerMaterialPriceDto {
 	private String price;
 	private String priceUpdatedDate;
 	private String priceUpdatedBy;
-	private String currency = "INR";
+	private String currency;
 	private String ordQty;
 	private String discount;
 	private String gstCode;
@@ -20,6 +20,8 @@ public class DlerMaterialPriceDto {
 	private String materialId;
 	private String materialName;
 	private String skuId;
+	private String dlerId;
+	
 
 }
 

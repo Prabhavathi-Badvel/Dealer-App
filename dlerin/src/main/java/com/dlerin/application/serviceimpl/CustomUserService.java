@@ -1,6 +1,5 @@
 package com.dlerin.application.serviceimpl;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,6 +11,7 @@ import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.AdminLoginRepo;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+
 @Service
 public class CustomUserService implements UserDetailsService {
 
@@ -20,7 +20,6 @@ public class CustomUserService implements UserDetailsService {
 
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
-
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -36,9 +35,5 @@ public class CustomUserService implements UserDetailsService {
 		}
 		throw new UsernameNotFoundException("User not found with username: " + username);
 	}
-
-
-
-
 
 }

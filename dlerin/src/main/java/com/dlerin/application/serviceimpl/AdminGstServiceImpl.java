@@ -31,6 +31,8 @@ public class AdminGstServiceImpl implements AdminGstService {
 			AdminGst existingGst = adminGstRepo.findByGstCode(adminGst.getGstCode());
 			if (existingGst == null) {
 				adminGst.setUpdatedBy(adminDb.getEmailId());
+				adminGst.setEmailId(adminDb.getEmailId());
+				adminGst.setMobileNo(adminDb.getMobileNo());
 				return adminGstRepo.save(adminGst);
 			}
 		}
@@ -51,15 +53,15 @@ public class AdminGstServiceImpl implements AdminGstService {
 	}
 
 	@Override
-	public List<AdminGst> getDetails(AdminGst admingst) {
+	public List<AdminGst> getDetails(String gstCode, int gstPercentage) {
 
-		if (admingst.getGstCode() != null && admingst.getGstPercentage() != 0) {
+		if (gstCode != null && gstPercentage != 0) {
 
-			List<AdminGst> details = adminGstRepo.findByGstCodeAndGstPercentage(admingst.getGstCode(),
-					admingst.getGstPercentage());
+			List<AdminGst> details = adminGstRepo.findByGstCodeAndGstPercentage(gstCode,
+					gstPercentage);
 			return details;
 		}
-		return adminGstRepo.findByGstCodeOrGstPercentage(admingst.getGstCode(), admingst.getGstPercentage());
+		return adminGstRepo.findByGstCodeOrGstPercentage(gstCode, gstPercentage);
 
 	}
 }

@@ -6,9 +6,8 @@ import org.springframework.stereotype.Repository;
 import com.dlerin.application.entity.AdminBrandMaster;
 
 @Repository
-public interface AdminBrandMasterRepo extends JpaRepository<AdminBrandMaster, String>{
+public interface AdminBrandMasterRepo extends JpaRepository<AdminBrandMaster, String> {
 
 	AdminBrandMaster findByBrandCatSubCat(String brandCatSubCat);
-
 
 }

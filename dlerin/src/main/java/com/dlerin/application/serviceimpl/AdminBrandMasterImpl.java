@@ -6,12 +6,9 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.dlerin.application.dto.AdminBrandDto;
 import com.dlerin.application.entity.AdminBrandMaster;
 import com.dlerin.application.repository.AdminBrandMasterRepo;
 import com.dlerin.application.service.AdminBrandMasterService;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
@@ -59,21 +56,21 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 	}
 
 	@Override
-	public List<AdminBrandMaster> getBrands(AdminBrandDto admin) {
+	public List<AdminBrandMaster> getBrands(String brandName, String brandCategory, String brandSubcategory) {
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<AdminBrandMaster> query = cb.createQuery(AdminBrandMaster.class);
 		Root<AdminBrandMaster> root = query.from(AdminBrandMaster.class);
 		List<Predicate> predicates = new ArrayList<>();
 
-		if (admin.getBrandName() != null) {
-			predicates.add(cb.equal(root.get("brandName"), admin.getBrandName()));
+		if (brandName != null) {
+			predicates.add(cb.equal(root.get("brandName"), brandName));
 		}
-		if (admin.getBrandCategory() != null) {
-			predicates.add(cb.equal(root.get("brandCategory"), admin.getBrandCategory()));
+		if (brandCategory != null) {
+			predicates.add(cb.equal(root.get("brandCategory"), brandCategory));
 		}
-		if (admin.getBrandSubcategory() != null) {
-			predicates.add(cb.equal(root.get("brandSubcategory"), admin.getBrandSubcategory()));
+		if (brandSubcategory != null) {
+			predicates.add(cb.equal(root.get("brandSubcategory"), brandSubcategory));
 		}
 
 		query.where(predicates.toArray(new Predicate[0]));

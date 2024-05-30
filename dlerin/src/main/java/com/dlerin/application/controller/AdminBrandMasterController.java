@@ -1,5 +1,7 @@
 package com.dlerin.application.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -8,11 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.dlerin.application.dto.AdminBrandDto;
 import com.dlerin.application.dto.ResponseAdminBrandDto;
 import com.dlerin.application.dto.ResponseAdminBrandMasterDto;
+import com.dlerin.application.dto.ResponseAdminBrandMasterDto1;
 import com.dlerin.application.entity.AdminBrandMaster;
 import com.dlerin.application.repository.AdminBrandMasterRepo;
 import com.dlerin.application.service.AdminBrandMasterService;
@@ -28,22 +30,29 @@ public class AdminBrandMasterController {
 	AdminBrandMasterRepo admindBrandRepo;
 
 	ResponseAdminBrandMasterDto response = new ResponseAdminBrandMasterDto();
-	
+
+	ResponseAdminBrandMasterDto1 response1 = new ResponseAdminBrandMasterDto1();
+
 	@PostMapping("/dlerin-add-adminbrands")
 	public ResponseEntity<?> addAdminBrands(@RequestBody AdminBrandMaster adminBrands) {
 
 		try {
 			AdminBrandMaster savedBrand = adminBrandService.addBrand(adminBrands);
-			
-			response.setMessage("Brand added successfully");
-			response.setStatus(true);
-			response.setBrandsData(savedBrand);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-
+			if (savedBrand != null) {
+				response.setMessage("Brand added successfully");
+				response.setStatus(true);
+				response.setBrandsData(savedBrand);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("Failed to add/admin not present");
+				response.setStatus(true);
+				response.setBrandsData(savedBrand);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
 		} catch (Exception e) {
-			
 			response.setMessage("Record already exists");
 			response.setStatus(false);
+			response.setBrandsData(null);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
@@ -53,13 +62,13 @@ public class AdminBrandMasterController {
 		boolean updated = adminBrandService.updateBrands(brand);
 		try {
 			if (updated) {
-				response.setMessage("Updated successfully");
-				response.setStatus(true);
-				return new ResponseEntity<>(response, HttpStatus.OK);
+				response1.setMessage("Updated successfully");
+				response1.setStatus(true);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			} else {
-				response.setMessage("Failed to update brand");
-				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.OK);
+				response1.setMessage("Failed to update brand");
+				response1.setStatus(false);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
@@ -67,14 +76,24 @@ public class AdminBrandMasterController {
 	}
 
 	@GetMapping("/dlerin-get-adminbrands")
-	public ResponseEntity<?> getAdminBrandMaster(@RequestBody AdminBrandDto adminBrandDto) {
+	public ResponseEntity<?> getAdminBrandMaster(@RequestParam(required = false) String brandName,
+			@RequestParam(required = false) String brandCategory,
+			@RequestParam(required = false) String brandSubcategory) {
 
 		try {
+			List<AdminBrandMaster> brands = adminBrandService.getBrands(brandName, brandCategory, brandSubcategory);
 			ResponseAdminBrandDto response = new ResponseAdminBrandDto();
-			response.setMassege("Successfully receieved brands");
-			response.setStatus(true);
-			response.setGetBrands(adminBrandService.getBrands(adminBrandDto));
-			return new ResponseEntity<>(response, HttpStatus.OK);
+			if (brands != null && !brands.isEmpty()) {
+				response.setMessage("Successfully receieved brands");
+				response.setStatus(true);
+				response.setGetBrands(brands);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("No brands found with the provided parameters/check your parameters");
+				response.setStatus(false);
+				response.setGetBrands(brands);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
 
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());

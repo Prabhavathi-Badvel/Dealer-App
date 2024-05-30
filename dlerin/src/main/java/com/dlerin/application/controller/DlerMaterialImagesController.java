@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dlerin.application.dto.ResponseDlerMaterialImagesAddDto;
 import com.dlerin.application.dto.ResponseDlerMaterialImagesGetDto;
 import com.dlerin.application.entity.DlerMaterialImages;
-import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.repository.DlerMaterialImagesRepo;
 import com.dlerin.application.serviceimpl.DlerMaterialImagesServiceImpl;
 

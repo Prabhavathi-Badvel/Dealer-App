@@ -3,23 +3,19 @@ package com.dlerin.application.serviceimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import com.dlerin.application.entity.DealerBrands;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.DealerBrandsRepo;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.service.DealerBrandsService;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import java.util.logging.Logger;
 
 @Service
 public class DealerBrandsServiceImpl implements DealerBrandsService {
@@ -61,21 +57,21 @@ public class DealerBrandsServiceImpl implements DealerBrandsService {
 	}
 
 	@Override
-	public List<DealerBrands> getBrands(DealerBrands brands) {
+	public List<DealerBrands> getBrands(String brandId, String updatedBy, String businessType) {
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DealerBrands> query = cb.createQuery(DealerBrands.class);
 		Root<DealerBrands> root = query.from(DealerBrands.class);
 		List<Predicate> predicates = new ArrayList<>();
 
-		if (brands.getBrandId() != null) {
-			predicates.add(cb.equal(root.get("brandId"), brands.getBrandId()));
+		if (brandId != null) {
+			predicates.add(cb.equal(root.get("brandId"), brandId));
 		}
-		if (brands.getUpdatedBy() != null) {
-			predicates.add(cb.equal(root.get("updatedBy"), brands.getUpdatedBy()));
+		if (updatedBy != null) {
+			predicates.add(cb.equal(root.get("updatedBy"), updatedBy));
 		}
-		if (brands.getBusinessType() != null) {
-			predicates.add(cb.equal(root.get("businessType"), brands.getBusinessType()));
+		if (businessType != null) {
+			predicates.add(cb.equal(root.get("businessType"), businessType));
 		}
 
 		query.where(predicates.toArray(new Predicate[0]));

@@ -8,5 +8,5 @@ public interface DealerBrandsService {
 
 	public DealerBrands addBrands(DealerBrands brand);
 	public DealerBrands updateBrands(DealerBrands brands);
-	public List<DealerBrands> getBrands(DealerBrands brands);
+	public List<DealerBrands> getBrands(String brandId,String updatedBy,String businessType);
 }

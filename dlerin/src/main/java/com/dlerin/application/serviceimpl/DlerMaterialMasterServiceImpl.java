@@ -34,8 +34,8 @@ public class DlerMaterialMasterServiceImpl implements DlerMaterialMasterService 
 
 	@Override
 	public DlerMaterialMaster add(DlerMaterialMaster dlerMaterialMaster) {
-		Optional<DlerBusinessLogin> dlerPresent = Optional.ofNullable(dlerBusinessLoginRepo
-				.findByDlerUserId(dlerMaterialMaster.getDlerId()));
+		Optional<DlerBusinessLogin> dlerPresent = Optional
+				.ofNullable(dlerBusinessLoginRepo.findByDlerUserId(dlerMaterialMaster.getDlerId()));
 
 		if (dlerPresent.isPresent()) {
 			Optional<DlerMaterialMaster> dlerIdmaterialidExists = Optional.ofNullable(
@@ -71,29 +71,27 @@ public class DlerMaterialMasterServiceImpl implements DlerMaterialMasterService 
 	}
 
 	@Override
-	public List<DlerMaterialMaster> getProfileDlerMaterial(DlerMaterialMaster dler) {
+	public List<DlerMaterialMaster> getDlerMaterialProfile(String brandId, String materialType, String materialId,
+			String dlerId, String materialName) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DlerMaterialMaster> query = cb.createQuery(DlerMaterialMaster.class);
 		Root<DlerMaterialMaster> root = query.from(DlerMaterialMaster.class);
 		List<Predicate> predicates = new ArrayList<>();
 
-		if (dler.getBrandId() != null) {
-			predicates.add(cb.equal(root.get("brandId"), dler.getBrandId()));
+		if (brandId != null) {
+			predicates.add(cb.equal(root.get("brandId"), brandId));
 		}
-		if (dler.getMaterialType() != null) {
-			predicates.add(cb.equal(root.get("materialType"), dler.getMaterialType()));
+		if (materialType != null) {
+			predicates.add(cb.equal(root.get("materialType"), materialType));
 		}
-		if (dler.getMaterialId() != null) {
-			predicates.add(cb.equal(root.get("materialId"), dler.getMaterialId()));
+		if (materialId != null) {
+			predicates.add(cb.equal(root.get("materialId"), materialId));
 		}
-		if (dler.getDlerIdMaterialId() != null) {
-			predicates.add(cb.equal(root.get("dlerIdMaterialId"), dler.getDlerIdMaterialId()));
+		if (dlerId != null) {
+			predicates.add(cb.equal(root.get("dlerId"), dlerId));
 		}
-		if (dler.getDlerId() != null) {
-			predicates.add(cb.equal(root.get("dlerId"), dler.getDlerId()));
-		}
-		if (dler.getMaterialName() != null) {
-			predicates.add(cb.equal(root.get("materialName"), dler.getMaterialName()));
+		if (materialName != null) {
+			predicates.add(cb.equal(root.get("materialName"), materialName));
 		}
 
 		query.where(predicates.toArray(new Predicate[0]));

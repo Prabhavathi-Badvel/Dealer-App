@@ -25,10 +25,9 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
-	
+
 	@PersistenceContext
 	private EntityManager entityManager;
-
 
 	@Override
 	public DlerProfile addDler(DlerProfile dProfile) throws DlerNotFoundException {
@@ -62,20 +61,23 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 
 	}
 
-    @Override
-	public List<DlerProfile> getProfile(ProfileDto profile){
-		
-		Optional<DlerBusinessLogin> isExists = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(profile.getDlerId(),profile.getEmail(), profile.getMobile()));
-		if(isExists.isPresent()) {
-			
-			Optional<List<DlerProfile>> dlerPresent = Optional.ofNullable(dlerProfileRepo.findByDlerId(isExists.get().getDlerUserId()));
-			if( !dlerPresent.isEmpty()) {
+	@Override
+	public List<DlerProfile> getProfile(ProfileDto profile) {
+
+		Optional<DlerBusinessLogin> isExists = Optional
+				.ofNullable(dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(profile.getDlerId(),
+						profile.getEmail(), profile.getMobile()));
+		if (isExists.isPresent()) {
+
+			Optional<List<DlerProfile>> dlerPresent = Optional
+					.ofNullable(dlerProfileRepo.findByDlerId(isExists.get().getDlerUserId()));
+			if (!dlerPresent.isEmpty()) {
 				profile.setEmail(isExists.get().getDlerEmailId());
 				profile.setMobile(isExists.get().getDlerMobileNo());
 				return dlerPresent.get();
 			}
 		}
 		return null;
-		
+
 	}
 }

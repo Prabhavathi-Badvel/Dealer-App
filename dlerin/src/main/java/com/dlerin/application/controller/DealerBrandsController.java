@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dlerin.application.dto.ResponseDealerBrandsDto1;
 import com.dlerin.application.dto.ResponseDealerBrnadsDto;
 import com.dlerin.application.entity.DealerBrands;
@@ -30,6 +30,8 @@ public class DealerBrandsController {
 	DealerBrandsRepo dealerBrandsRepo;
 
 	ResponseDealerBrnadsDto response = new ResponseDealerBrnadsDto();
+	ResponseDealerBrandsDto1 response1 = new ResponseDealerBrandsDto1();
+	
 
 	@PostMapping("/dlerin-add-dealerBrands")
 	public ResponseEntity<?> AddDealerBrands(@RequestBody DealerBrands brands) {
@@ -45,11 +47,13 @@ public class DealerBrandsController {
 			} else {
 				response.setMessage("Dealer not present");
 				response.setStatus(false);
+				response.setData(null);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			response.setMessage("Record already exist");
 			response.setStatus(false);
+			response.setData(null);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}
@@ -82,16 +86,21 @@ public class DealerBrandsController {
 	}
 
 	@GetMapping("/dlerin-get-dealerBtrands")
-	public ResponseEntity<?> getDealerBrands(@RequestBody DealerBrands dBrands) {
+	public ResponseEntity<?> getDealerBrands(@RequestParam(required = false)String brandId,@RequestParam(required = false)String updatedBy,@RequestParam(required = false)String businessType) {
 		try {
-			List<DealerBrands> getBrand = dealerBrandsService.getBrands(dBrands);
-			ResponseDealerBrandsDto1 response1 = new ResponseDealerBrandsDto1();
+			List<DealerBrands> getBrand = dealerBrandsService.getBrands(brandId,updatedBy,businessType);
+		if(getBrand!=null && !getBrand.isEmpty()) {	
+			
 			response1.setMessage("dealer brands details");
 			response1.setStatus(true);
 			response1.setGetData(getBrand);
-
 			return new ResponseEntity<>(response1, HttpStatus.OK);
-
+		}else {
+			response1.setMessage("No details found for provided parameters/check your parameters");
+			response1.setStatus(false);
+			response1.setGetData(getBrand);
+			return new ResponseEntity<>(response1, HttpStatus.OK);
+		}
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}

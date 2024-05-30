@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dlerin.application.dto.ProfileDto;
 import com.dlerin.application.dto.ResponseDlerProfileDto;
 import com.dlerin.application.dto.ResponseDlerProfileDto1;
@@ -36,6 +35,7 @@ public class DlerProfileController {
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
 
 	ResponseDlerProfileDto1 response1 = new ResponseDlerProfileDto1();
+	ResponseDlerProfileDto response = new ResponseDlerProfileDto();
 
 	@PostMapping("/dlerin-add-dlerprofile")
 	public ResponseEntity<?> addDlerProfile(@RequestBody DlerProfile dp) {
@@ -58,11 +58,13 @@ public class DlerProfileController {
 					} else {
 						response1.setMessage("Failed to add Dler Profile");
 						response1.setStatus(false);
+						response1.setDlerProfile(null);
 						return ResponseEntity.status(HttpStatus.OK).body(response1);
 					}
 				} else {
 					response1.setMessage("Record already exists");
 					response1.setStatus(false);
+					response1.setDlerProfile(null);
 					return ResponseEntity.status(HttpStatus.OK).body(response1);
 				}
 			} else {
@@ -96,27 +98,30 @@ public class DlerProfileController {
 				return ResponseEntity.status(HttpStatus.OK).body(response1);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			response1.setMessage(e.getMessage());
+			response1.setStatus(false);
+			return new ResponseEntity<>(response1, HttpStatus.OK);
 		}
-		response1.setMessage("invalid business id");
-		response1.setStatus(false);
-		return new ResponseEntity<>(response1, HttpStatus.OK);
 
 	}
 
 	@GetMapping("/dlerin-get-dlerprofile")
-	public ResponseEntity<?> getDlerProfile(@RequestBody ProfileDto dealerProfile
-			) {
+	public ResponseEntity<?> getDlerProfile(@RequestBody ProfileDto dealerProfile) {
 
 		try {
 
 			List<DlerProfile> dler = dlerProfileService.getProfile(dealerProfile);
-			ResponseDlerProfileDto response = new ResponseDlerProfileDto();
-			response.setMessage("Dler details");
-			response.setStatus(true);
-			response.setGetDlerProfile(dler);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-
+			if (dler != null && !dler.isEmpty()) {
+				response.setMessage("Dler details");
+				response.setStatus(true);
+				response.setGetDlerProfile(dler);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("No details found for given parameters/check your parameters");
+				response.setStatus(false);
+				response.setGetDlerProfile(dler);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}

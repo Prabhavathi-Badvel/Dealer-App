@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-
 import com.dlerin.application.dto.DlerMaterialPriceDto;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto1;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto2;
+import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerMaterialPrice;
 import com.dlerin.application.repository.DlerMaterialPriceRepo;
 import com.dlerin.application.service.DlerMaterialPriceService;
@@ -51,12 +51,14 @@ public class DlerMaterialPriceController {
 	            } else {
 	                response.setMessage("Record already exists or given DlerIdMaterialId not found");
 	                response.setStatus(false);
+	                response.setAddData(null);
 	                return new ResponseEntity<>(response, HttpStatus.OK);
 	            }
 	        } catch (Exception e) {
 	            response.setMessage("Failed to add prices");
 	            response.setStatus(false);
-	            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	            response.setAddData(null);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
 	        }
 	    }
 	
@@ -71,7 +73,7 @@ public class DlerMaterialPriceController {
 				response2.setStatus(true);
 				return new ResponseEntity<>(response2, HttpStatus.OK);
 			} else {
-				response2.setMessage("Failed to update. Material ID not found");
+				response2.setMessage("Failed to update/MaterialIDPriceId not found");
 				response2.setStatus(false);
 				return new ResponseEntity<>(response2, HttpStatus.OK);
 			}
@@ -82,25 +84,36 @@ public class DlerMaterialPriceController {
 
 	}
 
+	
 	@GetMapping("/dlerin-get-DlerMaterialPrice")
 	public ResponseEntity<?> getDlerPrice(@RequestBody DlerMaterialPriceDto dlerPrice) {
 
-		List<DlerMaterialPrice> priceExists = dlerMaterialPriceService.get(dlerPrice);
-		try {
-			if (!priceExists.isEmpty()) {
-				response1.setMessage("Get price details");
-				response1.setStatus(true);
-				response1.setGetData(priceExists);
-				return new ResponseEntity<>(response1, HttpStatus.OK);
-			} else {
-				response1.setMessage("No user found for the given parameters");
-				response1.setStatus(false);
-				return new ResponseEntity<>(response1, HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+	 
+	    DlerMaterialMaster searchCriteria = new DlerMaterialMaster();
+	    searchCriteria.setDlerId(dlerPrice.getDlerId());
+	    searchCriteria.setMaterialName(dlerPrice.getMaterialName());
+	    searchCriteria.setSkuId(dlerPrice.getSkuId());
+	    searchCriteria.setMaterialId(dlerPrice.getMaterialId());
 
-		}
+	    List<DlerMaterialPrice> priceExists = dlerMaterialPriceService.getPrice(dlerPrice);
+	    List<DlerMaterialMaster> allDlers = dlerMaterialPriceService.getDlersDetails(searchCriteria);
 
+	    try {
+	        if (priceExists!=null && !priceExists.isEmpty()) {
+	            response1.setMessage("Get price details");
+	            response1.setStatus(true);
+	            response1.setPriceData(priceExists);
+	            response1.setDlerDetails(allDlers);
+	            return new ResponseEntity<>(response1, HttpStatus.OK);
+	        } else {
+	            response1.setMessage("No details found for the given parameters");
+	            response1.setStatus(false);
+	            response1.setPriceData(priceExists);
+	            response1.setDlerDetails(allDlers);
+	            return new ResponseEntity<>(response1, HttpStatus.OK);
+	        }
+	    } catch (Exception e) {
+	    	return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+	    }
 	}
 }

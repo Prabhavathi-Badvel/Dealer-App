@@ -36,7 +36,7 @@ public class EmailServiceImpl {
 			helper.setText(body, true);
 			mailsender.send(message);
 		} catch (MessagingException e) {
-			// Handle exception
+			
 		}
 	}
 }

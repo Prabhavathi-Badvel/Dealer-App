@@ -9,7 +9,6 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +19,6 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "dler_material_price")
-@Builder
 public class DlerMaterialPrice {
 
 	@Id
@@ -40,9 +38,9 @@ public class DlerMaterialPrice {
 	@Column(name = "price_updated_by")
 	private String priceUpdatedBy;
 
-	@Builder.Default
+	
 	@Column(name = "currency")
-	private String currency = "INR";
+	private String currency;
 
 	@Column(name = "ord_qty")
 	private String ordQty;

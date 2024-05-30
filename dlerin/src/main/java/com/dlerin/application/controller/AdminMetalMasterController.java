@@ -11,9 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.dlerin.application.dto.AdminMetalMasterDto;
 import com.dlerin.application.dto.ResponseAdminmetalMaterialDto2;
 import com.dlerin.application.dto.ResponseAdminMetalMasterDto;
 import com.dlerin.application.dto.ResponseAdminMetalMasterDto1;
@@ -40,21 +39,20 @@ public class AdminMetalMasterController {
 	@PostMapping("/dlerin-add-adminmetalmaster")
 	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMaster admin) {
 
-	
 		try {
 			AdminMetalMaster add = adminMetalMaterService.addMaterial(admin);
 
-				response.setMessage("Material added successfully");
-				response.setStatus(true);
-				response.setMaterialData(add);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			
+			response.setMessage("Material added successfully");
+			response.setStatus(true);
+			response.setMaterialData(add);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+
 		} catch (Exception e) {
 			response.setMessage("Record alredy exists");
 			response.setStatus(false);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
-		
+
 	}
 
 	@PutMapping("/dlerin-update-adminmetalmaster")
@@ -80,16 +78,24 @@ public class AdminMetalMasterController {
 	}
 
 	@GetMapping("/dlerin-get-adminmetalmaster")
-	public ResponseEntity<?> getAdminMaterial(@RequestBody AdminMetalMaster materials) {
+	public ResponseEntity<?> getAdminMaterial(@RequestParam(required = false) String materialId,
+			@RequestParam(required = false) String materialType, @RequestParam(required = false) String materialShape) {
 
-		
 		try {
-				List<AdminMetalMaster> material = adminMetalMaterService.getMaterial(materials);
+			List<AdminMetalMaster> material = adminMetalMaterService.getMaterial(materialId, materialType,
+					materialShape);
+			if (material != null && !material.isEmpty()) {
 				response2.setMessage("Successfully received metals");
 				response2.setStatus(true);
 				response2.setGetData(material);
 				return new ResponseEntity<>(response2, HttpStatus.OK);
-			} catch (Exception e) {
+			} else {
+				response2.setMessage("No metals found with provided parameter/check your parameters");
+				response2.setStatus(false);
+				response2.setGetData(material);
+				return new ResponseEntity<>(response2, HttpStatus.OK);
+			}
+		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
 

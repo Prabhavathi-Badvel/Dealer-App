@@ -17,10 +17,10 @@ public interface AdminLoginRepo extends JpaRepository<AdminLogin, String> {
 
 	AdminLogin findByEmpId(String empId);
 
-	AdminLogin findByEmailIdOrMobileNoOrEmpId(String emailId, String mobileNo, String empId);
-
 	AdminLogin findByEmailIdOrMobileNo(String emailId, String mobileNo);
 
 	AdminLogin findByMobileNo(String mobile);
+	
+	Optional<AdminLogin> findByEmailIdOrMobileNoOrEmpId(String emailId, String mobileNo, String empId);
 
 }

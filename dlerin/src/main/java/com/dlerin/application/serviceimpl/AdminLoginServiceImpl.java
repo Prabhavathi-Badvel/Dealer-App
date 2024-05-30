@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.dlerin.application.dto.AdminLoginDto;
 import com.dlerin.application.dto.AdminLoginDto1;
 import com.dlerin.application.dto.ResponseAdminLoginDto2;
@@ -12,6 +13,9 @@ import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.repository.AdminLoginRepo;
 import com.dlerin.application.securities.JwtService;
 import com.dlerin.application.service.AdminLoginService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 public class AdminLoginServiceImpl implements AdminLoginService {
@@ -24,9 +28,12 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 	@Autowired
 	JwtService jwtService;
-	
+
 	@Autowired
 	BCryptPasswordEncoder byCrypt;
+
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Override
 	public AdminLoginDto1 saveAdminDetails(AdminLogin adminLogin) {
@@ -39,7 +46,6 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 			AdminLogin admin = adminLoginRepo.save(adminLogin);
 
 			AdminLoginDto1 adminLoginDto = new AdminLoginDto1();
-
 
 			adminLoginDto.setEmailId(adminLogin.getEmailId());
 			adminLoginDto.setEmpId(adminLogin.getEmpId());
@@ -59,11 +65,11 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 		if (adminLogin != null) {
 			if (byCrypt.matches(password, adminLogin.getPassword())) {
-				String jwtToken = jwtService.generateToken(adminLogin.getEmailId(), adminLogin.getUserType()); // Assuming userType is "Admin for admin login																									 
+				String jwtToken = jwtService.generateToken(adminLogin.getEmailId(), adminLogin.getUserType()); 																																														
 				response.setMessage("Login Successful");
 				response.setStatus(true);
 				response.setJwtToken(jwtToken);
-				response.setAdminData(getAdminData(adminLogin.getEmpId())); // Implement this method to fetch admin data
+				response.setAdminData(getAdminData(adminLogin.getEmpId())); 
 				return response;
 			} else {
 				response.setMessage("Invalid Password");
@@ -91,30 +97,34 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		return loginDto;
 	}
 
+
 	@Override
 	public AdminLoginDto getAdminLoginDetails(String emailId, String mobileNo, String empId) {
-		Optional<AdminLogin> user = Optional
-				.of(adminLoginRepo.findByEmailIdOrMobileNoOrEmpId(emailId, mobileNo, empId));
-		AdminLogin dbt = user.get();
+		Optional<AdminLogin> user = adminLoginRepo.findByEmailIdOrMobileNoOrEmpId(emailId, mobileNo, empId);
 
-		AdminLoginDto logindto = new AdminLoginDto();
+		if (user.isPresent()) {
+			AdminLogin dbt = user.get();
+			AdminLoginDto logindto = new AdminLoginDto();
 
-		logindto.setAddress(dbt.getAddress());
-		logindto.setEmailId(dbt.getEmailId());
-		logindto.setEmpId(dbt.getEmpId());
-		logindto.setMobileNo(dbt.getMobileNo());
-		logindto.setName(dbt.getName());
-		logindto.setRegisteredDate(dbt.getRegisteredDate());
-		logindto.setUpdatedBy(dbt.getUpdatedBy());
-		logindto.setUserType(dbt.getUserType());
+			logindto.setAddress(dbt.getAddress());
+			logindto.setEmailId(dbt.getEmailId());
+			logindto.setEmpId(dbt.getEmpId());
+			logindto.setMobileNo(dbt.getMobileNo());
+			logindto.setName(dbt.getName());
+			logindto.setRegisteredDate(dbt.getRegisteredDate());
+			logindto.setUpdatedBy(dbt.getUpdatedBy());
+			logindto.setUserType(dbt.getUserType());
 
-		return logindto;
-
+			return logindto;
+		} else {
+			return null;
+		}
 	}
 
 	@Override
-	public String changePassword(String emailId, String oldPassword, String newPassword, String confirmPassword,String mobile) {
-		
+	public String changePassword(String emailId, String oldPassword, String newPassword, String confirmPassword,
+			String mobile) {
+
 		Optional<AdminLogin> user = adminLoginRepo.findByEmailId(emailId);
 		if (user.isPresent()) {
 			if (byCrypt.matches(oldPassword, user.get().getPassword())) {
@@ -173,9 +183,10 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		}
 		return null;
 	}
-	
+
 	@Override
-	public String forgetPassword(String emailId, String otp, String newPassword, String confirmPassword,String mobileNo) {
+	public String forgetPassword(String emailId, String otp, String newPassword, String confirmPassword,
+			String mobileNo) {
 		BCryptPasswordEncoder byCrypt = new BCryptPasswordEncoder();
 
 		Optional<AdminLogin> userEmail = adminLoginRepo.findByEmailId(emailId);
@@ -193,7 +204,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 			} else {
 				return "incorrect";
 			}
-		}else if(userMobile.isPresent()) {
+		} else if (userMobile.isPresent()) {
 			if (otpService.verifyMobileOtp(mobileNo, otp)) {
 				if (newPassword.equals(confirmPassword)) {
 					String encryptPassword = byCrypt.encode(confirmPassword);
@@ -206,8 +217,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 			} else {
 				return "incorrect";
 			}
-		}
-		else if(!userEmail.isPresent()&& userMobile.isPresent()) {
+		} else if (!userEmail.isPresent() && userMobile.isPresent()) {
 			return "incorrectEmail";
 		}
 		return null;

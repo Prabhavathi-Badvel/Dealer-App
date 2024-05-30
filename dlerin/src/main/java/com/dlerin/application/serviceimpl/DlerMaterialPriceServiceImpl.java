@@ -3,6 +3,7 @@ package com.dlerin.application.serviceimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -100,19 +101,42 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 	}
 
 	@Override
-	public List<DlerMaterialPrice> get(DlerMaterialPriceDto dprice) {
+	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice) {
+		List<DlerMaterialMaster> exists = dlerMaterialMasterRepo.findByDlerIdOrMaterialNameOrMaterialIdOrSkuId(
+				dprice.getDlerId(), dprice.getMaterialName(), dprice.getMaterialId(), dprice.getSkuId());
 
-		Optional<DlerMaterialMaster> exists = Optional
-				.ofNullable(dlerMaterialMasterRepo.findByMaterialNameOrMaterialIdOrSkuId(dprice.getMaterialName(),
-						dprice.getSkuId(), dprice.getMaterialId()));
-		if (exists.isPresent()) {
-			Optional<List<DlerMaterialPrice>> isdlerIdMaterialIdExists = Optional
-					.ofNullable(dlerMaterialPriceRepo.findByDlerIdMaterialId(exists.get().getDlerIdMaterialId()));
-			if (!isdlerIdMaterialIdExists.isEmpty()) {
-				return isdlerIdMaterialIdExists.get();
+		if (!exists.isEmpty()) {
+			List<String> dlerIdMaterialIds = exists.stream().map(DlerMaterialMaster::getDlerIdMaterialId)
+					.collect(Collectors.toList());
+
+			List<DlerMaterialPrice> dlerMaterialPrices = dlerMaterialPriceRepo
+					.findByDlerIdMaterialIdIn(dlerIdMaterialIds);
+
+			if (!dlerMaterialPrices.isEmpty()) {
+				return dlerMaterialPrices;
 			}
 		}
 		return null;
-
 	}
+
+	@Override
+	public List<DlerMaterialMaster> getDlersDetails(DlerMaterialMaster master) {
+		List<DlerMaterialMaster> dlerMaterialMasters = new ArrayList<>();
+
+		if (master.getDlerId() != null) {
+			dlerMaterialMasters = dlerMaterialMasterRepo.findByDlerId(master.getDlerId());
+		} else {
+
+			if (master.getMaterialName() != null) {
+				dlerMaterialMasters = dlerMaterialMasterRepo.findByMaterialName(master.getMaterialName());
+			} else if (master.getMaterialId() != null) {
+				dlerMaterialMasters = dlerMaterialMasterRepo.findByMaterialId(master.getMaterialId());
+			} else if (master.getSkuId() != null) {
+				dlerMaterialMasters = dlerMaterialMasterRepo.findBySkuId(master.getSkuId());
+			}
+		}
+
+		return dlerMaterialMasters;
+	}
+
 }

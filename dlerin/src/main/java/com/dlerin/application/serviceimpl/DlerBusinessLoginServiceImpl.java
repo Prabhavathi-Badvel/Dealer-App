@@ -1,20 +1,20 @@
 package com.dlerin.application.serviceimpl;
 
-import java.util.Optional;
 
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.dlerin.application.dto.DlerBusinessLoginDto;
 import com.dlerin.application.dto.DlerBusinessLoginDto1;
 import com.dlerin.application.dto.DlerBusinessLoginDto2;
 import com.dlerin.application.dto.ResponseDlerLoginDto;
-import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.securities.JwtService;
 import com.dlerin.application.service.DlerBusinessLoginService;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 @Service
 public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
@@ -30,7 +30,10 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 
 	@Autowired
 	OtpGenerationServiceImpl otpService;
-	
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
 	@Override
 	public DlerBusinessLoginDto addDlerBusinessProfile(DlerBusinessLogin dbl) {
 		DlerBusinessLogin existingProfile = dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(
@@ -45,7 +48,6 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			dbl.setDlerMobileOtp(null);
 			dbl.setDlerMobileVerify("no");
 			dbl.setDlerStatus("active");
-			
 
 			DlerBusinessLogin saved = dlerBusinessLoginRepo.save(dbl);
 
@@ -177,10 +179,10 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 		return null;
 	}
 
-	
 	@Override
-	public String changePassword(String dlerEmailId, String oldPassword, String newPassword, String confirmPassword,String dlerMobileNo) {
-	
+	public String changePassword(String dlerEmailId, String oldPassword, String newPassword, String confirmPassword,
+			String dlerMobileNo) {
+
 		Optional<DlerBusinessLogin> user = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
 		if (user.isPresent()) {
 			if (byCrypt.matches(oldPassword, user.get().getPassword())) {
@@ -213,20 +215,23 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 
 	@Override
 	public String sendSms(String dlerMobileNo) {
-		Optional<DlerBusinessLogin> userOp = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
+		Optional<DlerBusinessLogin> userOp = Optional
+				.ofNullable(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
 		if (userOp.isPresent()) {
 			otpService.generateMobileOtp(dlerMobileNo);
 			return "otp";
 		}
 		return null;
 	}
-	
-	@Override
-	public String forgetPassword(String dlerEmailId, String otp, String newPassword, String confirmPassword,String dlerMobileNo) {
-		
 
-		Optional<DlerBusinessLogin> userEmail = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
-		Optional<DlerBusinessLogin> userMobile = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
+	@Override
+	public String forgetPassword(String dlerEmailId, String otp, String newPassword, String confirmPassword,
+			String dlerMobileNo) {
+
+		Optional<DlerBusinessLogin> userEmail = Optional
+				.ofNullable(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
+		Optional<DlerBusinessLogin> userMobile = Optional
+				.ofNullable(dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo));
 		if (userEmail.isPresent()) {
 			if (otpService.verifyOtp(dlerEmailId, otp)) {
 				if (newPassword.equals(confirmPassword)) {
@@ -240,7 +245,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			} else {
 				return "incorrect";
 			}
-		}else if(userMobile.isPresent()) {
+		} else if (userMobile.isPresent()) {
 			if (otpService.verifyMobileOtp(dlerMobileNo, otp)) {
 				if (newPassword.equals(confirmPassword)) {
 					String encryptPassword = byCrypt.encode(confirmPassword);
@@ -253,8 +258,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			} else {
 				return "incorrect";
 			}
-		}
-		else if(!userEmail.isPresent()&& userMobile.isPresent()) {
+		} else if (!userEmail.isPresent() && userMobile.isPresent()) {
 			return "incorrectEmail";
 		}
 		return null;
