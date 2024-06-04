@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dlerin.application.entity.DlerBusinessLogin;
+import com.dlerin.application.entity.DlerMaterialAvailability;
 import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+import com.dlerin.application.repository.DlerMaterialAvailabilityRepo;
 import com.dlerin.application.repository.DlerMaterialMasterRepo;
 import com.dlerin.application.service.DlerMaterialMasterService;
 
@@ -32,22 +34,47 @@ public class DlerMaterialMasterServiceImpl implements DlerMaterialMasterService 
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
 
+	@Autowired
+	DlerMaterialAvailabilityRepo dlerMaterialAvailabilityRepo;
+
+	DlerMaterialAvailability availability = new DlerMaterialAvailability();
+
+	
 	@Override
 	public DlerMaterialMaster add(DlerMaterialMaster dlerMaterialMaster) {
-		Optional<DlerBusinessLogin> dlerPresent = Optional
-				.ofNullable(dlerBusinessLoginRepo.findByDlerUserId(dlerMaterialMaster.getDlerId()));
+	    Optional<DlerBusinessLogin> dlerPresent = Optional
+	            .ofNullable(dlerBusinessLoginRepo.findByDlerUserId(dlerMaterialMaster.getDlerId()));
 
-		if (dlerPresent.isPresent()) {
-			Optional<DlerMaterialMaster> dlerIdmaterialidExists = Optional.ofNullable(
-					dlerMaterialMasterRepo.findByDlerIdMaterialId(dlerMaterialMaster.getDlerIdMaterialId()));
-			if (!dlerIdmaterialidExists.isPresent())
+	    if (dlerPresent.isPresent()) {
+	        Optional<DlerMaterialMaster> dlerIdMaterialIdExists = Optional.ofNullable(
+	                dlerMaterialMasterRepo.findByDlerIdMaterialId(dlerMaterialMaster.getDlerIdMaterialId()));
+	        if (!dlerIdMaterialIdExists.isPresent()) {
+	            DlerMaterialMaster saved = dlerMaterialMasterRepo.save(dlerMaterialMaster);
 
-				return dlerMaterialMasterRepo.save(dlerMaterialMaster);
+	            DlerMaterialAvailability dlerIdMaterialAvailability = dlerMaterialAvailabilityRepo
+	                    .findByDlerIdMaterialId(dlerMaterialMaster.getDlerIdMaterialId());
 
-		}
-		return null;
+	            if (dlerIdMaterialAvailability == null) {
+	                DlerMaterialAvailability availability = new DlerMaterialAvailability();
+	                availability.setDlerId(saved.getDlerId());
+	                availability.setDlerIdMaterialId(saved.getDlerIdMaterialId());
+	                availability.setAvailability("Yes");
+	                availability.setOnlineDisplay(null);
+	                availability.setReturnPolicy(null);
+	                availability.setUpdatedBy(null);
+	                availability.setUpdatedDate(null);
+
+	                dlerMaterialAvailabilityRepo.save(availability);
+	            }
+
+	            return saved;
+	        }
+	    }
+	    return null;
 	}
 
+	
+	
 	@Override
 	public DlerMaterialMaster update(DlerMaterialMaster dlerMaterialMaster) {
 		Optional<DlerMaterialMaster> exists = Optional

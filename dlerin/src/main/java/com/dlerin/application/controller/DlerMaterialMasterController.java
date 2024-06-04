@@ -31,34 +31,33 @@ public class DlerMaterialMasterController {
 
 	ResponseDlerMaterialMasterDto response = new ResponseDlerMaterialMasterDto();
 	ResponseDlerMaterialMasterDto1 response1 = new ResponseDlerMaterialMasterDto1();
-
+	
 	@PostMapping("/dlerin-add-dlermaterialmaster")
-	public ResponseEntity<?> addDlerMetrialMaster(@RequestBody DlerMaterialMaster material) {
+	public ResponseEntity<?> addDlerMaterialMaster(@RequestBody DlerMaterialMaster material) {
+	  
 
-		try {
+	    try {
+	        DlerMaterialMaster addedMaterialMaster = dlerMaterialMasterService.add(material);
 
-			DlerMaterialMaster addedMaterialMaster = dlerMaterialMasterService.add(material);
-
-			if (addedMaterialMaster != null) {
-				response.setMessage("Added Dler Material Master");
-				response.setStatus(true);
-				response.setAdded(addedMaterialMaster);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Failed to add/dler not present");
-				response.setStatus(false);
-				response.setAdded(null);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
-
-		} catch (Exception e) {
-			response.setMessage("Record already exists");
-			response.setStatus(false);
-			response.setAdded(null);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
-
+	        if (addedMaterialMaster != null) {
+	            response.setMessage("Added Dler Material Master");
+	            response.setStatus(true);
+	            response.setAdded(addedMaterialMaster);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
+	        } else {
+	            response.setMessage("Failed to add/dler not present");
+	            response.setStatus(false);
+	            response.setAdded(null);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
+	        }
+	    } catch (Exception e) {
+	        response.setMessage("Record alredy exists");
+	        response.setStatus(false);
+	        response.setAdded(null);
+	        return new ResponseEntity<>(response, HttpStatus.OK);
+	    }
 	}
+
 
 	@PutMapping("/dlerin-update-dlermaterialmaster")
 	public ResponseEntity<?> updateDlerMaterialMaster(@RequestBody DlerMaterialMaster material) {

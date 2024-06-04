@@ -6,5 +6,5 @@ import com.dlerin.application.entity.DlerOrderDetails;
 public interface DlerOrderDetailsService {
 	
 	public List<DlerOrderDetails> addOrders(List<DlerOrderDetails> orders);
-	public DlerOrderDetails updateOrder(DlerOrderDetails order);
+	public List<DlerOrderDetails> updateOrder(List<DlerOrderDetails> orders);
 }

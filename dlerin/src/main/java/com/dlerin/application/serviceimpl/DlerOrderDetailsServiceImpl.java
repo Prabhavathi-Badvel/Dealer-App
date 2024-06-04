@@ -43,6 +43,11 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 		return "Ord" + year + month + day + hour + minute + second + millis;
 	}
 
+
+	private String generateLineId(String generatedOrderId, int lineCounter) {
+        return String.format("%s_%05d", generatedOrderId, lineCounter);
+    }
+	
 	public DlerOrderDetails addOrderDetailsToCart(DlerOrderDetails order) {
 
 		Optional<DlerMaterialMaster> materialOptional = Optional
@@ -66,6 +71,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 			newHeader.setTotalAmount(calculateTotalPrice(order.getOrderId()));
 			newHeader.setOrderBy(savedOrder.getDlerId());
 			newHeader.setUpdatedBy(savedOrder.getDlerId());
+			newHeader.setOrderTo(savedOrder.getOrderTo());
 			dlerOrderHeaderRepo.save(newHeader);
 		} else {
 
@@ -80,11 +86,18 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 		List<DlerOrderDetails> addedOrders = new ArrayList<>();
 		String generatedOrderId = generateOrderId();
 
+		int lineCounter = 1;
+		
 		for (DlerOrderDetails order : orders) {
 			try {
 
 				order.setOrderId(generatedOrderId);
-
+				 order.setLineId(generateLineId(generatedOrderId, lineCounter));
+	                lineCounter++;
+	                
+	                order.setDlerId(order.getDlerId());
+	                order.setOrderTo(order.getOrderTo());
+				
 				DlerOrderDetails addedOrder = addOrderDetailsToCart(order);
 				if (addedOrder != null) {
 					addedOrders.add(addedOrder);
@@ -99,46 +112,95 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 		return addedOrders;
 	}
 
-	private String calculateTotalPrice(String orderId) {
+	private int calculateTotalPrice(String orderId) {
 		List<DlerOrderDetails> orderDetailsList = dlerOrderDetailsRepo.findByOrderId(orderId);
 
 		int totalPrice = 0;
 		for (DlerOrderDetails orderDetail : orderDetailsList) {
 			try {
-				int basePrice = Integer.parseInt(orderDetail.getPricePerUnit());
-				int orderQty = Integer.parseInt(orderDetail.getOrderQty());
-				totalPrice += basePrice * orderQty;
+				int basePrice = orderDetail.getPricePerUnit();
+                int orderQty = orderDetail.getOrderQty();
+                int discount = orderDetail.getDiscount();
+
+                int priceBeforeDiscount = basePrice * orderQty;
+     
+                int priceAfterDiscount = priceBeforeDiscount - (priceBeforeDiscount * discount / 100);
+
+                totalPrice += priceAfterDiscount;
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
 		}
-		return String.valueOf(totalPrice);
+		return totalPrice;
 	}
 
 	private void updateOrderHeaderTotalAmount(String orderId) {
 		DlerOrderHeader dlerHeader = dlerOrderHeaderRepo.findByOrderId(orderId);
 
 		if (dlerHeader != null) {
-			String totalAmount = calculateTotalPrice(orderId);
+			int totalAmount = calculateTotalPrice(orderId);
 			dlerHeader.setTotalAmount(totalAmount);
 			dlerOrderHeaderRepo.save(dlerHeader);
 		}
 	}
 
+	
+	
 	@Override
-	public DlerOrderDetails updateOrder(DlerOrderDetails order) {
+	public List<DlerOrderDetails> updateOrder(List<DlerOrderDetails> orders) {
+	    List<DlerOrderDetails> updatedOrders = new ArrayList<>();
+	    for (DlerOrderDetails order : orders) {
+	        Optional<DlerOrderDetails> lineIdOptional = dlerOrderDetailsRepo.findById(order.getLineId());
+	        if (lineIdOptional.isPresent()) {
+	            DlerOrderDetails dbOrderDetails = lineIdOptional.get();
+	            dbOrderDetails.setRemark(order.getRemark());
+	            dbOrderDetails.setStatus(order.getStatus());
+	            dbOrderDetails.setDeliveredQty(order.getDeliveredQty());
+	            
+	            DlerOrderDetails updatedOrderDetails = dlerOrderDetailsRepo.save(dbOrderDetails);
+	            updatedOrders.add(updatedOrderDetails);
+	            
+	            
+	            
+	        }
+	    }
 
-		Optional<DlerOrderDetails> orderId = dlerOrderDetailsRepo.findById(order.getLineId());
-		if (orderId.isPresent()) {
-			DlerOrderDetails db = orderId.get();
-			db.setDeliveredQty(order.getDeliveredQty());
-			db.setRemark(order.getRemark());
-			db.setStatus(order.getStatus());
-			return dlerOrderDetailsRepo.save(db);
+	    if (!updatedOrders.isEmpty()) {
+	        
+	        updateInvoicedAmount(updatedOrders.get(0).getOrderId());
+	    }
 
-		}
-		return null;
+	    return updatedOrders;
+	}
 
+	private void updateInvoicedAmount(String orderId) {
+	    Integer invoicedAmount = calculateDeliveryAmount(orderId);
+	    DlerOrderHeader orderHeader = dlerOrderHeaderRepo.findByOrderId(orderId);
+	    if (orderHeader != null) {
+	        orderHeader.setToBeInvoicedAmount(invoicedAmount != null ? invoicedAmount : 0); // Assign default value if invoicedAmount is null
+	        
+	        dlerOrderHeaderRepo.save(orderHeader);
+	    }
+	}
+
+	private int calculateDeliveryAmount(String orderId) {
+	    List<DlerOrderDetails> orderDetailsList = dlerOrderDetailsRepo.findByOrderId(orderId);
+	    int totalPrice = 0;
+	    for (DlerOrderDetails orderDetail : orderDetailsList) {
+	        try {
+	            int basePrice = orderDetail.getPricePerUnit();
+	            int deliveredQty = orderDetail.getDeliveredQty();
+	            int discount = orderDetail.getDiscount();
+
+	            int priceBeforeDiscount = basePrice * deliveredQty;
+	            int priceAfterDiscount = priceBeforeDiscount - (priceBeforeDiscount * discount / 100);
+
+	            totalPrice += priceAfterDiscount;
+	        } catch (NumberFormatException e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return totalPrice;
 	}
 
 }

@@ -12,5 +12,6 @@ public class DlerOrderDetailsDto {
 	private String orderBy;
 	private String fromDate;
 	private String toDate;
+	private String orderTo;
 
 }

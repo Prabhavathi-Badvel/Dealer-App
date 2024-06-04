@@ -16,4 +16,8 @@ public interface DlerOrderHeaderRepo extends JpaRepository<DlerOrderHeader, Stri
 
 	List<DlerOrderHeader> findByOrderDateBetween(LocalDate localDate, LocalDate localDate2);
 
+	List<DlerOrderHeader> findByOrderTo(String orderTo);
+
+	List<DlerOrderHeader> findByOrderBy(String orderBy);
+
 }

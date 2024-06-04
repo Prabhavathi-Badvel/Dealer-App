@@ -59,16 +59,17 @@ public class DlerOrderHeaderController {
 		String orderBy = order.getOrderBy();
 		String fromDate = order.getFromDate();
 		String toDate = order.getToDate();
+		String orderTo = order.getOrderTo();
 
 		try {
-			List<DlerOrderDetails> entity = dlerOrderHeaderService.getOrderData(orderId, orderBy, fromDate, toDate);
+			List<DlerOrderDetails> entity = dlerOrderHeaderService.getOrderData(orderId, orderBy, fromDate, toDate,orderTo);
 			if (!entity.isEmpty()) {
 				response1.setMessage("Order details fetched successfully.!");
 				response1.setStatus(true);
 				response1.setData(entity);
 				return ResponseEntity.ok(response1);
 			} else {
-				response1.setMessage("No data found for the given details.!");
+				response1.setMessage("No data found for the given details/check your parameters!");
 				response1.setStatus(true);
 				return ResponseEntity.status(HttpStatus.OK).body(response1);
 			}

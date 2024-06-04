@@ -7,7 +7,7 @@ import java.util.List;
 
 
 @Repository
-public interface DlerOrderDetailsRepo extends JpaRepository<DlerOrderDetails, Integer>{
+public interface DlerOrderDetailsRepo extends JpaRepository<DlerOrderDetails, String>{
 
 	 List<DlerOrderDetails> findByOrderId(String orderId);
 

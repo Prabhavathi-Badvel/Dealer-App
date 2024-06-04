@@ -41,37 +41,37 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 
 	}
 
-
 	@Override
-	public List<DlerOrderDetails> getOrderData(String orderId, String orderBy, String fromDate, String toDate) {
-	    List<DlerOrderHeader> headers = new ArrayList<>();
-	    List<DlerOrderDetails> orderDetails = new ArrayList<>();
+	public List<DlerOrderDetails> getOrderData(String orderId, String orderBy, String fromDate, String toDate,
+			String orderTo) {
+		List<DlerOrderHeader> headers = new ArrayList<>();
+		List<DlerOrderDetails> orderDetails = new ArrayList<>();
 
-	    if (orderId != null) {
-	        DlerOrderHeader header = dlerOrderHeaderRepo.findByOrderId(orderId);
-	        if (header != null) {
-	            orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(Collections.singletonList(header.getOrderId()));
-	        }
-	    } else if (orderBy != null) {
-	        headers = dlerOrderHeaderRepo.findByOrderIdOrOrderBy(null, orderBy);
-	        List<String> orderIds = headers.stream()
-	                                       .map(DlerOrderHeader::getOrderId)
-	                                       .collect(Collectors.toList());
-	        if (!orderIds.isEmpty()) {
-	            orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
-	        }
-	    } else if (fromDate != null && toDate != null) {
-	        headers = dlerOrderHeaderRepo.findByOrderDateBetween(LocalDate.parse(fromDate), LocalDate.parse(toDate));
-	        List<String> orderIds = headers.stream()
-	                                       .map(DlerOrderHeader::getOrderId)
-	                                       .collect(Collectors.toList());
-	        if (!orderIds.isEmpty()) {
-	            orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
-	        }
-	    }
+		if (orderId != null) {
+			DlerOrderHeader header = dlerOrderHeaderRepo.findByOrderId(orderId);
+			if (header != null) {
+				orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(Collections.singletonList(header.getOrderId()));
+			}
+		} else if (orderBy != null) {
+			headers = dlerOrderHeaderRepo.findByOrderBy(orderBy);
+			List<String> orderIds = headers.stream().map(DlerOrderHeader::getOrderId).collect(Collectors.toList());
+			if (!orderIds.isEmpty()) {
+				orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
+			}
+		} else if (fromDate != null && toDate != null) {
+			headers = dlerOrderHeaderRepo.findByOrderDateBetween(LocalDate.parse(fromDate), LocalDate.parse(toDate));
+			List<String> orderIds = headers.stream().map(DlerOrderHeader::getOrderId).collect(Collectors.toList());
+			if (!orderIds.isEmpty()) {
+				orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
+			}
+		} else if (orderTo != null) {
+			headers = dlerOrderHeaderRepo.findByOrderTo(orderTo);
+			List<String> orderIds = headers.stream().map(DlerOrderHeader::getOrderId).collect(Collectors.toList());
+			if (!orderIds.isEmpty()) {
+				orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
+			}
+		}
+		return orderDetails;
 
-	    return orderDetails;
 	}
-
-		 
 }

@@ -53,10 +53,10 @@ public class DlerOrderDetailsController {
 	}
 
 	@PutMapping("/dlerin-update-dlerorderdetails")
-	public ResponseEntity<?> updateOrderDetails(@RequestBody DlerOrderDetails orders) {
+	public ResponseEntity<?> updateOrderDetails(@RequestBody List<DlerOrderDetails> orders) {
 		try {
-			DlerOrderDetails updateOrders = orderService.updateOrder(orders);
-			if (updateOrders != null) {
+			List<DlerOrderDetails> updateOrders = orderService.updateOrder(orders);
+			if (!updateOrders.isEmpty()) {
 				response1.setMessage("updated successfully");
 				response1.setStatus(true);
 				return new ResponseEntity<>(response1, HttpStatus.OK);

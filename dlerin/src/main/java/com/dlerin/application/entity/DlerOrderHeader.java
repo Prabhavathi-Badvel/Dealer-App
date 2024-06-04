@@ -17,31 +17,33 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="dler_order_header")
+@Table(name = "dler_order_header")
 public class DlerOrderHeader {
 
 	@Id
-	@Column(name="order_id")
+	@Column(name = "order_id")
 	private String orderId;
 	@CreationTimestamp
-	@Column(name="order_date")
+	@Column(name = "order_date")
 	private LocalDate orderDate;
 	@Column(name = "total_amount")
-	private String totalAmount;
-	@Column(name="status")
+	private int totalAmount;
+	@Column(name = "status")
 	private String status;
-	@Column(name="updated_by")
+	@Column(name = "updated_by")
 	private String updatedBy;
-	@Column(name="order_to")
+	@Column(name = "order_to")
 	private String orderTo;
 	@UpdateTimestamp
-	@Column(name="updated_date")
+	@Column(name = "updated_date")
 	private String updatedDate;
-	@Column(name="remarks")
+	@Column(name = "remarks")
 	private String remarks;
-	@Column(name="order_by")
+	@Column(name = "order_by")
 	private String orderBy;
-	
-	
+	@Column(name = "invoice_no")
+	private String invoiceNo;
+	@Column(name = "to_be_invoiced_amount")
+	private int toBeInvoicedAmount;
 
 }
