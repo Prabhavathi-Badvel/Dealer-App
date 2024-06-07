@@ -25,25 +25,49 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
-	private  JwtService jwtService;
+	private JwtService jwtService;
 
 	@Autowired
-	private  UserDetailsService userDetailsService;
+	private UserDetailsService userDetailsService;
 
-
-
+	private static final String ORIGIN = "Origin";
 
 	@Override
-	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
 		String token = extractToken(request);
-		if (token != null && jwtService.isTokenValid(token)) {
-			String username = jwtService.extractUsername(token);
-			String userType = jwtService.extractUserType(token);
-			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-			UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-			SecurityContextHolder.getContext().setAuthentication(authentication);
+		String origin = request.getHeader(ORIGIN);
+		if (origin != null) {
+			response.setHeader("Access-Control-Allow-Origin", origin);
+			response.setHeader("Access-Control-Allow-Credentials", "true");
+			response.setHeader("Access-Control-Allow-Headers", request.getHeader("Access-Control-Request-Headers"));
+			response.setHeader("Access-Control-Allow-Methods", "PATCH, GET, POST, PUT, DELETE, OPTIONS");
 		}
-		filterChain.doFilter(request, response);
+
+		if (request.getMethod().equals("OPTIONS")) {
+			// stop here if OPTIONS used
+			try {
+				response.setStatus(HttpServletResponse.SC_OK);
+				response.setContentType("text/plain");
+				response.getWriter().print("OK");
+				response.getWriter().flush();
+			} catch (IOException e) {
+			}
+		} else {
+			if (token != null && jwtService.isTokenValid(token)) {
+				String username = jwtService.extractUsername(token);
+				String userType = jwtService.extractUserType(token);
+				UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+				UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails,
+						null, userDetails.getAuthorities());
+				SecurityContextHolder.getContext().setAuthentication(authentication);
+			}
+		}
+		
+		if (!response.isCommitted()) {
+			filterChain.doFilter(request,response);
+		}
+
 	}
 
 	private String extractToken(HttpServletRequest request) {
@@ -53,9 +77,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		return null;
 	}
-
-
-
 
 //	@Override
 //	protected void doFilterInternal(HttpServletRequest request,
@@ -87,7 +108,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 //		filterChain.doFilter(request, response);
 //	}
 
-
 }
-
-
