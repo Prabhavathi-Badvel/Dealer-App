@@ -22,15 +22,16 @@ public class DlerOrderDetailsController {
 	@Autowired
 	DlerOrderDetailsService orderService;
 
-	ResponseDlerOrderDetails response = new ResponseDlerOrderDetails();
+	
 
 	ResponseDlerOrderDetails1 response1 = new ResponseDlerOrderDetails1();
 
 	@PostMapping("/dlerin-add-orders")
 	public ResponseEntity<?> addOrderDetails(@RequestBody List<DlerOrderDetails> order) {
-
+		ResponseDlerOrderDetails response = new ResponseDlerOrderDetails();
+		List<DlerOrderDetails> orderDetailsList = orderService.addOrders(order);
 		try {
-			List<DlerOrderDetails> orderDetailsList = orderService.addOrders(order);
+			
 			if (!orderDetailsList.isEmpty()) {
 				response.setMessage("Added successfully");
 				response.setStatus(true);
@@ -40,14 +41,14 @@ public class DlerOrderDetailsController {
 			} else {
 				response.setMessage("failed to add/dlerId not present");
 				response.setStatus(false);
-				response.setOrderData(null);
+				response.setOrderData(orderDetailsList);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 
 			}
 		} catch (Exception e) {
 			response.setMessage(e.getMessage());
 			response.setStatus(false);
-			response.setOrderData(null);
+			response.setOrderData(orderDetailsList);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 	}

@@ -50,7 +50,6 @@ public class DlerBusinessLogin implements UserDetails {
 	private String dlerMobileVerify;
 
 	@Column(name = "dler_status")
-
 	private String dlerStatus;
 	@Column(name = "dler_status_updated_by")
 	private String dlerStatusUpdatedBy;

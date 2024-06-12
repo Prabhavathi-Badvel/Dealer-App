@@ -49,7 +49,7 @@ public class AdminLogin implements UserDetails {
 
 	@PrePersist
 	private void prePersist() {
-		this.updatedBy = empId;
+		this.updatedBy = emailId;
 	}
 
 	@Override

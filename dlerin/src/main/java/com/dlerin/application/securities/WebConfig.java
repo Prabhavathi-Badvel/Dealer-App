@@ -1,6 +1,5 @@
 package com.dlerin.application.securities;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,16 +16,12 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.dlerin.application.serviceimpl.CustomUserService;
 
-
-
 @Configuration
 public class WebConfig {
 
 	@Autowired
 	CustomUserService registrationService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
-
-
 
 	@Autowired
 	public WebConfig(BCryptPasswordEncoder bCryptPasswordEncoder) {
@@ -46,7 +41,6 @@ public class WebConfig {
 		return authConfiguration.getAuthenticationManager();
 	}
 
-
 	@Bean
 	public JwtAuthenticationFilter authenticationJwtTokenFilter() {
 		return new JwtAuthenticationFilter();
@@ -57,15 +51,16 @@ public class WebConfig {
 		http.cors(AbstractHttpConfigurer::disable).csrf(AbstractHttpConfigurer::disable)
 				.exceptionHandling((exception) -> exception.authenticationEntryPoint(new JwtAuthEntryPoint()))
 				.sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/dlerin-registration","/dlerin-login-dlerbusinesslogin","/dlerin-send-otp-verify-email","/dlerin-verify-otp-verify-email","/sendmobileOtp","/verifySmsOtp","/dlerin-register-adminlogin","/dlerin-login-adminlogin","/admin/forgetPassword/sendOtp","/admin/forgetPassword/verifyOtpAndChangePassword","/dlerforgetPassword/sendOtp","/dler/forgetPassword/verification","/dlerin-get-adminbrands").permitAll()
-						.anyRequest().authenticated());
+				.authorizeHttpRequests(
+						auth -> auth.requestMatchers("/dlerin-registration", "/dlerin-login-dlerbusinesslogin",
+								"/dlerin-send-otp-verify-email", "/dlerin-verify-otp-verify-email", "/sendmobileOtp",
+								"/verifySmsOtp", "/dlerin-register-adminlogin", "/dlerin-login-adminlogin",
+								"/admin/forgetPassword/sendOtp", "/admin/forgetPassword/verifyOtpAndChangePassword",
+								"/dlerforgetPassword/sendOtp", "/dler/forgetPassword/verification").permitAll().anyRequest().authenticated());
 
 		http.authenticationProvider(customDaoAuthenticationProvider());
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 		return http.build();
 	}
 
-
-
 }
-

@@ -120,10 +120,8 @@ public class DlerBusinessLoginController {
 
 	@PostMapping("/dlerin-login-dlerbusinesslogin")
 	public ResponseEntity<ResponseDlerLoginDto> login(@RequestBody LoginDto requestDto) {
-		String dlrEmail = requestDto.getEmail();
-		String dlrMobileNo = requestDto.getMobileNo();
-		String dlrPassword = requestDto.getPassword();
-		ResponseDlerLoginDto response = dlerBusinessLoginService.DlerloginDetails(dlrEmail, dlrMobileNo, dlrPassword);
+		
+		ResponseDlerLoginDto response = dlerBusinessLoginService.DlerloginDetails(requestDto.getEmail(), requestDto.getMobileNo(), requestDto.getPassword());
 		try {
 			if (response.getJwtToken() != null) {
 				return new ResponseEntity<ResponseDlerLoginDto>(response, HttpStatus.OK);

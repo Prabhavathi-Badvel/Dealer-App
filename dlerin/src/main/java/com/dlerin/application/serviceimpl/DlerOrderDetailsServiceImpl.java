@@ -50,8 +50,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 	
 	public DlerOrderDetails addOrderDetailsToCart(DlerOrderDetails order) {
 
-		Optional<DlerMaterialMaster> materialOptional = Optional
-				.ofNullable(dlerMaterialMasterRepo.findDlerId(order.getDlerId()));
+		Optional<DlerMaterialMaster> materialOptional = Optional.ofNullable(dlerMaterialMasterRepo.findDlerId(order.getDlerId()));
 
 		if (!materialOptional.isPresent()) {
 			return null;
@@ -59,12 +58,15 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 
 		order.setStatus("Pending");
 
+		order.setDlerId(materialOptional.get().getDlerId());
 		DlerOrderDetails savedOrder = dlerOrderDetailsRepo.save(order);
 
+		 savedOrder.setOrderTo(order.getOrderTo());
+		 savedOrder.setDlerId(order.getDlerId());
+		
 		DlerOrderHeader dlerHeader = dlerOrderHeaderRepo.findByOrderId(order.getOrderId());
 
 		if (dlerHeader == null) {
-
 			DlerOrderHeader newHeader = new DlerOrderHeader();
 			newHeader.setStatus(savedOrder.getStatus());
 			newHeader.setOrderId(savedOrder.getOrderId());
@@ -78,6 +80,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 			dlerHeader.setTotalAmount(calculateTotalPrice(order.getOrderId()));
 			dlerOrderHeaderRepo.save(dlerHeader);
 		}
+		
 
 		return savedOrder;
 	}
@@ -94,9 +97,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 				order.setOrderId(generatedOrderId);
 				 order.setLineId(generateLineId(generatedOrderId, lineCounter));
 	                lineCounter++;
-	                
-	                order.setDlerId(order.getDlerId());
-	                order.setOrderTo(order.getOrderTo());
+	               
 				
 				DlerOrderDetails addedOrder = addOrderDetailsToCart(order);
 				if (addedOrder != null) {
@@ -177,7 +178,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 	    Integer invoicedAmount = calculateDeliveryAmount(orderId);
 	    DlerOrderHeader orderHeader = dlerOrderHeaderRepo.findByOrderId(orderId);
 	    if (orderHeader != null) {
-	        orderHeader.setToBeInvoicedAmount(invoicedAmount != null ? invoicedAmount : 0); // Assign default value if invoicedAmount is null
+	        orderHeader.setToBeInvoicedAmount(invoicedAmount != null ? invoicedAmount : 0); 
 	        
 	        dlerOrderHeaderRepo.save(orderHeader);
 	    }

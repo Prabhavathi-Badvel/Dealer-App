@@ -1,6 +1,5 @@
 package com.dlerin.application.serviceimpl;
 
-
 import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -90,38 +89,76 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 		return null;
 	}
 
+	
 	@Override
 	public ResponseDlerLoginDto DlerloginDetails(String dlerEmailId, String dlerMobileNo, String dlerPassword) {
-		ResponseDlerLoginDto response = new ResponseDlerLoginDto();
+	    ResponseDlerLoginDto response = new ResponseDlerLoginDto();
 
-		DlerBusinessLogin login = dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(dlerEmailId, dlerMobileNo);
-		if (login != null && login.getDlerStatus().equalsIgnoreCase("active")) {
+	    Optional<DlerBusinessLogin> login = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(dlerEmailId, dlerMobileNo));
+	    if (!login.isPresent()) {
+	        return createErrorResponse(response, "Invalid dler");
+	    }
 
-			if ((dlerEmailId != null && login.getDlerEmailVerify().equalsIgnoreCase("yes"))
-					|| (dlerMobileNo != null && login.getDlerMobileVerify().equalsIgnoreCase("yes"))) {
-				if (byCrypt.matches(dlerPassword, login.getDlerPassword())) {
+	    DlerBusinessLogin loginDetails = login.get();
+	    
+	    if (loginDetails.getDlerStatus() == null || !loginDetails.getDlerStatus().equalsIgnoreCase("active")) {
+	        return createErrorResponse(response, "Inactive dler/verify your account");
+	    }
 
-					String jwtToken = jwtService.generateToken(login.getDlerEmailId(), login.getUserType());
-					response.setMessage("Login Successful");
-					response.setStatus(true);
-					response.setJwtToken(jwtToken);
-					response.setLoginDetails(getDlerBusinessLoginDto(login.getDlerUserId()));
-					return response;
-				} else {
-					response.setMessage("Invalid Password");
-					response.setStatus(false);
-				}
-			} else {
-				response.setMessage("Please verify your email/mobile first");
-				response.setStatus(false);
-			}
-		} else {
-			response.setMessage("Invalid User or Inactive User");
-			response.setStatus(false);
-		}
-		return response;
+	    if (dlerEmailId != null && dlerMobileNo == null) {
+	        return handleEmailLogin(response, dlerEmailId, dlerPassword, loginDetails);
+	    } else if (dlerEmailId == null && dlerMobileNo != null) {
+	        return handleMobileLogin(response, dlerMobileNo, dlerPassword, loginDetails);
+	    }
+
+	    return createErrorResponse(response, "Invalid dealer!");
 	}
 
+	private ResponseDlerLoginDto handleEmailLogin(ResponseDlerLoginDto response, String email, String password, DlerBusinessLogin loginDetails) {
+	    if (!loginDetails.getDlerEmailVerify().equalsIgnoreCase("yes")) {
+	        return createErrorResponse(response, "verify email");
+	    }
+
+	    if (!byCrypt.matches(password, loginDetails.getDlerPassword())) {
+	        return createErrorResponse(response, "Invalid Password");
+	    }
+
+	    String jwtToken = jwtService.generateToken(loginDetails.getDlerEmailId(), loginDetails.getUserType());
+	    response.setMessage("Login Successful");
+	    response.setStatus(true);
+	    response.setJwtToken(jwtToken);
+	    response.setLoginDetails(getDlerBusinessLoginDto(loginDetails.getDlerUserId()));
+
+	    return response;
+	}
+
+	private ResponseDlerLoginDto handleMobileLogin(ResponseDlerLoginDto response, String mobileNo, String password, DlerBusinessLogin loginDetails) {
+	    if (!loginDetails.getDlerEmailVerify().equalsIgnoreCase("yes")) {
+	        return createErrorResponse(response, "verify mobile");
+	    }
+
+	    if (!byCrypt.matches(password, loginDetails.getDlerPassword())) {
+	        return createErrorResponse(response, "Invalid Password");
+	    }
+
+	    String jwtToken = jwtService.generateToken(loginDetails.getDlerMobileNo(), loginDetails.getUserType());
+	    response.setMessage("Login Successful");
+	    response.setStatus(true);
+	    response.setJwtToken(jwtToken);
+	    response.setLoginDetails(getDlerBusinessLoginDto(loginDetails.getDlerUserId()));
+
+	    return response;
+	}
+
+	private ResponseDlerLoginDto createErrorResponse(ResponseDlerLoginDto response, String message) {
+	    response.setMessage(message);
+	    response.setStatus(false);
+	    return response;
+	}
+
+
+
+	
 	@Override
 	public DlerBusinessLoginDto1 getDlerBusinessLoginDto(String userId) {
 		DlerBusinessLoginDto1 loginDto = new DlerBusinessLoginDto1();

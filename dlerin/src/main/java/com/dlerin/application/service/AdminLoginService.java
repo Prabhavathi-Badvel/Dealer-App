@@ -7,7 +7,7 @@ import com.dlerin.application.entity.AdminLogin;
 
 public interface AdminLoginService {
 
-	public AdminLoginDto1 saveAdminDetails(AdminLogin adminLogin);
+	public AdminLoginDto saveAdminDetails(AdminLogin adminLogin);
 	public String changePassword(String emailId, String oldPassword, String newPassword, String confirmPassword,String password);
 	public ResponseAdminLoginDto2 loginDetails(String emailId, String mobileNo, String password);
 	public AdminLogin updateprofile(AdminLogin adminLogin, String empId);

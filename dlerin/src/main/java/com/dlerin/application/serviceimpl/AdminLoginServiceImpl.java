@@ -36,7 +36,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	private EntityManager entityManager;
 
 	@Override
-	public AdminLoginDto1 saveAdminDetails(AdminLogin adminLogin) {
+	public AdminLoginDto saveAdminDetails(AdminLogin adminLogin) {
 		if (adminLoginRepo.findByEmailIdOrMobileNoOrEmpId(adminLogin.getEmailId(), adminLogin.getMobileNo(),
 				adminLogin.getEmpId()) == null) {
 			BCryptPasswordEncoder byCrypt = new BCryptPasswordEncoder();
@@ -45,13 +45,16 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 			AdminLogin admin = adminLoginRepo.save(adminLogin);
 
-			AdminLoginDto1 adminLoginDto = new AdminLoginDto1();
+			AdminLoginDto adminLoginDto = new AdminLoginDto();
 
+			adminLoginDto.setAddress(adminLogin.getAddress());
 			adminLoginDto.setEmailId(adminLogin.getEmailId());
 			adminLoginDto.setEmpId(adminLogin.getEmpId());
 			adminLoginDto.setMobileNo(adminLogin.getMobileNo());
 			adminLoginDto.setName(adminLogin.getName());
+			adminLoginDto.setRegisteredDate(admin.getRegisteredDate());
 			adminLoginDto.setUserType(adminLogin.getUserType());
+			adminLoginDto.setUpdatedBy(adminLogin.getUpdatedBy());
 
 			return adminLoginDto;
 		}
@@ -100,7 +103,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 
 	@Override
 	public AdminLoginDto getAdminLoginDetails(String emailId, String mobileNo, String empId) {
-		Optional<AdminLogin> user = adminLoginRepo.findByEmailIdOrMobileNoOrEmpId(emailId, mobileNo, empId);
+		Optional<AdminLogin> user = Optional.ofNullable(adminLoginRepo.findByEmailIdOrMobileNoOrEmpId(emailId, mobileNo, empId));
 
 		if (user.isPresent()) {
 			AdminLogin dbt = user.get();

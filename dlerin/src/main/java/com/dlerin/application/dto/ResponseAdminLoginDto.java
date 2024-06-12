@@ -11,6 +11,6 @@ public class ResponseAdminLoginDto {
 	private String message;
 	private boolean status;
 	private String jwtToken;
-	private AdminLoginDto1 adminData;
+	private AdminLoginDto adminData;
 
 }

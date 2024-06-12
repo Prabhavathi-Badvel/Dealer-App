@@ -31,7 +31,7 @@ public class AdminLoginController {
 	@Autowired
 	AdminLoginService adminLoginService;
 
-	ResponseAdminLoginDto response = new ResponseAdminLoginDto();
+	
 	ResponseAdminLoginDto1 response1 = new ResponseAdminLoginDto1();
 	ResponseAdminLoginDto3 response3 = new ResponseAdminLoginDto3();
 
@@ -40,8 +40,8 @@ public class AdminLoginController {
 	@PostMapping("/dlerin-register-adminlogin")
 	public ResponseEntity<?> saveAdminLogin(@RequestBody AdminLogin adminLoginDto) {
 		try {
-
-			AdminLoginDto1 savedLogin = adminLoginService.saveAdminDetails(adminLoginDto);
+			ResponseAdminLoginDto response = new ResponseAdminLoginDto();
+			AdminLoginDto savedLogin = adminLoginService.saveAdminDetails(adminLoginDto);
 			if (savedLogin != null) {
 
 				response.setMessage("Admin registered successfully");
