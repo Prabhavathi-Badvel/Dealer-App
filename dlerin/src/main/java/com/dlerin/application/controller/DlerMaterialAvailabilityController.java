@@ -21,10 +21,11 @@ public class DlerMaterialAvailabilityController {
 	@Autowired
 	DlerMaterialAvailabilityService availabilityService;
 	
-	ResponseDlerMaterialAvailabilityDto response = new ResponseDlerMaterialAvailabilityDto();
+	
 	
 	@GetMapping("/get-material-availability")
 	public ResponseEntity<?> getAvailability(@RequestParam(required = false)String dlerId,@RequestParam(required = false)String dlerIdMaterialId){
+		ResponseDlerMaterialAvailabilityDto response = new ResponseDlerMaterialAvailabilityDto();
 		try {
 			List<DlerMaterialAvailability> availability = availabilityService.getMaterialAvailability(dlerId, dlerIdMaterialId);
 			if(availability!= null && !availability.isEmpty()) {

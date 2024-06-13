@@ -15,13 +15,13 @@ public interface DlerBusinessLoginRepo extends JpaRepository<DlerBusinessLogin, 
 
 	DlerBusinessLogin findByDlerEmailId(String dlerEmailId);
 
-//	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
-
 	DlerBusinessLogin findByDlerMobileNo(String dlerMobileNo);
 
 	DlerBusinessLogin findByDlerUserIdOrDlerEmailId(String dlerUserId, String dlerEmailId);
 
 	DlerBusinessLogin findByDlerUserId(String userId);
 	
-	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
+//	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
+	
+	 Optional<DlerBusinessLogin> findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
 }

@@ -74,4 +74,32 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 		return orderDetails;
 
 	}
+	
+	
+	@Override
+	public List<DlerOrderHeader> getOrderHeaderData(String orderId, String orderBy, String fromDate, String toDate,
+			String orderTo) {
+		List<DlerOrderHeader> headers = new ArrayList<>();
+
+		if (orderId != null) {
+			DlerOrderHeader details = dlerOrderHeaderRepo.findByOrderId(orderId);
+			if (details != null) {
+	            headers.add(details);
+	        }
+		} else if (orderBy != null) {
+			headers = dlerOrderHeaderRepo.findByOrderBy(orderBy);
+			
+		} else if (fromDate != null && toDate != null) {
+			headers = dlerOrderHeaderRepo.findByOrderDateBetween(LocalDate.parse(fromDate), LocalDate.parse(toDate));
+			
+			
+		} else if (orderTo != null) {
+			headers = dlerOrderHeaderRepo.findByOrderTo(orderTo);
+			
+		}
+		return headers;
+
+	}
+		
+	
 }

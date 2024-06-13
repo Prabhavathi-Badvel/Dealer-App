@@ -28,13 +28,10 @@ public class AdminBrandMasterController {
 
 	@Autowired
 	AdminBrandMasterRepo admindBrandRepo;
-
-	ResponseAdminBrandMasterDto response = new ResponseAdminBrandMasterDto();
-
-	ResponseAdminBrandMasterDto1 response1 = new ResponseAdminBrandMasterDto1();
-
+	
 	@PostMapping("/dlerin-add-adminbrands")
 	public ResponseEntity<?> addAdminBrands(@RequestBody AdminBrandMaster adminBrands) {
+		ResponseAdminBrandMasterDto response = new ResponseAdminBrandMasterDto();
 
 		try {
 			AdminBrandMaster savedBrand = adminBrandService.addBrand(adminBrands);
@@ -60,6 +57,8 @@ public class AdminBrandMasterController {
 	@PutMapping("/dlerin-update-adminbrands")
 	public ResponseEntity<?> updateAdminBrands(@RequestBody AdminBrandMaster brand) {
 		boolean updated = adminBrandService.updateBrands(brand);
+		ResponseAdminBrandMasterDto1 response1 = new ResponseAdminBrandMasterDto1();
+
 		try {
 			if (updated) {
 				response1.setMessage("Updated successfully");

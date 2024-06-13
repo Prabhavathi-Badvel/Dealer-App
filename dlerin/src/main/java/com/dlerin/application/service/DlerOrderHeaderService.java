@@ -9,5 +9,6 @@ public interface DlerOrderHeaderService {
 
 	public DlerOrderHeader updateHeaderDetails(DlerOrderHeader header);
 	public List<DlerOrderDetails> getOrderData(String orderId, String orderBy, String fromDate, String toDate,String orderTo);
-
+	public List<DlerOrderHeader> getOrderHeaderData(String orderId, String orderBy, String fromDate, String toDate,
+			String orderTo);
 }

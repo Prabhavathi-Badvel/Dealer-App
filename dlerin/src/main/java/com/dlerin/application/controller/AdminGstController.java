@@ -29,15 +29,11 @@ public class AdminGstController {
 	@Autowired
 	AdminGstService adminGstService;
 
-	ResponseAdminGstDto response = new ResponseAdminGstDto();
-
-	ResponseAdminGstDto1 response1 = new ResponseAdminGstDto1();
-
 	@PostMapping("/dlerin-add-AdminGst")
 	public ResponseEntity<?> addAdminGst(@RequestBody AdminGst gst) {
 		String email = gst.getEmailId();
 		String mobile = gst.getMobileNo();
-
+		ResponseAdminGstDto response = new ResponseAdminGstDto();
 		try {
 
 			AdminGst ad = adminGstService.addGst(gst, email, mobile);
@@ -63,7 +59,7 @@ public class AdminGstController {
 
 	@PutMapping("/dlerin-update-AdminGst")
 	public ResponseEntity<?> updateAdminGst(@RequestBody AdminGst admin) {
-
+		ResponseAdminGstDto1 response1 = new ResponseAdminGstDto1();
 		Optional<AdminGst> gstExists = Optional.ofNullable(adminGstRepo.findByGstCode(admin.getGstCode()));
 		try {
 			if (gstExists.isPresent()) {
@@ -87,10 +83,10 @@ public class AdminGstController {
 	@GetMapping("/dlerin-get-AdminGst")
 	public ResponseEntity<?> getGstDetails(@RequestParam(required = false) String gstCode,
 			@RequestParam(required = false) int gstPercentage) {
-
+		ResponseAdminGstDto2 response2 = new ResponseAdminGstDto2();
 		try {
 			List<AdminGst> getBrand = adminGstService.getDetails(gstCode, gstPercentage);
-			ResponseAdminGstDto2 response2 = new ResponseAdminGstDto2();
+			
 			if (getBrand != null && !getBrand.isEmpty()) {
 				response2.setMessage("Received gst details");
 				response2.setStatus(true);

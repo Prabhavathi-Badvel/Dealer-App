@@ -24,7 +24,7 @@ public class AdminGstServiceImpl implements AdminGstService {
 
 	@Override
 	public AdminGst addGst(AdminGst adminGst, String email, String mobile) {
-		Optional<AdminLogin> login = Optional.ofNullable(adminLoginRepo.findByEmailIdOrMobileNo(email, mobile));
+		Optional<AdminLogin> login = adminLoginRepo.findByEmailIdOrMobileNo(email, mobile);
 
 		if (login.isPresent()) {
 			AdminLogin adminDb = login.get();

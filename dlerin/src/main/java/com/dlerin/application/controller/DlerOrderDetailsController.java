@@ -22,10 +22,6 @@ public class DlerOrderDetailsController {
 	@Autowired
 	DlerOrderDetailsService orderService;
 
-	
-
-	ResponseDlerOrderDetails1 response1 = new ResponseDlerOrderDetails1();
-
 	@PostMapping("/dlerin-add-orders")
 	public ResponseEntity<?> addOrderDetails(@RequestBody List<DlerOrderDetails> order) {
 		ResponseDlerOrderDetails response = new ResponseDlerOrderDetails();
@@ -55,6 +51,7 @@ public class DlerOrderDetailsController {
 
 	@PutMapping("/dlerin-update-dlerorderdetails")
 	public ResponseEntity<?> updateOrderDetails(@RequestBody List<DlerOrderDetails> orders) {
+		ResponseDlerOrderDetails1 response1 = new ResponseDlerOrderDetails1();
 		try {
 			List<DlerOrderDetails> updateOrders = orderService.updateOrder(orders);
 			if (!updateOrders.isEmpty()) {

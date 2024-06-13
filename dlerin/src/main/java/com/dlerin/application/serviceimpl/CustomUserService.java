@@ -1,5 +1,7 @@
 package com.dlerin.application.serviceimpl;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -24,14 +26,14 @@ public class CustomUserService implements UserDetailsService {
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		DlerBusinessLogin dler = dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(username, username);
-		if (dler != null) {
-			return dler;
-		}
+		Optional<DlerBusinessLogin> dler = dlerBusinessLoginRepo.findByDlerEmailIdOrDlerMobileNo(username, username);
+		   if (dler.isPresent()) {
+	            return dler.get();
+	        }
 
-		AdminLogin adminLogin = adminLoginRepo.findByEmailIdOrMobileNo(username, username);
-		if (adminLogin != null) {
-			return adminLogin;
+		Optional<AdminLogin> adminLogin = adminLoginRepo.findByEmailIdOrMobileNo(username, username);
+		if (adminLogin.isPresent()) {
+			return adminLogin.get();
 		}
 		throw new UsernameNotFoundException("User not found with username: " + username);
 	}

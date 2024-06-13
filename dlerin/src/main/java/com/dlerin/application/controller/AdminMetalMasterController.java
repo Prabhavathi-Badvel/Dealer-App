@@ -30,15 +30,9 @@ public class AdminMetalMasterController {
 	@Autowired
 	AdminMetalMasterRepo adminMetalMasterRepo;
 
-	ResponseAdminMetalMasterDto response = new ResponseAdminMetalMasterDto();
-
-	ResponseAdminMetalMasterDto1 response1 = new ResponseAdminMetalMasterDto1();
-
-	ResponseAdminmetalMaterialDto2 response2 = new ResponseAdminmetalMaterialDto2();
-
 	@PostMapping("/dlerin-add-adminmetalmaster")
 	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMaster admin) {
-
+		ResponseAdminMetalMasterDto response = new ResponseAdminMetalMasterDto();
 		try {
 			AdminMetalMaster add = adminMetalMaterService.addMaterial(admin);
 
@@ -57,7 +51,7 @@ public class AdminMetalMasterController {
 
 	@PutMapping("/dlerin-update-adminmetalmaster")
 	public ResponseEntity<?> updateAdminMaterial(@RequestBody AdminMetalMaster adminMaterial) {
-
+		ResponseAdminMetalMasterDto1 response1 = new ResponseAdminMetalMasterDto1();
 		Optional<AdminMetalMaster> materialIdExists = adminMetalMasterRepo.findById(adminMaterial.getMaterialId());
 		try {
 			if (materialIdExists.isPresent()) {
@@ -80,7 +74,7 @@ public class AdminMetalMasterController {
 	@GetMapping("/dlerin-get-adminmetalmaster")
 	public ResponseEntity<?> getAdminMaterial(@RequestParam(required = false) String materialId,
 			@RequestParam(required = false) String materialType, @RequestParam(required = false) String materialShape) {
-
+		ResponseAdminmetalMaterialDto2 response2 = new ResponseAdminmetalMaterialDto2();
 		try {
 			List<AdminMetalMaster> material = adminMetalMaterService.getMaterial(materialId, materialType,
 					materialShape);

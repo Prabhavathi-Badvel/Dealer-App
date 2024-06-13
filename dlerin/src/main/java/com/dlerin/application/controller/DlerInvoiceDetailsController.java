@@ -20,17 +20,16 @@ public class DlerInvoiceDetailsController {
 	
 	@PostMapping("/invoice details")
 	public ResponseEntity<?> SaveInvioce(@RequestBody DlerInvoiceDetails invoice){
-		
+		ResponseDlerInvioceDto response = new ResponseDlerInvioceDto();
 		try {
 			DlerInvoiceDetails details = InvoiceService.saveInvoceDetails(invoice);
+			
 			if(details != null) {
-				ResponseDlerInvioceDto response = new ResponseDlerInvioceDto();
 				response.setMessage("added invoice details");
 				response.setStatus(true);
 				response.setAddData(details);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			}else {
-				ResponseDlerInvioceDto response = new ResponseDlerInvioceDto();
 				response.setMessage("failed to add/orderid not present");
 				response.setStatus(false);
 				response.setAddData(details);
@@ -38,7 +37,6 @@ public class DlerInvoiceDetailsController {
 			}
 			
 		}catch(Exception e){
-			ResponseDlerInvioceDto response = new ResponseDlerInvioceDto();
 			response.setMessage(e.getMessage());
 			response.setStatus(false);
 			response.setAddData(null);

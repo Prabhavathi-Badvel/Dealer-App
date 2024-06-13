@@ -30,44 +30,37 @@ public class DlerMaterialPriceController {
 	@Autowired
 	DlerMaterialPriceRepo dlerMaterialPriceRepo;
 
-	ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
-	
-	ResponseDlerMaterialPriceDto1 response1 = new ResponseDlerMaterialPriceDto1();
+	@PostMapping("/dlerin-add-DlerMaterialPrices")
+	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
+		ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
+		try {
+			List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
 
-	ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
-
-	
-	 @PostMapping("/dlerin-add-DlerMaterialPrices")
-	    public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
-	       
-	        try {
-	            List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
-
-	            if (!addedPrices.isEmpty()) {
-	                response.setMessage("Added successfully");
-	                response.setStatus(true);
-	                response.setAddData(addedPrices);
-	                return new ResponseEntity<>(response, HttpStatus.OK);
-	            } else {
-	                response.setMessage("Record already exists or given DlerIdMaterialId not found");
-	                response.setStatus(false);
-	                response.setAddData(null);
-	                return new ResponseEntity<>(response, HttpStatus.OK);
-	            }
-	        } catch (Exception e) {
-	            response.setMessage("Failed to add prices");
-	            response.setStatus(false);
-	            response.setAddData(null);
-	            return new ResponseEntity<>(response, HttpStatus.OK);
-	        }
-	    }
-	
+			if (!addedPrices.isEmpty()) {
+				response.setMessage("Added successfully");
+				response.setStatus(true);
+				response.setAddData(addedPrices);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				response.setMessage("Record already exists or given DlerIdMaterialId not found");
+				response.setStatus(false);
+				response.setAddData(null);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			response.setMessage("Failed to add prices");
+			response.setStatus(false);
+			response.setAddData(null);
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+	}
 
 	@PutMapping("/dlerin-update-DlerMaterialPrice")
 	public ResponseEntity<?> updateDlerMaterialPrice(@RequestBody DlerMaterialPrice price) {
 		boolean updateSuccess = dlerMaterialPriceService.updatePriceAndStoreHistory(price);
+		ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
 		try {
-			
+
 			if (updateSuccess) {
 				response2.setMessage("Updated successfully");
 				response2.setStatus(true);
@@ -84,36 +77,34 @@ public class DlerMaterialPriceController {
 
 	}
 
-	
 	@GetMapping("/dlerin-get-DlerMaterialPrice")
 	public ResponseEntity<?> getDlerPrice(@RequestBody DlerMaterialPriceDto dlerPrice) {
 
-	 
-	    DlerMaterialMaster searchCriteria = new DlerMaterialMaster();
-	    searchCriteria.setDlerId(dlerPrice.getDlerId());
-	    searchCriteria.setMaterialName(dlerPrice.getMaterialName());
-	    searchCriteria.setSkuId(dlerPrice.getSkuId());
-	    searchCriteria.setMaterialId(dlerPrice.getMaterialId());
+		DlerMaterialMaster searchCriteria = new DlerMaterialMaster();
+		searchCriteria.setDlerId(dlerPrice.getDlerId());
+		searchCriteria.setMaterialName(dlerPrice.getMaterialName());
+		searchCriteria.setSkuId(dlerPrice.getSkuId());
+		searchCriteria.setMaterialId(dlerPrice.getMaterialId());
 
-	    List<DlerMaterialPrice> priceExists = dlerMaterialPriceService.getPrice(dlerPrice);
-	    List<DlerMaterialMaster> allDlers = dlerMaterialPriceService.getDlersDetails(searchCriteria);
-
-	    try {
-	        if (priceExists!=null && !priceExists.isEmpty()) {
-	            response1.setMessage("Get price details");
-	            response1.setStatus(true);
-	            response1.setPriceData(priceExists);
-	            response1.setDlerDetails(allDlers);
-	            return new ResponseEntity<>(response1, HttpStatus.OK);
-	        } else {
-	            response1.setMessage("No details found for the given parameters");
-	            response1.setStatus(false);
-	            response1.setPriceData(priceExists);
-	            response1.setDlerDetails(allDlers);
-	            return new ResponseEntity<>(response1, HttpStatus.OK);
-	        }
-	    } catch (Exception e) {
-	    	return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
-	    }
+		List<DlerMaterialPrice> priceExists = dlerMaterialPriceService.getPrice(dlerPrice);
+		List<DlerMaterialMaster> allDlers = dlerMaterialPriceService.getDlersDetails(searchCriteria);
+		ResponseDlerMaterialPriceDto1 response1 = new ResponseDlerMaterialPriceDto1();
+		try {
+			if (priceExists != null && !priceExists.isEmpty()) {
+				response1.setMessage("Get price details");
+				response1.setStatus(true);
+				response1.setPriceData(priceExists);
+				response1.setDlerDetails(allDlers);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
+			} else {
+				response1.setMessage("No details found for the given parameters");
+				response1.setStatus(false);
+				response1.setPriceData(priceExists);
+				response1.setDlerDetails(allDlers);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+		}
 	}
 }

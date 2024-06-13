@@ -11,7 +11,7 @@ public interface DlerBusinessLoginService {
 	public DlerBusinessLoginDto addDlerBusinessProfile(DlerBusinessLogin dbl);
 	public String isEmailExists(String dlerEmailId);
 	public DlerBusinessLogin updateData(String otp, String dlerEmailId);
-	public ResponseDlerLoginDto DlerloginDetails(String dlerEmailId, String dlerMobileNo, String dlerPassword);
+	public ResponseDlerLoginDto dlerLoginDetails(String dlerEmailId, String dlerMobileNo, String dlerPassword);
 	public DlerBusinessLoginDto1 getDlerBusinessLoginDto(String userId);
 	public DlerBusinessLogin updateDataWithMobile(String dlerMobileNo);
 	public String changePassword(String dlerEmailId, String oldPassword, String newPassword, String confirmPassword,String dlerMobileNo);

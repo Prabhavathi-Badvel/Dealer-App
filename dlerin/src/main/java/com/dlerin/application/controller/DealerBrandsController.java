@@ -29,13 +29,9 @@ public class DealerBrandsController {
 	@Autowired
 	DealerBrandsRepo dealerBrandsRepo;
 
-	ResponseDealerBrnadsDto response = new ResponseDealerBrnadsDto();
-	ResponseDealerBrandsDto1 response1 = new ResponseDealerBrandsDto1();
-	
-
 	@PostMapping("/dlerin-add-dealerBrands")
 	public ResponseEntity<?> AddDealerBrands(@RequestBody DealerBrands brands) {
-
+		ResponseDealerBrnadsDto response = new ResponseDealerBrnadsDto();
 		try {
 			DealerBrands dealerBrands = dealerBrandsService.addBrands(brands);
 
@@ -60,7 +56,7 @@ public class DealerBrandsController {
 
 	@PutMapping("/dlerin-update-dealerBrands")
 	public ResponseEntity<?> updateDealerBrands(@RequestBody DealerBrands dealerBrands) {
-
+		ResponseDealerBrnadsDto response = new ResponseDealerBrnadsDto();
 		try {
 			Optional<DealerBrands> exists = Optional
 					.ofNullable(dealerBrandsRepo.findByBrandIdDlerId(dealerBrands.getBrandIdDlerId()));
@@ -86,21 +82,24 @@ public class DealerBrandsController {
 	}
 
 	@GetMapping("/dlerin-get-dealerBtrands")
-	public ResponseEntity<?> getDealerBrands(@RequestParam(required = false)String brandId,@RequestParam(required = false)String updatedBy,@RequestParam(required = false)String businessType) {
+	public ResponseEntity<?> getDealerBrands(@RequestParam(required = false) String brandId,
+			@RequestParam(required = false) String updatedBy, @RequestParam(required = false) String businessType) {
+		ResponseDealerBrandsDto1 response1 = new ResponseDealerBrandsDto1();
+
 		try {
-			List<DealerBrands> getBrand = dealerBrandsService.getBrands(brandId,updatedBy,businessType);
-		if(getBrand!=null && !getBrand.isEmpty()) {	
-			
-			response1.setMessage("dealer brands details");
-			response1.setStatus(true);
-			response1.setGetData(getBrand);
-			return new ResponseEntity<>(response1, HttpStatus.OK);
-		}else {
-			response1.setMessage("No details found for provided parameters/check your parameters");
-			response1.setStatus(false);
-			response1.setGetData(getBrand);
-			return new ResponseEntity<>(response1, HttpStatus.OK);
-		}
+			List<DealerBrands> getBrand = dealerBrandsService.getBrands(brandId, updatedBy, businessType);
+			if (getBrand != null && !getBrand.isEmpty()) {
+
+				response1.setMessage("dealer brands details");
+				response1.setStatus(true);
+				response1.setGetData(getBrand);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
+			} else {
+				response1.setMessage("No details found for provided parameters/check your parameters");
+				response1.setStatus(false);
+				response1.setGetData(getBrand);
+				return new ResponseEntity<>(response1, HttpStatus.OK);
+			}
 		} catch (Exception e) {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}

@@ -40,15 +40,9 @@ public class DlerBusinessLoginController {
 	@Autowired
 	MobileOtpService MobileOtpService;
 
-	ResponseDlerBusinessLoginDto response = new ResponseDlerBusinessLoginDto();
-
-	ResponseDlerBusinessLoginDto1 response1 = new ResponseDlerBusinessLoginDto1();
-
-	ResponseMessageDto message = new ResponseMessageDto();
-
 	@PostMapping("/dlerin-registration")
 	public ResponseEntity<?> addDlerBusinessLoginProfile(@RequestBody DlerBusinessLogin dlerBusinessl) {
-
+		ResponseDlerBusinessLoginDto response = new ResponseDlerBusinessLoginDto();
 		try {
 			DlerBusinessLoginDto dblDTO = dlerBusinessLoginService.addDlerBusinessProfile(dlerBusinessl);
 			if (dblDTO != null) {
@@ -74,7 +68,7 @@ public class DlerBusinessLoginController {
 	@PostMapping("/dlerin-send-otp-verify-email")
 	public ResponseEntity<?> sendEmail(@RequestBody DlerBusinessLogin login) {
 		String dlerEmailId = login.getDlerEmailId();
-
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (dlerBusinessLoginService.isEmailExists(dlerEmailId) == null) {
 				message.setMessage("Invalid EmailId");
@@ -102,6 +96,7 @@ public class DlerBusinessLoginController {
 	public ResponseEntity<?> verifyUserEmail(@RequestBody DlerBusinessLogin login) {
 		String dlerEmailId = login.getDlerEmailId();
 		String dlerEmailOtp = login.getDlerEmailOtp();
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (otpService.verifyOtp(dlerEmailId, dlerEmailOtp)) {
 
@@ -120,8 +115,10 @@ public class DlerBusinessLoginController {
 
 	@PostMapping("/dlerin-login-dlerbusinesslogin")
 	public ResponseEntity<ResponseDlerLoginDto> login(@RequestBody LoginDto requestDto) {
-		
-		ResponseDlerLoginDto response = dlerBusinessLoginService.DlerloginDetails(requestDto.getEmail(), requestDto.getMobileNo(), requestDto.getPassword());
+		String dlerEmailId = requestDto.getDlerEmailId();
+		String dlerMobileNo = requestDto.getDlerMobileNo();
+		String dlerPassword = requestDto.getDlerPassword();
+		ResponseDlerLoginDto response = dlerBusinessLoginService.dlerLoginDetails(dlerEmailId,dlerMobileNo,dlerPassword );
 		try {
 			if (response.getJwtToken() != null) {
 				return new ResponseEntity<ResponseDlerLoginDto>(response, HttpStatus.OK);
@@ -140,6 +137,8 @@ public class DlerBusinessLoginController {
 
 		DlerBusinessLoginDto2 profile = dlerBusinessLoginService.getBusinessProfile(dlerEmailId, dlerMobileNo,
 				dlerUserId);
+		ResponseDlerBusinessLoginDto1 response1 = new ResponseDlerBusinessLoginDto1();
+
 		try {
 			if (profile != null) {
 				response1.setMessage("Dler details");
@@ -160,6 +159,7 @@ public class DlerBusinessLoginController {
 	@PostMapping("/sendmobileOtp")
 	public ResponseEntity<?> sendMobileOtp(@RequestBody DlerBusinessLogin login) {
 		String dlerMobileNo = login.getDlerMobileNo();
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (dlerBusinessLoginRepo.findByDlerMobileNo(dlerMobileNo) == null) {
 				message.setMessage("Invalid mobile number");
@@ -185,6 +185,7 @@ public class DlerBusinessLoginController {
 	public ResponseEntity<?> verifyMobileOtp(@RequestBody DlerBusinessLogin login) {
 		String mobile = login.getDlerMobileNo();
 		String otp = login.getDlerMobileOtp();
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (otpService.verifyMobileOtp(mobile, otp)) {
 
@@ -210,7 +211,7 @@ public class DlerBusinessLoginController {
 		String newPassword = changePassword.getNewPassword();
 		String confirmPassword = changePassword.getConfirmPassword();
 		String dlerMobileNo = changePassword.getDlerMobileNo();
-
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			String password = dlerBusinessLoginService.changePassword(dlerEmailId, oldPassword, newPassword,
 					confirmPassword, dlerMobileNo);
@@ -241,6 +242,7 @@ public class DlerBusinessLoginController {
 	public ResponseEntity<?> sendOtpForgotPassword(@RequestBody ChangeForgotdto password) {
 		String dlerEmailId = password.getDlerEmailId();
 		String dlerMobileNo = password.getDlerMobileNo();
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (dlerEmailId != null && dlerMobileNo == null) {
 				if (dlerBusinessLoginService.sendMail(dlerEmailId) != null) {
@@ -277,6 +279,7 @@ public class DlerBusinessLoginController {
 		String newPassword = forgotPwd.getNewPassword();
 		String confirmPassword = forgotPwd.getConfirmPassword();
 		String mobile = forgotPwd.getDlerMobileNo();
+		ResponseMessageDto message = new ResponseMessageDto();
 
 		try {
 			String data = dlerBusinessLoginService.forgetPassword(dlerEmailId, otp, newPassword, confirmPassword,

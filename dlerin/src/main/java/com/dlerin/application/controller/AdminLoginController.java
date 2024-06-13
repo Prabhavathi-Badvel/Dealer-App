@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.dlerin.application.dto.AdminChangeForgotdto;
 import com.dlerin.application.dto.AdminLoginDto;
-import com.dlerin.application.dto.AdminLoginDto1;
-import com.dlerin.application.dto.LoginDto;
+import com.dlerin.application.dto.LoginAdminDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto;
 import com.dlerin.application.dto.ResponseAdminLoginDto1;
 import com.dlerin.application.dto.ResponseAdminLoginDto2;
@@ -30,12 +30,6 @@ public class AdminLoginController {
 
 	@Autowired
 	AdminLoginService adminLoginService;
-
-	
-	ResponseAdminLoginDto1 response1 = new ResponseAdminLoginDto1();
-	ResponseAdminLoginDto3 response3 = new ResponseAdminLoginDto3();
-
-	ResponseMessageDto message = new ResponseMessageDto();
 
 	@PostMapping("/dlerin-register-adminlogin")
 	public ResponseEntity<?> saveAdminLogin(@RequestBody AdminLogin adminLoginDto) {
@@ -60,11 +54,11 @@ public class AdminLoginController {
 	}
 
 	@PostMapping("/dlerin-login-adminlogin")
-	public ResponseEntity<?> login(@RequestBody LoginDto login) {
-		String userEmail = login.getEmail();
-		String userMobile = login.getMobileNo();
-		String userPassword = login.getPassword();
-		ResponseAdminLoginDto2 response = adminLoginService.loginDetails(userEmail, userMobile, userPassword);
+	public ResponseEntity<?> login(@RequestBody LoginAdminDto login) {
+		String email = login.getEmail();
+		String mobileNo = login.getMobileNo();
+		String password = login.getPassword();
+		ResponseAdminLoginDto2 response = adminLoginService.loginDetails(email, mobileNo, password);
 		if (response.getJwtToken() != null) {
 			return new ResponseEntity<ResponseAdminLoginDto2>(response, HttpStatus.OK);
 		}
@@ -76,6 +70,7 @@ public class AdminLoginController {
 	@GetMapping("/dlerin-get-adminlogin-profile")
 	public ResponseEntity<?> getAdminProfile(@RequestParam(required = false) String emailId,
 			@RequestParam(required = false) String mobileNo, @RequestParam(required = false) String empId) {
+		ResponseAdminLoginDto3 response3 = new ResponseAdminLoginDto3();
 		try {
 			AdminLoginDto details = adminLoginService.getAdminLoginDetails(emailId, mobileNo, empId);
 			if (details != null) {
@@ -103,7 +98,7 @@ public class AdminLoginController {
 		String newPassword = changePassword.getNewPassword();
 		String confirmPassword = changePassword.getConfirmPassword();
 		String mobileNo = changePassword.getMobileNo();
-
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (adminLoginService.changePassword(emailId, oldPassword, newPassword, confirmPassword,
 					mobileNo) == "changed") {
@@ -136,7 +131,7 @@ public class AdminLoginController {
 	public ResponseEntity<?> updateAdminProfile(@RequestBody AdminLogin adminLogin) {
 
 		String empId = adminLogin.getEmpId();
-
+		ResponseAdminLoginDto1 response1 = new ResponseAdminLoginDto1();
 		AdminLogin update = adminLoginService.updateprofile(adminLogin, empId);
 		try {
 			if (update == null) {
@@ -159,6 +154,7 @@ public class AdminLoginController {
 	public ResponseEntity<?> sendOtpForgotPassword(@RequestBody AdminChangeForgotdto password) {
 		String emailId = password.getEmailId();
 		String mobileNo = password.getMobileNo();
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			if (emailId != null && mobileNo == null) {
 				if (adminLoginService.sendMail(emailId) != null) {
@@ -196,7 +192,7 @@ public class AdminLoginController {
 		String newPassword = forgotPwd.getNewPassword();
 		String confirmPassword = forgotPwd.getConfirmPassword();
 		String mobileNo = forgotPwd.getMobileNo();
-
+		ResponseMessageDto message = new ResponseMessageDto();
 		try {
 			String data = adminLoginService.forgetPassword(emailId, otp, newPassword, confirmPassword, mobileNo);
 			if (data == "changed") {

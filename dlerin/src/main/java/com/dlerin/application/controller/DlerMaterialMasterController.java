@@ -28,14 +28,11 @@ public class DlerMaterialMasterController {
 
 	@Autowired
 	DlerMaterialMasterRepo dlerMaterialMasterRepo;
-
-	ResponseDlerMaterialMasterDto response = new ResponseDlerMaterialMasterDto();
-	ResponseDlerMaterialMasterDto1 response1 = new ResponseDlerMaterialMasterDto1();
 	
 	@PostMapping("/dlerin-add-dlermaterialmaster")
 	public ResponseEntity<?> addDlerMaterialMaster(@RequestBody DlerMaterialMaster material) {
 	  
-
+		ResponseDlerMaterialMasterDto response = new ResponseDlerMaterialMasterDto();
 	    try {
 	        DlerMaterialMaster addedMaterialMaster = dlerMaterialMasterService.add(material);
 
@@ -61,7 +58,7 @@ public class DlerMaterialMasterController {
 
 	@PutMapping("/dlerin-update-dlermaterialmaster")
 	public ResponseEntity<?> updateDlerMaterialMaster(@RequestBody DlerMaterialMaster material) {
-
+		ResponseDlerMaterialMasterDto response = new ResponseDlerMaterialMasterDto();
 		try {
 			Optional<DlerMaterialMaster> exists = Optional
 					.ofNullable(dlerMaterialMasterRepo.findByDlerIdMaterialId(material.getDlerIdMaterialId()));
@@ -89,7 +86,7 @@ public class DlerMaterialMasterController {
 	public ResponseEntity<?> getMaterialMaster(@RequestParam(required = false) String brandId,
 			@RequestParam(required = false) String materialType, @RequestParam(required = false) String materialId,
 			@RequestParam(required = false) String dlerId, @RequestParam(required = false) String materialName) {
-
+		ResponseDlerMaterialMasterDto1 response1 = new ResponseDlerMaterialMasterDto1();
 		try {
 
 			List<DlerMaterialMaster> dlerprofile = dlerMaterialMasterService.getDlerMaterialProfile(brandId,

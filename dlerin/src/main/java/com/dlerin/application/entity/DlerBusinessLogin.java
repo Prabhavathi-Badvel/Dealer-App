@@ -57,7 +57,7 @@ public class DlerBusinessLogin implements UserDetails {
 	@Column(name = "dler_password_updated_date")
 	private String dlerPasswordUpdatedDate;
 
-	@Column(name = "user_type")
+    @Column(name = "user_type")
 	private String userType;
 
 	@PrePersist

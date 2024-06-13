@@ -1,19 +1,15 @@
 package com.dlerin.application.serviceimpl;
 
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
 import com.dlerin.application.dto.AdminLoginDto;
-import com.dlerin.application.dto.AdminLoginDto1;
 import com.dlerin.application.dto.ResponseAdminLoginDto2;
 import com.dlerin.application.entity.AdminLogin;
 import com.dlerin.application.repository.AdminLoginRepo;
 import com.dlerin.application.securities.JwtService;
 import com.dlerin.application.service.AdminLoginService;
-
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
@@ -64,22 +60,23 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	@Override
 	public ResponseAdminLoginDto2 loginDetails(String emailId, String mobileNo, String password) {
 		ResponseAdminLoginDto2 response = new ResponseAdminLoginDto2();
-		AdminLogin adminLogin = adminLoginRepo.findByEmailIdOrMobileNo(emailId, mobileNo);
-
-		if (adminLogin != null) {
-			if (byCrypt.matches(password, adminLogin.getPassword())) {
-				String jwtToken = jwtService.generateToken(adminLogin.getEmailId(), adminLogin.getUserType()); 																																														
+		Optional<AdminLogin> adminLogin = adminLoginRepo.findByEmailIdOrMobileNo(emailId, mobileNo);
+		
+		if (adminLogin.isPresent()) {
+			
+			if (byCrypt.matches(password, adminLogin.get().getPassword())) {
+				String jwtToken = jwtService.generateToken(adminLogin.get().getEmailId(), adminLogin.get().getUserType()); 																																														
 				response.setMessage("Login Successful");
 				response.setStatus(true);
 				response.setJwtToken(jwtToken);
-				response.setAdminData(getAdminData(adminLogin.getEmpId())); 
+				response.setAdminData(getAdminData(adminLogin.get().getEmpId())); 
 				return response;
 			} else {
 				response.setMessage("Invalid Password");
 				response.setStatus(false);
 			}
 		} else {
-			response.setMessage("Invalid User");
+			response.setMessage("Invalid admin");
 			response.setStatus(false);
 		}
 		return response;
@@ -96,6 +93,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 		loginDto.setAddress(login.get().getAddress());
 		loginDto.setRegisteredDate(login.get().getRegisteredDate());
 		loginDto.setUpdatedBy(login.get().getUpdatedBy());
+		loginDto.setUserType(login.get().getUserType());
 
 		return loginDto;
 	}

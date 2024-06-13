@@ -34,12 +34,9 @@ public class DlerProfileController {
 	@Autowired
 	DlerBusinessLoginRepo dlerBusinessLoginRepo;
 
-	ResponseDlerProfileDto1 response1 = new ResponseDlerProfileDto1();
-	ResponseDlerProfileDto response = new ResponseDlerProfileDto();
-
 	@PostMapping("/dlerin-add-dlerprofile")
 	public ResponseEntity<?> addDlerProfile(@RequestBody DlerProfile dp) {
-
+		ResponseDlerProfileDto1 response1 = new ResponseDlerProfileDto1();
 		try {
 
 			Optional<DlerBusinessLogin> dlerOptional = dlerBusinessLoginRepo.findById(dp.getDlerId());
@@ -81,7 +78,7 @@ public class DlerProfileController {
 
 	@PutMapping("/dlerin-update-dlerprofile")
 	public ResponseEntity<?> updateDlerProfle(@RequestBody DlerProfile dp) {
-
+		ResponseDlerProfileDto1 response1 = new ResponseDlerProfileDto1();
 		String dlerBusinessId = dp.getDlerBusinessId();
 		try {
 
@@ -107,7 +104,7 @@ public class DlerProfileController {
 
 	@GetMapping("/dlerin-get-dlerprofile")
 	public ResponseEntity<?> getDlerProfile(@RequestBody ProfileDto dealerProfile) {
-
+		ResponseDlerProfileDto response = new ResponseDlerProfileDto();
 		try {
 
 			List<DlerProfile> dler = dlerProfileService.getProfile(dealerProfile);
