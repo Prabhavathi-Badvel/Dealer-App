@@ -28,7 +28,7 @@ public class AdminBrandMasterController {
 
 	@Autowired
 	AdminBrandMasterRepo admindBrandRepo;
-	
+
 	@PostMapping("/dlerin-add-adminbrands")
 	public ResponseEntity<?> addAdminBrands(@RequestBody AdminBrandMaster adminBrands) {
 		ResponseAdminBrandMasterDto response = new ResponseAdminBrandMasterDto();
@@ -78,10 +78,10 @@ public class AdminBrandMasterController {
 	public ResponseEntity<?> getAdminBrandMaster(@RequestParam(required = false) String brandName,
 			@RequestParam(required = false) String brandCategory,
 			@RequestParam(required = false) String brandSubcategory) {
+		ResponseAdminBrandDto response = new ResponseAdminBrandDto();
 
 		try {
 			List<AdminBrandMaster> brands = adminBrandService.getBrands(brandName, brandCategory, brandSubcategory);
-			ResponseAdminBrandDto response = new ResponseAdminBrandDto();
 			if (brands != null && !brands.isEmpty()) {
 				response.setMessage("Successfully receieved brands");
 				response.setStatus(true);
@@ -97,5 +97,10 @@ public class AdminBrandMasterController {
 		} catch (Exception e) {
 			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
 		}
+	}
+
+	@GetMapping("/getCategoryOnly")
+	public List<String> getDistinctBrandCategories() {
+		return adminBrandService.getDistinctBrandCategories();
 	}
 }

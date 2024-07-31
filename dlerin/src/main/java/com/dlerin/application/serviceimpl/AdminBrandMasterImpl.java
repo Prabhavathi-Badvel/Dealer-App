@@ -7,7 +7,9 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.dlerin.application.entity.AdminBrandMaster;
+import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.AdminBrandMasterRepo;
+import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.service.AdminBrandMasterService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,6 +26,9 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	@Autowired
+	DlerBusinessLoginRepo dlerBusinessLoginRepo;
 
 	@Override
 	public AdminBrandMaster addBrand(AdminBrandMaster adminBrand) {
@@ -77,4 +82,11 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 
 		return entityManager.createQuery(query).getResultList();
 	}
+
+	@Override
+	public List<String> getDistinctBrandCategories() {
+		return admindBrandMaterRepo.findDistinctBrandCategories();
+	}
+
+
 }

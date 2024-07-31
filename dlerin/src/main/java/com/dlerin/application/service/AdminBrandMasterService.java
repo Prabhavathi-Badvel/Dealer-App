@@ -8,4 +8,6 @@ public interface AdminBrandMasterService {
 	public AdminBrandMaster addBrand(AdminBrandMaster adminBrand);
 	public boolean updateBrands(AdminBrandMaster adminBrand);
 	public List<AdminBrandMaster> getBrands(String brandName,String brandCategory, String brandSubcategory);
+	
+	 public List<String> getDistinctBrandCategories();
 }
