@@ -48,29 +48,29 @@ public class AdminBrandMaster {
 	@Column(name = "brand_subcategory")
 	private String brandSubcategory;
 
-	public void setBrandNameList(List<String> brandName) {
-		this.brandName = String.join(",", brandName);
-	}
-
-	public List<String> getBrandNameList() {
-		return Arrays.asList(this.brandName.split(","));
-	}
-
-	@PrePersist
-	private void prePersist() {
-		updateBrandCatSubCat();
-
-	}
-
-	@PreUpdate
-	private void preUpdate() {
-		if (brandName != null || brandCategory != null || brandSubcategory != null) {
-			updateBrandCatSubCat();
-		}
-	}
-
-	private void updateBrandCatSubCat() {
-		this.brandCatSubCat = brandName + "_" + brandCategory + "_" + brandSubcategory;
-
-	}
+//	public void setBrandNameList(List<String> brandName) {
+//		this.brandName = String.join(",", brandName);
+//	}
+//
+//	public List<String> getBrandNameList() {
+//		return Arrays.asList(this.brandName.split(","));
+//	}
+//
+//	@PrePersist
+//	private void prePersist() {
+//		updateBrandCatSubCat();
+//
+//	}
+//
+//	@PreUpdate
+//	private void preUpdate() {
+//		if (brandName != null || brandCategory != null || brandSubcategory != null) {
+//			updateBrandCatSubCat();
+//		}
+//	}
+//
+//	private void updateBrandCatSubCat() {
+//		this.brandCatSubCat = brandName + "_" + brandCategory + "_" + brandSubcategory;
+//
+//	}
 }
