@@ -10,12 +10,18 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DlerResponse;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.entity.DlerMaterialMaster;
+import com.dlerin.application.entity.DlerMaterialPrice;
+import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.entity.DlerStoreDetails;
+import com.dlerin.application.repository.AdminBrandMasterRepo;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.repository.DlerMaterialMasterRepo;
+import com.dlerin.application.repository.DlerMaterialPriceRepo;
+import com.dlerin.application.repository.DlerProfileRepo;
 import com.dlerin.application.repository.DlerStoreDetailsRepo;
 import com.dlerin.application.service.DlerStoreDetailsService;
 
@@ -33,10 +39,16 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	private DlerStoreDetailsRepo dlerStoreDetailsRepo;
 
 	@Autowired
-	DlerBusinessLoginRepo dlerBusinessLoginRepo;
+	private DlerBusinessLoginRepo dlerBusinessLoginRepo;
 
 	@Autowired
-	DlerMaterialMasterRepo dlerMaterialMasterRepo;
+	private DlerMaterialMasterRepo dlerMaterialMasterRepo;
+
+	@Autowired
+	private DlerMaterialPriceRepo dlerMaterialPriceRepo;
+
+	@Autowired
+	private DlerProfileRepo dlerProfileRepo;
 
 	@Autowired
 	private ModelMapper modelMapper;
@@ -136,4 +148,74 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 			}
 		}).filter(Objects::nonNull).collect(Collectors.toList());
 	}
+
+	@Override
+	public DealerMasterResponse getDealerDetails(String businessType, String location, String brandId,
+			String businessName, String materialName) {
+		List<DlerStoreDetails> dlerStoreDetails = new ArrayList<>();
+		DealerMasterResponse dmr = new DealerMasterResponse();
+		List<DlerProfile> dps;
+		if (businessName != null) {
+			dps = dlerProfileRepo.findByDlerBusinessName(businessName);
+			if (!dps.isEmpty()) {
+				// Fetch store details if businessName is provided
+				if (businessType != null && location != null) {
+					dlerStoreDetails = dlerStoreDetailsRepo.findByBusinessTypeAndLocation(businessType, location);
+				}
+				dmr.setDlerProfiles(dps);
+			}
+		} else {
+			// Fetch all profiles if businessName is not provided
+			dps = dlerProfileRepo.findAll();
+			dmr.setDlerProfiles(dps);
+
+			if (businessType != null && location != null) {
+				// Filter by businessType and location if both are provided
+				dlerStoreDetails = dlerStoreDetailsRepo.findByBusinessTypeAndLocation(businessType, location);
+				dmr.setDlerStoreDetails(dlerStoreDetails);
+			}
+		}
+		List<DlerMaterialMaster> allMaterialMasters = new ArrayList<>();
+		List<DlerMaterialPrice> allMaterialPrices = new ArrayList<>();
+		for (DlerStoreDetails ds : dlerStoreDetails) {
+			List<DlerMaterialMaster> dmms;
+			if (brandId != null) {
+				dmms = dlerMaterialMasterRepo.findByDlerIdAndBrandId(ds.getDlerId(), brandId);
+
+				if (!dmms.isEmpty()) {
+					if (materialName != null && brandId != null) {
+						dmms = dlerMaterialMasterRepo.findByDlerIdAndBrandIdAndMaterialName(ds.getDlerId(), brandId,
+								materialName);
+						dmms.forEach(dmm -> {
+							List<DlerMaterialPrice> dmp = dlerMaterialPriceRepo
+									.findByDlerIdMaterialId(dmm.getDlerIdMaterialId());
+						});
+					}
+				}
+			} else {
+				dmms = dlerMaterialMasterRepo.findByDlerId(ds.getDlerId()); // Fetch all materials for the dlerId
+//		        dmms = dlerMaterialMasterRepo.findAll(); 
+			}
+			if (!dmms.isEmpty()) {
+				allMaterialMasters.addAll(dmms);
+				dmms.forEach(dmm -> {
+					List<DlerMaterialPrice> dmp = dlerMaterialPriceRepo
+							.findByDlerIdMaterialId(dmm.getDlerIdMaterialId());
+					if (!dmp.isEmpty()) {
+						allMaterialPrices.addAll(dmp);
+					}
+				});
+			}
+
+		}
+		;
+		if (!allMaterialMasters.isEmpty()) {
+			dmr.setMaterialMasters(allMaterialMasters);
+		}
+		if (!allMaterialPrices.isEmpty()) {
+			dmr.setMaterialPrices(allMaterialPrices);
+		}
+		return dmr;
+	}
+
 }

@@ -10,9 +10,11 @@ public interface DlerMaterialPriceRepo extends JpaRepository<DlerMaterialPrice, 
 
 	DlerMaterialPrice findByMaterialIdPriceId(String materialIdPriceId);
 	
-	DlerMaterialPrice findByDlerIdMaterialId(String dlerIdMaterialId);
+	List<DlerMaterialPrice> findByDlerIdMaterialId(String dlerIdMaterialId);
 
 	List<DlerMaterialPrice> findByDlerIdMaterialIdIn(List<String> dlerIdMaterialIds);
 	
 	List<DlerMaterialPrice> findByPriceUpdatedBy(String priceUpdatedBy);
+	
+	
 }

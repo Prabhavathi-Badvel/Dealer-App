@@ -17,10 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DlerResponse;
 import com.dlerin.application.dto.ResponseDealerStoreDto;
 import com.dlerin.application.dto.ResponseUpdateDealerStoreDto;
-import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerStoreDetails;
 import com.dlerin.application.repository.DlerStoreDetailsRepo;
 import com.dlerin.application.service.DlerStoreDetailsService;
@@ -133,4 +133,12 @@ public class DlerStoreDetailsController {
 		return ResponseEntity.ok(responses);
 	}
 
+	@GetMapping("/search-products")
+	public ResponseEntity<DealerMasterResponse> getDealerDetails(@RequestParam(required = false) String businessType,
+			@RequestParam(required = false) String location, @RequestParam(required = false) String brandId,
+			@RequestParam(required = false) String businessName, @RequestParam(required = false) String materialName) {
+		DealerMasterResponse response = dlerStoreDetailsService.getDealerDetails(businessType, location, brandId,
+				businessName, materialName);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
 }

@@ -2,8 +2,8 @@ package com.dlerin.application.service;
 
 import java.util.List;
 
+import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DlerResponse;
-import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerStoreDetails;
 
 public interface DlerStoreDetailsService {
@@ -19,4 +19,7 @@ public interface DlerStoreDetailsService {
 	public void deleteDlerStoreDetailsById(String dlerIdStoreId);
 
 	public List<DlerResponse> getDataBy(String businessType, String location);
+
+	public DealerMasterResponse getDealerDetails(String businessType, String location, String brandId,
+			String businessName, String materialName);
 }
