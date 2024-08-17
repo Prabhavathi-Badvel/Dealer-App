@@ -133,7 +133,7 @@ public class DlerStoreDetailsController {
 		return ResponseEntity.ok(responses);
 	}
 
-	@GetMapping("/search-products")
+	@GetMapping("/home-search")
 	public ResponseEntity<DealerMasterResponse> getDealerDetails(@RequestParam(required = false) String businessType,
 			@RequestParam(required = false) String location, @RequestParam(required = false) String brandId,
 			@RequestParam(required = false) String businessName, @RequestParam(required = false) String materialName) {

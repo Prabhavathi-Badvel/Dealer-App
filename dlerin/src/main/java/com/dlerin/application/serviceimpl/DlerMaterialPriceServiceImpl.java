@@ -1,6 +1,7 @@
 package com.dlerin.application.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -8,26 +9,32 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.dlerin.application.dto.DealerStoreMaterialResponse;
 import com.dlerin.application.dto.DlerMaterialPriceDto;
 import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerMaterialPrice;
 import com.dlerin.application.entity.DlerMaterialPriceHistory;
+import com.dlerin.application.entity.DlerStoreMaterial;
 import com.dlerin.application.repository.DlerMaterialMasterRepo;
 import com.dlerin.application.repository.DlerMaterialPriceHistoryRepo;
 import com.dlerin.application.repository.DlerMaterialPriceRepo;
+import com.dlerin.application.repository.DlerStoreMaterialRepo;
 import com.dlerin.application.service.DlerMaterialPriceService;
 
 @Service
 public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 
 	@Autowired
-	DlerMaterialPriceRepo dlerMaterialPriceRepo;
+	private DlerMaterialPriceRepo dlerMaterialPriceRepo;
 
 	@Autowired
-	DlerMaterialMasterRepo dlerMaterialMasterRepo;
+	private DlerMaterialMasterRepo dlerMaterialMasterRepo;
 
 	@Autowired
-	DlerMaterialPriceHistoryRepo dlerMaterialPriceHistoryRepo;
+	private DlerMaterialPriceHistoryRepo dlerMaterialPriceHistoryRepo;
+
+	@Autowired
+	private DlerStoreMaterialRepo dlerStoreMaterialRepo;
 
 	@Override
 	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices) {
@@ -56,6 +63,7 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 			if (!idExists.isPresent()) {
 				price.setCurrency("INR");
 				price.setMaterialId(dlerDb.getMaterialId());
+				price.setSkuId(dlerDb.getSkuId());
 				price.setDlerIdMaterialId(dlerDb.getDlerIdMaterialId());
 				price.setPriceUpdatedBy(dlerDb.getDlerId());
 				return dlerMaterialPriceRepo.save(price);
@@ -102,41 +110,63 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 
 	@Override
 	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice) {
-		List<DlerMaterialMaster> exists = dlerMaterialMasterRepo.findByDlerIdOrMaterialNameOrMaterialIdOrSkuId(
-				dprice.getDlerId(), dprice.getMaterialName(), dprice.getMaterialId(), dprice.getSkuId());
+		// Get DlerMaterialMaster entities based on the criteria
+		List<DlerMaterialMaster> dlerMasters = getDlersDetails(dprice);
 
-		if (!exists.isEmpty()) {
-			List<String> dlerIdMaterialIds = exists.stream().map(DlerMaterialMaster::getDlerIdMaterialId)
+		if (!dlerMasters.isEmpty()) {
+			// Collect dlerIdMaterialId values from the DlerMaterialMaster entities
+			List<String> dlerIdMaterialIds = dlerMasters.stream().map(DlerMaterialMaster::getDlerIdMaterialId)
 					.collect(Collectors.toList());
 
-			List<DlerMaterialPrice> dlerMaterialPrices = dlerMaterialPriceRepo
-					.findByDlerIdMaterialIdIn(dlerIdMaterialIds);
-
-			if (!dlerMaterialPrices.isEmpty()) {
-				return dlerMaterialPrices;
-			}
+			// Fetch DlerMaterialPrice records where dlerIdMaterialId matches
+			return dlerMaterialPriceRepo.findByDlerIdMaterialIdIn(dlerIdMaterialIds);
 		}
-		return null;
+		return Collections.emptyList();
 	}
 
 	@Override
-	public List<DlerMaterialMaster> getDlersDetails(DlerMaterialMaster master) {
-		List<DlerMaterialMaster> dlerMaterialMasters = new ArrayList<>();
+	public DealerStoreMaterialResponse getDealerPriceDetails(String skuId, String dlerId, String materialId) {
+	    DealerStoreMaterialResponse response = new DealerStoreMaterialResponse();
 
-		if (master.getDlerId() != null) {
-			dlerMaterialMasters = dlerMaterialMasterRepo.findByDlerId(master.getDlerId());
-		} else {
+	    // Fetch DlerMaterialMaster based on dlerId and optionally materialId and skuId
+	    List<DlerMaterialMaster> dlerMaterialMasters;
+	    if (materialId != null && skuId != null) {
+	        // If all three parameters are provided
+	        dlerMaterialMasters = dlerMaterialMasterRepo.findByDlerIdAndMaterialIdAndSkuId(dlerId, materialId, skuId);
+	    } else if (materialId != null) {
+	        dlerMaterialMasters = dlerMaterialMasterRepo.findByDlerIdAndMaterialId(dlerId, materialId);
+	    } else {
+	        dlerMaterialMasters = dlerMaterialMasterRepo.findByDlerId(dlerId);
+	    }
 
-			if (master.getMaterialName() != null) {
-				dlerMaterialMasters = dlerMaterialMasterRepo.findByMaterialName(master.getMaterialName());
-			} else if (master.getMaterialId() != null) {
-				dlerMaterialMasters = dlerMaterialMasterRepo.findByMaterialId(master.getMaterialId());
-			} else if (master.getSkuId() != null) {
-				dlerMaterialMasters = dlerMaterialMasterRepo.findBySkuId(master.getSkuId());
-			}
-		}
+	    if (!dlerMaterialMasters.isEmpty()) {
+	        response.setDlerMaterialMasters(dlerMaterialMasters);
 
-		return dlerMaterialMasters;
+	        // Fetch DlerStoreMaterial by matching skuId from DlerMaterialMaster
+	        List<DlerStoreMaterial> dlerStoreMaterials = new ArrayList<>();
+	        for (DlerMaterialMaster materialMaster : dlerMaterialMasters) {
+	            String masterSkuId = materialMaster.getSkuId();
+
+	            // If skuId is provided in the request, match it; otherwise, fetch all matching store materials
+	            if (skuId == null || skuId.equals(masterSkuId)) {
+	                List<DlerStoreMaterial> storeMaterials = dlerStoreMaterialRepo.findBySkuId(masterSkuId);
+	                dlerStoreMaterials.addAll(storeMaterials);
+	            }
+	        }
+	        response.setDlerStoreMaterial(dlerStoreMaterials);
+
+	        // Fetch DlerMaterialPrice based on dlerIdMaterialId from DlerMaterialMaster
+	        List<DlerMaterialPrice> dlerMaterialPrices = new ArrayList<>();
+	        for (DlerMaterialMaster materialMaster : dlerMaterialMasters) {
+	            String dlerIdMaterialId = materialMaster.getDlerIdMaterialId();
+
+	            // Find matching prices
+	            List<DlerMaterialPrice> materialPrices = dlerMaterialPriceRepo.findByDlerIdMaterialId(dlerIdMaterialId);
+	            dlerMaterialPrices.addAll(materialPrices);
+	        }
+	        response.setDlerMaterialPrices(dlerMaterialPrices);
+	    }
+
+	    return response;
 	}
-
 }

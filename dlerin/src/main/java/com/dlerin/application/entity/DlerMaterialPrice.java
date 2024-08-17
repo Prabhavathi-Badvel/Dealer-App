@@ -25,7 +25,7 @@ public class DlerMaterialPrice {
 	@Column(name = "material_id_price_id")
 	private String materialIdPriceId;
 
-	@Column(name = "dler_id_material_id")
+	@Column(name = "dler_id_sku_id_material_id")
 	private String dlerIdMaterialId;
 
 	@Column(name = "price")
@@ -56,10 +56,13 @@ public class DlerMaterialPrice {
 
 	@Transient
 	private String materialId;
+	
+	@Transient
+	private String skuId;
 
 	@PrePersist
 	private void prePersist() {
-		this.materialIdPriceId = materialId + "_" + price;
+		this.materialIdPriceId = materialId + "_" +skuId+"_"+ price;
 	}
 
 }

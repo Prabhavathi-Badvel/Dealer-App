@@ -20,7 +20,7 @@ import lombok.Setter;
 public class DlerMaterialMaster {
 
 	@Id
-	@Column(name = "dler_id_material_id")
+	@Column(name = "dler_id_sku_id_material_id")
 	private String dlerIdMaterialId;
 	@Column(name = "dler_id")
 	private String dlerId;
@@ -45,7 +45,7 @@ public class DlerMaterialMaster {
 
 	@PrePersist
 	private void prePersist() {
-		this.dlerIdMaterialId = dlerId + "_" + materialId;
+		this.dlerIdMaterialId = dlerId + "_"+skuId+"_" + materialId;
 		this.weight = weight + unit;
 	}
 }

@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.dlerin.application.dto.DlerMaterialPriceDto;
+
+import com.dlerin.application.dto.DealerStoreMaterialResponse;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto;
-import com.dlerin.application.dto.ResponseDlerMaterialPriceDto1;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto2;
-import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerMaterialPrice;
 import com.dlerin.application.repository.DlerMaterialPriceRepo;
 import com.dlerin.application.service.DlerMaterialPriceService;
@@ -78,33 +78,11 @@ public class DlerMaterialPriceController {
 	}
 
 	@GetMapping("/dlerin-get-DlerMaterialPrice")
-	public ResponseEntity<?> getDlerPrice(@RequestBody DlerMaterialPriceDto dlerPrice) {
-
-		DlerMaterialMaster searchCriteria = new DlerMaterialMaster();
-		searchCriteria.setDlerId(dlerPrice.getDlerId());
-		searchCriteria.setMaterialName(dlerPrice.getMaterialName());
-		searchCriteria.setSkuId(dlerPrice.getSkuId());
-		searchCriteria.setMaterialId(dlerPrice.getMaterialId());
-
-		List<DlerMaterialPrice> priceExists = dlerMaterialPriceService.getPrice(dlerPrice);
-		List<DlerMaterialMaster> allDlers = dlerMaterialPriceService.getDlersDetails(searchCriteria);
-		ResponseDlerMaterialPriceDto1 response1 = new ResponseDlerMaterialPriceDto1();
-		try {
-			if (priceExists != null && !priceExists.isEmpty()) {
-				response1.setMessage("Get price details");
-				response1.setStatus(true);
-				response1.setPriceData(priceExists);
-				response1.setDlerDetails(allDlers);
-				return new ResponseEntity<>(response1, HttpStatus.OK);
-			} else {
-				response1.setMessage("No details found for the given parameters");
-				response1.setStatus(false);
-				response1.setPriceData(priceExists);
-				response1.setDlerDetails(allDlers);
-				return new ResponseEntity<>(response1, HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
-		}
+	public ResponseEntity<DealerStoreMaterialResponse> getDealerPriceDetails(
+			@RequestParam(required = false) String skuId, @RequestParam(required = false) String dlerId,
+			@RequestParam(required = false) String materialId) {
+		DealerStoreMaterialResponse response = dlerMaterialPriceService.getDealerPriceDetails(skuId, dlerId,
+				materialId);
+		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 }

@@ -10,12 +10,12 @@ import org.springframework.stereotype.Repository;
 import com.dlerin.application.entity.DlerMaterialMaster;
 
 @Repository
-public interface DlerMaterialMasterRepo extends JpaRepository<DlerMaterialMaster, String>{
+public interface DlerMaterialMasterRepo extends JpaRepository<DlerMaterialMaster, String> {
 
 	DlerMaterialMaster findByDlerIdMaterialId(String dlerIdMaterialId);
 
-	List<DlerMaterialMaster> findByDlerIdOrMaterialNameOrMaterialIdOrSkuId(String dlerId, String materialName, String skuId,
-			String materialId);
+	List<DlerMaterialMaster> findByDlerIdOrMaterialNameOrMaterialIdOrSkuId(String dlerId, String materialName,
+			String skuId, String materialId);
 
 	List<DlerMaterialMaster> findByDlerId(String dlerId);
 
@@ -25,12 +25,22 @@ public interface DlerMaterialMasterRepo extends JpaRepository<DlerMaterialMaster
 
 	List<DlerMaterialMaster> findByMaterialId(String materialId);
 
-	  @Query("SELECT d FROM DlerMaterialMaster d WHERE d.dlerId = :dlerId")
-	    DlerMaterialMaster findDlerId(@Param("dlerId") String dlerId);
+	@Query("SELECT d FROM DlerMaterialMaster d WHERE d.dlerId = :dlerId")
+	DlerMaterialMaster findDlerId(@Param("dlerId") String dlerId);
 
 	List<DlerMaterialMaster> findByDlerIdAndBrandId(String dlerId, String brandId);
 
 	List<DlerMaterialMaster> findByDlerIdAndBrandIdAndMaterialName(String dlerId, String brandId, String materialName);
-	  
-	  
+
+	List<DlerMaterialMaster> findByDlerIdAndSkuIdAndMaterialId(String dlerId, String skuId, String materialId);
+
+	List<DlerMaterialMaster> findBySkuIdAndDlerId(String skuId, String dlerId);
+
+	List<DlerMaterialMaster> findByDlerIdAndMaterialId(String dlerId, String materialId);
+
+	List<DlerMaterialMaster> findBySkuIdAndMaterialId(String skuId, String materialId);
+
+	List<DlerMaterialMaster> findBydlerIdAndSkuIdAndMaterialId(String dlerId, String skuId, String materialId);
+
+	List<DlerMaterialMaster> findByDlerIdAndMaterialIdAndSkuId(String dlerId, String materialId, String skuId);
 }

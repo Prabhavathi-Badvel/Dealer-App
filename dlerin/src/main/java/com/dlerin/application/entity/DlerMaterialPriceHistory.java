@@ -29,7 +29,7 @@ public class DlerMaterialPriceHistory {
 	@Column(name="material_id_price_id")
 	private String materialIdPriceId;
 	
-	@Column(name="dler_id_material_id")
+	@Column(name="dler_id_sku_id_material_id")
 	private String dlerIdMaterialId;
 	
 	@Column(name="price")
