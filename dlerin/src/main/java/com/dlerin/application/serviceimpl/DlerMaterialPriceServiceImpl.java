@@ -108,21 +108,21 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 		}
 	}
 
-	@Override
-	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice) {
-		// Get DlerMaterialMaster entities based on the criteria
-		List<DlerMaterialMaster> dlerMasters = getDlersDetails(dprice);
-
-		if (!dlerMasters.isEmpty()) {
-			// Collect dlerIdMaterialId values from the DlerMaterialMaster entities
-			List<String> dlerIdMaterialIds = dlerMasters.stream().map(DlerMaterialMaster::getDlerIdMaterialId)
-					.collect(Collectors.toList());
-
-			// Fetch DlerMaterialPrice records where dlerIdMaterialId matches
-			return dlerMaterialPriceRepo.findByDlerIdMaterialIdIn(dlerIdMaterialIds);
-		}
-		return Collections.emptyList();
-	}
+//	@Override
+//	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice) {
+//		// Get DlerMaterialMaster entities based on the criteria
+//		List<DlerMaterialMaster> dlerMasters = getDlersDetails(dprice);
+//
+//		if (!dlerMasters.isEmpty()) {
+//			// Collect dlerIdMaterialId values from the DlerMaterialMaster entities
+//			List<String> dlerIdMaterialIds = dlerMasters.stream().map(DlerMaterialMaster::getDlerIdMaterialId)
+//					.collect(Collectors.toList());
+//
+//			// Fetch DlerMaterialPrice records where dlerIdMaterialId matches
+//			return dlerMaterialPriceRepo.findByDlerIdMaterialIdIn(dlerIdMaterialIds);
+//		}
+//		return Collections.emptyList();
+//	}
 
 	@Override
 	public DealerStoreMaterialResponse getDealerPriceDetails(String skuId, String dlerId, String materialId) {

@@ -13,7 +13,7 @@ public interface DlerMaterialPriceService {
 
 	public boolean updatePriceAndStoreHistory(DlerMaterialPrice price);
 
-	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice);
+//	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice);
 
 	public DealerStoreMaterialResponse getDealerPriceDetails(String skuId, String dlerId, String materialId);
 }
