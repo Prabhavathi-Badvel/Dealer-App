@@ -21,10 +21,11 @@ import lombok.Setter;
 @Table(name = "dler_material_price")
 public class DlerMaterialPrice {
 
-	@Id
-	@Column(name = "material_id_price_id")
-	private String materialIdPriceId;
+//	@Id
+//	@Column(name = "material_id_price_id")
+//	private String materialIdPriceId;
 
+	@Id
 	@Column(name = "dler_id_sku_id_material_id")
 	private String dlerIdMaterialId;
 
@@ -60,9 +61,9 @@ public class DlerMaterialPrice {
 	@Transient
 	private String skuId;
 
-	@PrePersist
-	private void prePersist() {
-		this.materialIdPriceId = materialId + "_" +skuId+"_"+ price;
-	}
+//	@PrePersist
+//	private void prePersist() {
+//		this.materialIdPriceId = materialId + "_" +skuId+"_"+ price;
+//	}
 
 }

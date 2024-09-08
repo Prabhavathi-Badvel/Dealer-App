@@ -105,7 +105,7 @@ public class DlerStoreMaterialServiceImpl implements DlerStoreMaterialService{
 
 	@Override
 	public String getPrice(String dlerId, String skuId, String storeId) {
-		 DlerMaterialPrice dto= dlerMaterialPriceRepo.findByPriceUpdatedBy(dlerId).get(0);
+		 DlerMaterialPrice dto= dlerMaterialPriceRepo.findByPriceUpdatedBy(dlerId);
 		 return dto.getPrice();
 	}
 

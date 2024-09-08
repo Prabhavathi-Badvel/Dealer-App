@@ -26,9 +26,6 @@ public class DlerMaterialPriceHistory {
 	@Column(name ="id")
 	private String id;
 	
-	@Column(name="material_id_price_id")
-	private String materialIdPriceId;
-	
 	@Column(name="dler_id_sku_id_material_id")
 	private String dlerIdMaterialId;
 	

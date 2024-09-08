@@ -17,5 +17,6 @@ public class DealerStoreMaterialResponse {
 	private List<DlerStoreMaterial> dlerStoreMaterial = new ArrayList<DlerStoreMaterial>();
 	private List<DlerMaterialMaster>dlerMaterialMasters=new ArrayList<DlerMaterialMaster>();
 	private List<DlerMaterialPrice> dlerMaterialPrices = new ArrayList<DlerMaterialPrice>();
+	private String Error;
 	
 }

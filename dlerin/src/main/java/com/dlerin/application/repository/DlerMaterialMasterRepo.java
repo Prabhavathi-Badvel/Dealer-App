@@ -43,4 +43,12 @@ public interface DlerMaterialMasterRepo extends JpaRepository<DlerMaterialMaster
 	List<DlerMaterialMaster> findBydlerIdAndSkuIdAndMaterialId(String dlerId, String skuId, String materialId);
 
 	List<DlerMaterialMaster> findByDlerIdAndMaterialIdAndSkuId(String dlerId, String materialId, String skuId);
+	
+	 @Query("SELECT d FROM DlerMaterialMaster d WHERE d.dlerId = :dlerId")
+	  List<DlerMaterialMaster> findAllDlerId(@Param("dlerId") String dlerId);
+
+	 @Query("SELECT d FROM DlerMaterialMaster d WHERE d.dlerIdMaterialId = :dlerIdMaterialId")
+	List<DlerMaterialMaster> findByDlerIdMaterialIdOne(@Param("dlerIdMaterialId")String dlerIdMaterialId);
+	 
+	 
 }
