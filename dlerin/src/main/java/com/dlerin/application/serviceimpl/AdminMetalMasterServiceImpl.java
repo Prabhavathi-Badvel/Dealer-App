@@ -81,4 +81,14 @@ public class AdminMetalMasterServiceImpl implements AdminMetalMasterService {
 		return entityManager.createQuery(query).getResultList();
 	}
 
+	@Override
+	public List<String> getDistinctMaterialType() {
+		return adminMetalMasterRepo.findDistinctMaterialType();
+	}
+
+	@Override
+	public List<String> getDistinctMaterialShape() {
+		return adminMetalMasterRepo.findDistinctMaterialShape();
+	}
+
 }

@@ -94,4 +94,14 @@ public class AdminMetalMasterController {
 		}
 
 	}
+	
+	@GetMapping("/adminmetalmaster-getMaterialType")
+	public List<String> getMaterialType() {
+		return adminMetalMaterService.getDistinctMaterialType();
+	}
+	
+	@GetMapping("/adminmetalmaster-getMaterialShape")
+	public List<String> getMaterialShape() {
+		return adminMetalMaterService.getDistinctMaterialShape();
+	}
 }
