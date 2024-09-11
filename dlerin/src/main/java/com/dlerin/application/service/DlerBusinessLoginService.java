@@ -19,4 +19,5 @@ public interface DlerBusinessLoginService {
 	public String sendSms(String dlerMobileNo);
 	public String forgetPassword(String dlerEmailId, String otp, String newPassword, String confirmPassword,String dlerMobileNo);
 	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId);
+	public String fetchEmailByDlerId(String dlerId);
 }

@@ -3,6 +3,8 @@ package com.dlerin.application.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dlerin.application.dto.AdminLoginDto;
@@ -16,6 +18,9 @@ public interface AdminLoginRepo extends JpaRepository<AdminLogin, String> {
 	Optional<AdminLogin> findByEmailId(String emailId);
 
 	AdminLogin findByEmpId(String empId);
+	
+	@Query("SELECT d FROM AdminLogin d WHERE d.empId = :empId")
+	Optional<AdminLogin> findByEmpIdOne(@Param("empId")String empId);
 
 	Optional<AdminLogin> findByEmailIdOrMobileNo(String emailId, String mobileNo);
 

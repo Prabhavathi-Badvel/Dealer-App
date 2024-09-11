@@ -23,4 +23,7 @@ public class DealerMasterResponse {
 
 	private List<DlerProfile> dlerProfiles = new ArrayList<DlerProfile>();
 
+	private String error;
+	
+
 }

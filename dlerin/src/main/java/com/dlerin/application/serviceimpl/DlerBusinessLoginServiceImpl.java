@@ -297,4 +297,10 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 		return null;
 
 	}
+	
+	@Override
+	public String fetchEmailByDlerId(String dlerId) {
+	    Optional<DlerBusinessLogin> businessLogin = dlerBusinessLoginRepo.findById(dlerId);
+	    return businessLogin.map(DlerBusinessLogin::getDlerEmailId).orElse(null);
+	}
 }

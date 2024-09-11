@@ -25,7 +25,7 @@ public class DlerInvoiceDetailsController {
 			DlerInvoiceDetails details = InvoiceService.saveInvoceDetails(invoice);
 			
 			if(details != null) {
-				response.setMessage("added invoice details");
+				response.setMessage("Generated Invoice Id is successfully");
 				response.setStatus(true);
 				response.setAddData(details);
 				return new ResponseEntity<>(response, HttpStatus.OK);

@@ -15,37 +15,42 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name="dler_order_details")
+@Table(name = "dler_order_details")
 public class DlerOrderDetails {
 
 	@Id
 	@Column(name = "line_id")
 	private String lineId;
-	@Column(name = "material_id")
-	private String materialId;
-	@Column(name="order_qty")
+
+	@Column(name = "dler_id_sku_id_material_id")
+	private String dlerIdMaterialId;
+	@Column(name = "order_qty")
 	private int orderQty;
-	@Column(name="delivered_qty")
+	@Column(name = "delivered_qty")
 	private int deliveredQty;
-	@Column(name="status")
+	@Column(name = "status")
 	private String status;
-	@Column(name="remark")
+	@Column(name = "remark")
 	private String remark;
-	@Column(name="price per unit")
+	@Column(name = "price per unit")
 	private int pricePerUnit;
-	@Column(name="gst")
+	@Column(name = "gst")
 	private String gst;
-	@Column(name="gst_code")
+	@Column(name = "gst_code")
 	private String gstCode;
-	@Column(name="order_id")
+	@Column(name = "order_id")
 	private String orderId;
-	@Column(name="discount")
+	@Column(name = "discount")
 	private int discount;
-	
+
+	@Column(name = "delivery_total")
+	private int deliveryTotal;
+	@Column(name = "order_total")
+	private int orderTotal;
+
 	@Transient
 	private String dlerId;
 
 	@Transient
 	private String orderTo;
-	
 }

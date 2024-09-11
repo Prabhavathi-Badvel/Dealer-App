@@ -24,8 +24,8 @@ import lombok.Setter;
 public class DlerInvoiceDetails {
 	
 	@Id
-	@Column(name="invoice_id")
-	private String invoiceId;
+	@Column(name="generated_invoice_id")
+	private String generatedInvoiceId;
 	@Column(name="order_id")
 	private String orderId;
 	@Column(name="total_amount")
@@ -53,7 +53,7 @@ public class DlerInvoiceDetails {
 		String minute = String.format("%02d", now.getMinute());
 		String second = String.format("%02d", now.getSecond());
 		String millis = String.format("%03d", now.getNano() / 1000000).substring(0, 2);
-		this.invoiceId= "INV" + year + month + day + hour + minute + second + millis;
+		this.generatedInvoiceId= "INV" + year + month + day + hour + minute + second + millis;
 	}
 
 }

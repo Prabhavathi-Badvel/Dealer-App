@@ -1,6 +1,7 @@
 package com.dlerin.application.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -151,71 +152,84 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 
 	@Override
 	public DealerMasterResponse getDealerDetails(String businessType, String location, String brandId,
-			String businessName, String materialName) {
-		List<DlerStoreDetails> dlerStoreDetails = new ArrayList<>();
-		DealerMasterResponse dmr = new DealerMasterResponse();
-		List<DlerProfile> dps;
-		if (businessName != null) {
-			dps = dlerProfileRepo.findByDlerBusinessName(businessName);
-			if (!dps.isEmpty()) {
-				// Fetch store details if businessName is provided
-				if (businessType != null && location != null) {
-					dlerStoreDetails = dlerStoreDetailsRepo.findByBusinessTypeAndLocation(businessType, location);
-				}
-				dmr.setDlerProfiles(dps);
-			}
-		} else {
-			// Fetch all profiles if businessName is not provided
-			dps = dlerProfileRepo.findAll();
-			dmr.setDlerProfiles(dps);
+	        String businessName, String materialName) {
+	    DealerMasterResponse dmr = new DealerMasterResponse();
 
-			if (businessType != null && location != null) {
-				// Filter by businessType and location if both are provided
-				dlerStoreDetails = dlerStoreDetailsRepo.findByBusinessTypeAndLocation(businessType, location);
-				dmr.setDlerStoreDetails(dlerStoreDetails);
-			}
-		}
-		List<DlerMaterialMaster> allMaterialMasters = new ArrayList<>();
-		List<DlerMaterialPrice> allMaterialPrices = new ArrayList<>();
-		for (DlerStoreDetails ds : dlerStoreDetails) {
-			List<DlerMaterialMaster> dmms;
-			if (brandId != null) {
-				dmms = dlerMaterialMasterRepo.findByDlerIdAndBrandId(ds.getDlerId(), brandId);
+	    // Check for businessName
+	    List<DlerProfile> dps;
+	    if (businessName != null) {
+	        dps = dlerProfileRepo.findByDlerBusinessName(businessName);
+	        if (dps.isEmpty()) {
+	            dmr.setError("No profiles found for the provided businessName.");
+	            return dmr;  // Return early if no profiles are found
+	        }
+	    } else {
+	        dps = dlerProfileRepo.findAll();  // Fetch all profiles if no businessName is provided
+	    }
 
-				if (!dmms.isEmpty()) {
-					if (materialName != null && brandId != null) {
-						dmms = dlerMaterialMasterRepo.findByDlerIdAndBrandIdAndMaterialName(ds.getDlerId(), brandId,
-								materialName);
-						dmms.forEach(dmm -> {
-							List<DlerMaterialPrice> dmp = dlerMaterialPriceRepo
-									.findByDlerIdMaterialId(dmm.getDlerIdMaterialId());
-						});
-					}
-				}
-			} else {
-				dmms = dlerMaterialMasterRepo.findByDlerId(ds.getDlerId()); // Fetch all materials for the dlerId
-//		        dmms = dlerMaterialMasterRepo.findAll(); 
-			}
-			if (!dmms.isEmpty()) {
-				allMaterialMasters.addAll(dmms);
-				dmms.forEach(dmm -> {
-					List<DlerMaterialPrice> dmp = dlerMaterialPriceRepo
-							.findByDlerIdMaterialId(dmm.getDlerIdMaterialId());
-					if (!dmp.isEmpty()) {
-						allMaterialPrices.addAll(dmp);
-					}
-				});
-			}
+	    dmr.setDlerProfiles(dps);
 
-		}
-		;
-		if (!allMaterialMasters.isEmpty()) {
-			dmr.setMaterialMasters(allMaterialMasters);
-		}
-		if (!allMaterialPrices.isEmpty()) {
-			dmr.setMaterialPrices(allMaterialPrices);
-		}
-		return dmr;
+	    // Handle businessType and location
+	    Optional<List<DlerStoreDetails>> storeDetailsOpt = Optional.ofNullable(dlerStoreDetailsRepo.findByBusinessTypeAndLocation(businessType, location));
+	    List<DlerStoreDetails> dlerStoreDetails = storeDetailsOpt.orElse(Collections.emptyList());
+
+	    if (dlerStoreDetails.isEmpty()) {
+	        dmr.setError("No store details found for the provided businessType and location.");
+	        return dmr;  // Return early if no store details are found
+	    }
+
+	    dmr.setDlerStoreDetails(dlerStoreDetails);
+
+	    List<DlerMaterialMaster> allMaterialMasters = new ArrayList<>();
+	    List<DlerMaterialPrice> allMaterialPrices = new ArrayList<>();
+
+	    // Handle brandId and materialName
+	    for (DlerStoreDetails ds : dlerStoreDetails) {
+	        List<DlerMaterialMaster> dmms = new ArrayList<>();
+
+	        // Check for brandId
+	        if (brandId != null) {
+	            dmms = Optional.ofNullable(dlerMaterialMasterRepo.findByDlerIdAndBrandId(ds.getDlerId(), brandId))
+	                           .orElse(Collections.emptyList());
+
+	            // If no materials found for the provided brandId, set error and return
+	            if (dmms.isEmpty()) {
+	                dmr.setError("No material found for the provided brandId.");
+	                return dmr;
+	            }
+
+	            // Handle materialName filter
+	            if (materialName != null) {
+	                dmms = dlerMaterialMasterRepo.findByDlerIdAndBrandIdAndMaterialName(ds.getDlerId(), brandId, materialName);
+	                if (dmms.isEmpty()) {
+	                    dmr.setError("No material found for the provided materialName.");
+	                    return dmr;
+	                }
+	            }
+	        } else {
+	            // Fetch all materials if brandId is not provided
+	            dmms = Optional.ofNullable(dlerMaterialMasterRepo.findByDlerId(ds.getDlerId()))
+	                           .orElse(Collections.emptyList());
+	        }
+
+	        if (!dmms.isEmpty()) {
+	            allMaterialMasters.addAll(dmms);
+	            dmms.forEach(dmm -> {
+	                List<DlerMaterialPrice> dmp = dlerMaterialPriceRepo.findByDlerIdMaterialId(dmm.getDlerIdMaterialId());
+	                if (!dmp.isEmpty()) {
+	                    allMaterialPrices.addAll(dmp);
+	                }
+	            });
+	        }
+	    }
+
+	    if (!allMaterialMasters.isEmpty()) {
+	        dmr.setMaterialMasters(allMaterialMasters);
+	    }
+	    if (!allMaterialPrices.isEmpty()) {
+	        dmr.setMaterialPrices(allMaterialPrices);
+	    }
+	    return dmr;
 	}
 
 }

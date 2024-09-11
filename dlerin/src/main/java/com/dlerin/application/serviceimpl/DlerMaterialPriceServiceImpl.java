@@ -86,8 +86,6 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 				oldHistoryEntry.setPrice(existingPrice.getPrice());
 				oldHistoryEntry.setPriceUpdatedDate(existingPrice.getPriceUpdatedDate());
 				oldHistoryEntry.setStockAvailable(existingPrice.getStockAvailable());
-//				oldHistoryEntry.setMaterialIdPriceId(existingPrice.getMaterialIdPriceId());
-				oldHistoryEntry.setDlerIdMaterialId(existingPrice.getDlerIdMaterialId());
 				dlerMaterialPriceHistoryRepo.save(oldHistoryEntry);
 
 				existingPrice.setPrice(price.getPrice());
