@@ -56,7 +56,8 @@ public class WebConfig {
 								"/dlerin-send-otp-verify-email", "/dlerin-verify-otp-verify-email", "/sendmobileOtp",
 								"/verifySmsOtp", "/dlerin-register-adminlogin", "/dlerin-login-adminlogin",
 								"/admin/forgetPassword/sendOtp", "/admin/forgetPassword/verifyOtpAndChangePassword",
-								"/dlerforgetPassword/sendOtp", "/dler/forgetPassword/verification").permitAll().anyRequest().authenticated());
+								"/dlerforgetPassword/sendOtp", "/dler/forgetPassword/verification",
+								"/adminmetalmaster-getMaterialType","/adminmetalmaster-getMaterialShape","/getCategoryOnly").permitAll().anyRequest().authenticated());
 
 		http.authenticationProvider(customDaoAuthenticationProvider());
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
