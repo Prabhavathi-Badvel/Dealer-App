@@ -21,7 +21,6 @@ import com.dlerin.application.repository.AdminMetalMasterRepo;
 import com.dlerin.application.service.AdminMetalMasterService;
 
 @RestController
-@PreAuthorize("hasAuthority('Admin')")
 public class AdminMetalMasterController {
 
 	@Autowired
@@ -31,6 +30,7 @@ public class AdminMetalMasterController {
 	AdminMetalMasterRepo adminMetalMasterRepo;
 
 	@PostMapping("/dlerin-add-adminmetalmaster")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminMaterial(@RequestBody AdminMetalMaster admin) {
 		ResponseAdminMetalMasterDto response = new ResponseAdminMetalMasterDto();
 		try {
@@ -50,6 +50,7 @@ public class AdminMetalMasterController {
 	}
 
 	@PutMapping("/dlerin-update-adminmetalmaster")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> updateAdminMaterial(@RequestBody AdminMetalMaster adminMaterial) {
 		ResponseAdminMetalMasterDto1 response1 = new ResponseAdminMetalMasterDto1();
 		Optional<AdminMetalMaster> materialIdExists = adminMetalMasterRepo.findById(adminMaterial.getMaterialId());
@@ -72,6 +73,7 @@ public class AdminMetalMasterController {
 	}
 
 	@GetMapping("/dlerin-get-adminmetalmaster")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> getAdminMaterial(@RequestParam(required = false) String materialId,
 			@RequestParam(required = false) String materialType, @RequestParam(required = false) String materialShape) {
 		ResponseAdminmetalMaterialDto2 response2 = new ResponseAdminmetalMaterialDto2();

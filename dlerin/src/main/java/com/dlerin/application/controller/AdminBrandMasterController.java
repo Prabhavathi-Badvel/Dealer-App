@@ -20,7 +20,6 @@ import com.dlerin.application.repository.AdminBrandMasterRepo;
 import com.dlerin.application.service.AdminBrandMasterService;
 
 @RestController
-@PreAuthorize("hasAuthority('Admin')")
 public class AdminBrandMasterController {
 
 	@Autowired
@@ -30,6 +29,7 @@ public class AdminBrandMasterController {
 	AdminBrandMasterRepo admindBrandRepo;
 
 	@PostMapping("/dlerin-add-adminbrands")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminBrands(@RequestBody AdminBrandMaster adminBrands) {
 		ResponseAdminBrandMasterDto response = new ResponseAdminBrandMasterDto();
 
@@ -55,6 +55,7 @@ public class AdminBrandMasterController {
 	}
 
 	@PutMapping("/dlerin-update-adminbrands")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> updateAdminBrands(@RequestBody AdminBrandMaster brand) {
 		boolean updated = adminBrandService.updateBrands(brand);
 		ResponseAdminBrandMasterDto1 response1 = new ResponseAdminBrandMasterDto1();
@@ -75,6 +76,7 @@ public class AdminBrandMasterController {
 	}
 
 	@GetMapping("/dlerin-get-adminbrands")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> getAdminBrandMaster(@RequestParam(required = false) String brandName,
 			@RequestParam(required = false) String brandCategory,
 			@RequestParam(required = false) String brandSubcategory) {
