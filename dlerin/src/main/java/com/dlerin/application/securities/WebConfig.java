@@ -60,7 +60,7 @@ public class WebConfig {
 								"/verifySmsOtp", "/dlerin-register-adminlogin", "/dlerin-login-adminlogin",
 								"/admin/forgetPassword/sendOtp", "/admin/forgetPassword/verifyOtpAndChangePassword",
 								"/dlerforgetPassword/sendOtp", "/dler/forgetPassword/verification",
-								"/adminmetalmaster-getMaterialType","/adminmetalmaster-getMaterialShape","/getCategoryOnly").permitAll().anyRequest().authenticated());
+								"/adminmetalmaster-getMaterialType","/adminmetalmaster-getMaterialShape","/getCategoryOnly","/dlerin-get-AdminBusinessCategory").permitAll().anyRequest().authenticated());
 
 		http.authenticationProvider(customDaoAuthenticationProvider());
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,7 +23,6 @@ import com.dlerin.application.repository.AdminBusinessCategoryRepo;
 import com.dlerin.application.service.AdminBusinessCategoryService;
 
 @RestController
-@PreAuthorize("hasAuthority('Admin')")
 public class AdminBusinessCategoryController {
 
 	@Autowired
@@ -32,6 +32,7 @@ public class AdminBusinessCategoryController {
 	private AdminBusinessCategoryRepo adminBusinessCategoryRepo;
 
 	@PostMapping("/dlerin-add-AdminBusinessCategory")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminBusinessCategory(@RequestBody AdminBusinessCategory  adminBusinessCategory) {
 		String empId = adminBusinessCategory.getEmpId();
 		ResponseAdminBusinessCategoryDto response = new ResponseAdminBusinessCategoryDto();
@@ -44,17 +45,20 @@ public class AdminBusinessCategoryController {
 				response.setStatus(true);
 				response.setData(abc);
 				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else if (abc == null) {
-				response.setMessage("failed to add/admin buinsess category not present or Record already exists");
-				response.setStatus(false);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			response.setMessage("An error occurred: " + e.getMessage());
-			response.setStatus(false);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
-		return null;
+			}  else {
+	            response.setMessage("Failed to add/admin business category not present or Record already exists");
+	            response.setStatus(false);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
+	        }
+	    } catch (DataIntegrityViolationException e) {
+	        response.setMessage("Failed to add/admin business category not present or Record already exists");
+	        response.setStatus(false);
+	        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+	    } catch (Exception e) {
+	        response.setMessage("An error occurred: " + e.getMessage());
+	        response.setStatus(false);
+	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 
 	}
 	
@@ -82,6 +86,7 @@ public class AdminBusinessCategoryController {
 	}
 	
 	@PutMapping("/dlerin-update-AdminBusinessCategory")
+	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> updateAdminBusinessCategory(@RequestBody AdminBusinessCategory abc) {
 		ResponseAdminBusinessCategoryDto response = new ResponseAdminBusinessCategoryDto();
 		Optional<AdminBusinessCategory> gstExists = Optional.ofNullable(adminBusinessCategoryRepo.findByBusinessCategoryId(abc.getBusinessCategoryId()));
