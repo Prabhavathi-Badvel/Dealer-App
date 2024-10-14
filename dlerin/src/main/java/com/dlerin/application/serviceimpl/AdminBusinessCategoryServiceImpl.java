@@ -34,16 +34,16 @@ public class AdminBusinessCategoryServiceImpl implements AdminBusinessCategorySe
 	private AdminBusinessCategoryRepo adminBusinessCategoryRepo;
 
 	@Override
-	public AdminBusinessCategory addAdminBusinessCategory(AdminBusinessCategory adminBusinessCategory, String empId) {
+	public AdminBusinessCategory addAdminBusinessCategory(AdminBusinessCategory adminBusinessCategory, String name) {
 
-		Optional<AdminLogin> login = adminLoginRepo.findByEmpIdOne(empId);
+		Optional<AdminLogin> login = adminLoginRepo.findByName(name);
 
 		if (login.isPresent()) {
 			AdminLogin adminDb = login.get();
 			AdminBusinessCategory existingAdminBusinessCategory = adminBusinessCategoryRepo
 					.findByBusinessCategoryId(adminBusinessCategory.getBusinessCategoryId());
 			if (existingAdminBusinessCategory == null) {
-				adminBusinessCategory.setUpdatedBy(adminDb.getEmpId());
+				adminBusinessCategory.setBusinessCategoryId(adminDb.getName());
 				
 				return adminBusinessCategoryRepo.save(adminBusinessCategory);
 			}

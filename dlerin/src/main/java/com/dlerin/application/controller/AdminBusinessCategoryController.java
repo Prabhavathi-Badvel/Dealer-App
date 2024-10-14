@@ -34,11 +34,11 @@ public class AdminBusinessCategoryController {
 	@PostMapping("/dlerin-add-AdminBusinessCategory")
 	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminBusinessCategory(@RequestBody AdminBusinessCategory  adminBusinessCategory) {
-		String empId = adminBusinessCategory.getEmpId();
+		String businessCategoryId = adminBusinessCategory.getBusinessCategoryId();
 		ResponseAdminBusinessCategoryDto response = new ResponseAdminBusinessCategoryDto();
 		try {
 
-			AdminBusinessCategory abc = adminBusinessCategoryService.addAdminBusinessCategory(adminBusinessCategory,empId);
+			AdminBusinessCategory abc = adminBusinessCategoryService.addAdminBusinessCategory(adminBusinessCategory,businessCategoryId);
 
 			if (abc != null) {
 				response.setMessage("added admin buinsess category");

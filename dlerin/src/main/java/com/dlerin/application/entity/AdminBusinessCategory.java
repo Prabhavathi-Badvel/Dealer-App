@@ -41,12 +41,4 @@ public class AdminBusinessCategory {
 	@Column(name = "updated_date")
 	private LocalDateTime updatedDate;
 
-	@Transient
-	private String empId;
-	
-	@PrePersist
-	private void prePersist() {
-		this.businessCategoryId = updatedBy + "_" + businessCategoryName;
-	}
-
 }

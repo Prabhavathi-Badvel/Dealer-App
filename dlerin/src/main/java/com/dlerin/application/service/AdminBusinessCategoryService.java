@@ -9,7 +9,7 @@ import com.dlerin.application.entity.AdminBusinessCategory;
 @Service
 public interface AdminBusinessCategoryService {
 
-	public AdminBusinessCategory addAdminBusinessCategory(AdminBusinessCategory adminBusinessCategory, String emailId);
+	public AdminBusinessCategory addAdminBusinessCategory(AdminBusinessCategory adminBusinessCategory, String name);
 	
 	public List<AdminBusinessCategory> getAdminBusinessCategory(String businessCategoryId, String businessCategoryName);
 	

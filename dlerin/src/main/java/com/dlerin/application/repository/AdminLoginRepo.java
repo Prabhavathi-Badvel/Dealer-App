@@ -21,6 +21,8 @@ public interface AdminLoginRepo extends JpaRepository<AdminLogin, String> {
 	
 	@Query("SELECT d FROM AdminLogin d WHERE d.empId = :empId")
 	Optional<AdminLogin> findByEmpIdOne(@Param("empId")String empId);
+	
+	Optional<AdminLogin> findByName(@Param("name")String name);
 
 	Optional<AdminLogin> findByEmailIdOrMobileNo(String emailId, String mobileNo);
 
