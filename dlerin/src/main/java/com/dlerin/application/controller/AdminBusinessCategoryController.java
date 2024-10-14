@@ -70,12 +70,12 @@ public class AdminBusinessCategoryController {
 			List<AdminBusinessCategory> getBrand = adminBusinessCategoryService.getAdminBusinessCategory(businessCategoryId, businessCategoryName);
 			
 			if (getBrand != null && !getBrand.isEmpty()) {
-				response.setMessage("Received gst details");
+				response.setMessage("Receive Admin business Category details");
 				response.setStatus(true);
 				response.setAddedData(getBrand);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				response.setMessage("No admin gst  details found for given parameters/check your parameter");
+				response.setMessage("No Admin business Category  details found for given parameters/check your parameter");
 				response.setStatus(false);
 				response.setAddedData(getBrand);
 				return new ResponseEntity<>(response, HttpStatus.OK);

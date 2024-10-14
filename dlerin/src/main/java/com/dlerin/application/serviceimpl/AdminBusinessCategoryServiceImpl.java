@@ -1,5 +1,6 @@
 package com.dlerin.application.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,15 +9,26 @@ import org.springframework.stereotype.Service;
 
 import com.dlerin.application.entity.AdminBusinessCategory;
 import com.dlerin.application.entity.AdminLogin;
+import com.dlerin.application.entity.AdminMetalMaster;
 import com.dlerin.application.repository.AdminBusinessCategoryRepo;
 import com.dlerin.application.repository.AdminLoginRepo;
 import com.dlerin.application.service.AdminBusinessCategoryService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Service
 public class AdminBusinessCategoryServiceImpl implements AdminBusinessCategoryService {
 
 	@Autowired
 	private AdminLoginRepo adminLoginRepo;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Autowired
 	private AdminBusinessCategoryRepo adminBusinessCategoryRepo;
@@ -42,13 +54,27 @@ public class AdminBusinessCategoryServiceImpl implements AdminBusinessCategorySe
 	@Override
 	public List<AdminBusinessCategory> getAdminBusinessCategory(String businessCategoryId,
 			String businessCategoryName) {
-		if (businessCategoryId != null && businessCategoryName != null) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<AdminBusinessCategory> query = cb.createQuery(AdminBusinessCategory.class);
+		Root<AdminBusinessCategory> root = query.from(AdminBusinessCategory.class);
+		List<Predicate> predicates = new ArrayList<>();
+//		if (businessCategoryId != null && businessCategoryName != null) {
+//
+//			List<AdminBusinessCategory> details = adminBusinessCategoryRepo
+//					.findByBusinessCategoryIdAndBusinessCategoryName(businessCategoryId, businessCategoryName);
+//			return details;
+//		}
+//		return null;
+		if(businessCategoryId!=null) {
+			predicates.add(cb.equal(root.get("businessCategoryId"), businessCategoryId));
 
-			List<AdminBusinessCategory> details = adminBusinessCategoryRepo
-					.findByBusinessCategoryIdAndBusinessCategoryName(businessCategoryId, businessCategoryName);
-			return details;
 		}
-		return null;
+		if (businessCategoryName != null) {
+			predicates.add(cb.equal(root.get("businessCategoryName"), businessCategoryName));
+		}
+		query.where(predicates.toArray(new Predicate[0]));
+
+		return entityManager.createQuery(query).getResultList();
 	}
 
 	@Override
