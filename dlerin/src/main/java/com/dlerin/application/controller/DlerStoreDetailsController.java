@@ -43,7 +43,7 @@ public class DlerStoreDetailsController {
 			DlerStoreDetails dealerStores = dlerStoreDetailsService.addStore(store);
 
 			if (dealerStores != null) {
-				response.setMessage("Dealer brands details added successfully");
+				response.setMessage("Dealer Store details added successfully");
 				response.setStatus(true);
 				response.setData(dealerStores);
 				return new ResponseEntity<>(response, HttpStatus.OK);
