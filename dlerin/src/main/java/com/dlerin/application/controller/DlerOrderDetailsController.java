@@ -133,6 +133,8 @@ public class DlerOrderDetailsController {
 	    try {
 	        MimeMessage mail = mailSender.createMimeMessage();
 	        MimeMessageHelper helper = new MimeMessageHelper(mail, true);
+	        
+	        helper.setFrom("no_reply@kosuriers.com");
 	        helper.setTo(toEmail);
 	        helper.setSubject(subject);
 	        helper.setText(message, true); // true means the content is HTML
@@ -158,6 +160,7 @@ public class DlerOrderDetailsController {
 	    MimeMessage message = mailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+	    helper.setFrom("no_reply@kosuriers.com");
 	    helper.setTo(to);
 	    helper.setSubject(subject);
 	    helper.setText(htmlContent, true);

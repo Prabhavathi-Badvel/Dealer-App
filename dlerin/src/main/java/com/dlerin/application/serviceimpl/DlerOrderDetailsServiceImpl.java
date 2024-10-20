@@ -324,6 +324,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 			MimeMessageHelper helper = new MimeMessageHelper(message, true); // true indicates multipart
 
 			try {
+				helper.setFrom("no_reply@kosuriers.com");
 				helper.setTo(to);
 				helper.setSubject(subject);
 				helper.setText(htmlContent, true); // true indicates HTML content
@@ -419,6 +420,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 	    MimeMessage message = mailSender.createMimeMessage();
 	    MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
+	    helper.setFrom("no_reply@kosuriers.com");
 	    helper.setTo(to);
 	    helper.setSubject(subject);
 	    helper.setText(htmlContent, true);
