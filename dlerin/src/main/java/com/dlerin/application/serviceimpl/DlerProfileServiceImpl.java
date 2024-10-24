@@ -1,5 +1,6 @@
 package com.dlerin.application.serviceimpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dlerin.application.dto.ProfileDto;
+import com.dlerin.application.entity.AdminBusinessCategory;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.exception.DlerNotFoundException;
@@ -16,6 +18,10 @@ import com.dlerin.application.service.DlerProfileService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 @Service
 public class DlerProfileServiceImpl implements DlerProfileService {
@@ -61,23 +67,50 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 
 	}
 
+//	@Override
+//	public List<DlerProfile> getProfile(ProfileDto profile) {
+//
+//		Optional<DlerBusinessLogin> isExists = Optional
+//				.ofNullable(dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(profile.getDlerId(),
+//						profile.getEmail(), profile.getMobile()));
+//		if (isExists.isPresent()) {
+//
+//			Optional<List<DlerProfile>> dlerPresent = Optional
+//					.ofNullable(dlerProfileRepo.findByDlerId(isExists.get().getDlerUserId()));
+//			if (!dlerPresent.isEmpty()) {
+//				profile.setEmail(isExists.get().getDlerEmailId());
+//				profile.setMobile(isExists.get().getDlerMobileNo());
+//				return dlerPresent.get();
+//			}
+//		}
+//		return null;
+//
+//	}
+
 	@Override
-	public List<DlerProfile> getProfile(ProfileDto profile) {
-
-		Optional<DlerBusinessLogin> isExists = Optional
-				.ofNullable(dlerBusinessLoginRepo.findByDlerUserIdOrDlerEmailIdOrDlerMobileNo(profile.getDlerId(),
-						profile.getEmail(), profile.getMobile()));
-		if (isExists.isPresent()) {
-
-			Optional<List<DlerProfile>> dlerPresent = Optional
-					.ofNullable(dlerProfileRepo.findByDlerId(isExists.get().getDlerUserId()));
-			if (!dlerPresent.isEmpty()) {
-				profile.setEmail(isExists.get().getDlerEmailId());
-				profile.setMobile(isExists.get().getDlerMobileNo());
-				return dlerPresent.get();
-			}
+	public List<DlerProfile> getProfile(String dlerBusinessId, String dlerId, String dlerBusinessName,
+			String dlerBusinessLocation, String dlerBusinessContactPerson, String dlerBusinessContactNo) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+		CriteriaQuery<DlerProfile> query = cb.createQuery(DlerProfile.class);
+		Root<DlerProfile> root = query.from(DlerProfile.class);
+		List<Predicate> predicates = new ArrayList<>();
+		if(dlerBusinessId!=null) {
+			predicates.add(cb.equal(root.get("dlerBusinessId"), dlerBusinessId));
 		}
-		return null;
+		if (dlerBusinessName != null) {
+			predicates.add(cb.equal(root.get("dlerBusinessName"), dlerBusinessName));
+		}
+		if(dlerBusinessLocation!=null) {
+			predicates.add(cb.equal(root.get("dlerBusinessLocation"), dlerBusinessLocation));
+		}
+		if (dlerBusinessContactPerson != null) {
+			predicates.add(cb.equal(root.get("dlerBusinessContactPerson"), dlerBusinessContactPerson));
+		}
+		if(dlerBusinessContactNo!=null) {
+			predicates.add(cb.equal(root.get("dlerBusinessContactNo"), dlerBusinessContactNo));
+		}
+		query.where(predicates.toArray(new Predicate[0]));
 
+		return entityManager.createQuery(query).getResultList();
 	}
 }

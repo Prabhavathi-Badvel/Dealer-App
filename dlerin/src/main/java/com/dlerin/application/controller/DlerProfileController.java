@@ -11,8 +11,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.dlerin.application.dto.ProfileDto;
+
 import com.dlerin.application.dto.ResponseDlerProfileDto;
 import com.dlerin.application.dto.ResponseDlerProfileDto1;
 import com.dlerin.application.entity.DlerBusinessLogin;
@@ -102,12 +103,36 @@ public class DlerProfileController {
 
 	}
 
+//	@GetMapping("/dlerin-get-dlerprofile")
+//	public ResponseEntity<?> getDlerProfile(@RequestBody ProfileDto dealerProfile) {
+//		ResponseDlerProfileDto response = new ResponseDlerProfileDto();
+//		try {
+//
+//			List<DlerProfile> dler = dlerProfileService.getProfile(dealerProfile);
+//			if (dler != null && !dler.isEmpty()) {
+//				response.setMessage("Dler details");
+//				response.setStatus(true);
+//				response.setGetDlerProfile(dler);
+//				return new ResponseEntity<>(response, HttpStatus.OK);
+//			} else {
+//				response.setMessage("No details found for given parameters/check your parameters");
+//				response.setStatus(false);
+//				response.setGetDlerProfile(dler);
+//				return new ResponseEntity<>(response, HttpStatus.OK);
+//			}
+//		} catch (Exception e) {
+//			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+//		}
+//	}
+	
 	@GetMapping("/dlerin-get-dlerprofile")
-	public ResponseEntity<?> getDlerProfile(@RequestBody ProfileDto dealerProfile) {
+	public ResponseEntity<?> getDlerProfile(@RequestParam(required = false) String dlerBusinessId,
+			@RequestParam(required = false) String dlerId,@RequestParam(required = false) String dlerBusinessName,
+			@RequestParam(required = false) String dlerBusinessLocation,@RequestParam(required = false) String dlerBusinessContactPerson,
+			@RequestParam(required = false) String dlerBusinessContactNo){
 		ResponseDlerProfileDto response = new ResponseDlerProfileDto();
 		try {
-
-			List<DlerProfile> dler = dlerProfileService.getProfile(dealerProfile);
+			List<DlerProfile> dler = dlerProfileService.getProfile(dlerBusinessId, dlerId, dlerBusinessName, dlerBusinessLocation, dlerBusinessContactPerson, dlerBusinessContactNo);
 			if (dler != null && !dler.isEmpty()) {
 				response.setMessage("Dler details");
 				response.setStatus(true);
