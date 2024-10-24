@@ -22,12 +22,12 @@ public class DlerMaterialPriceHistoryController {
 	DlerMaterialPriceHistoryService priceHistoryService;
 
 	@GetMapping("/get-price-history")
-	public ResponseEntity<?> getDlerPriceHistory(@RequestParam(required = false) String materialIdPriceId,
+	public ResponseEntity<?> getDlerPriceHistory(@RequestParam(required = false) String price,
 			@RequestParam(required = false) String dlerIdMaterialId, @RequestParam(required = false) String id,
 			@RequestParam(required = false) String dlerId) {
 		ResponseDlerMaterialPriceHistoryDto response = new ResponseDlerMaterialPriceHistoryDto();
 		try {
-			List<DlerMaterialPriceHistory> history = priceHistoryService.getPriceHistory(materialIdPriceId,
+			List<DlerMaterialPriceHistory> history = priceHistoryService.getPriceHistory(price,
 					dlerIdMaterialId, id, dlerId);
 			if (history != null && !history.isEmpty()) {
 				response.setMessage("price history");

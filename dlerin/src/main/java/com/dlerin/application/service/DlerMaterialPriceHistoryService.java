@@ -6,6 +6,6 @@ import com.dlerin.application.entity.DlerMaterialPriceHistory;
 
 public interface DlerMaterialPriceHistoryService {
 
-	public List<DlerMaterialPriceHistory> getPriceHistory(String materialIdPriceId, String dlerIdMaterialId, String id,
+	public List<DlerMaterialPriceHistory> getPriceHistory(String price, String dlerIdMaterialId, String id,
 			String dlerId);
 }

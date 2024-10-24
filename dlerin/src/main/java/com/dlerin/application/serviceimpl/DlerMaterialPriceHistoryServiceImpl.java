@@ -23,15 +23,15 @@ public class DlerMaterialPriceHistoryServiceImpl implements DlerMaterialPriceHis
 	
 	
 	@Override
-	public List<DlerMaterialPriceHistory> getPriceHistory(String materialIdPriceId, String dlerIdMaterialId, String id,
+	public List<DlerMaterialPriceHistory> getPriceHistory(String price, String dlerIdMaterialId, String id,
 			String dlerId) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DlerMaterialPriceHistory> query = cb.createQuery(DlerMaterialPriceHistory.class);
 		Root<DlerMaterialPriceHistory> root = query.from(DlerMaterialPriceHistory.class);
 		List<Predicate> predicates = new ArrayList<>();
 
-		if (materialIdPriceId != null) {
-			predicates.add(cb.equal(root.get("materialIdPriceId"), materialIdPriceId));
+		if (price != null) {
+			predicates.add(cb.equal(root.get("price"), price));
 		}
 		if (dlerIdMaterialId != null) {
 			predicates.add(cb.equal(root.get("dlerIdMaterialId"), dlerIdMaterialId));
