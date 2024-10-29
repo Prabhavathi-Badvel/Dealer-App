@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dlerin.application.dto.DealerStoreMaterialResponse;
+import com.dlerin.application.dto.DlerMaterialPriceRequest;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto;
 import com.dlerin.application.dto.ResponseDlerMaterialPriceDto2;
 import com.dlerin.application.entity.DlerMaterialPrice;
@@ -30,29 +31,67 @@ public class DlerMaterialPriceController {
 	@Autowired
 	DlerMaterialPriceRepo dlerMaterialPriceRepo;
 
+//	@PostMapping("/dlerin-add-DlerMaterialPrices")
+//	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
+//		ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
+//		try {
+//			List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
+//
+//			if (!addedPrices.isEmpty()) {
+//				response.setMessage("Added successfully");
+//				response.setStatus(true);
+//				response.setAddData(addedPrices);
+//				return new ResponseEntity<>(response, HttpStatus.OK);
+//			} else {
+//				response.setMessage("Record already exists or given DlerIdMaterialId not found");
+//				response.setStatus(false);
+//				response.setAddData(null);
+//				return new ResponseEntity<>(response, HttpStatus.OK);
+//			}
+//		} catch (Exception e) {
+//			response.setMessage("Failed to add prices");
+//			response.setStatus(false);
+//			response.setAddData(null);
+//			return new ResponseEntity<>(response, HttpStatus.OK);
+//		}
+//	}
+	
 	@PostMapping("/dlerin-add-DlerMaterialPrices")
-	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
-		ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
-		try {
-			List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
+	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody DlerMaterialPriceRequest request) {
+	    ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
+	    String dlerId = request.getDlerId();
 
-			if (!addedPrices.isEmpty()) {
-				response.setMessage("Added successfully");
-				response.setStatus(true);
-				response.setAddData(addedPrices);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			} else {
-				response.setMessage("Record already exists or given DlerIdMaterialId not found");
-				response.setStatus(false);
-				response.setAddData(null);
-				return new ResponseEntity<>(response, HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			response.setMessage("Failed to add prices");
-			response.setStatus(false);
-			response.setAddData(null);
-			return new ResponseEntity<>(response, HttpStatus.OK);
-		}
+	    // Validate that all materials have the correct dlerId
+	    boolean allMatchDlerId = request.getMaterials().stream()
+	            .allMatch(material -> material.getDlerIdMaterialId().startsWith(dlerId));
+
+	    if (!allMatchDlerId) {
+	        response.setMessage("All materials must have the same dlerId: " + dlerId);
+	        response.setStatus(false);
+	        response.setAddData(null);
+	        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	    }
+
+	    try {
+	        List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(request.getMaterials(), dlerId);
+
+	        if (!addedPrices.isEmpty()) {
+	            response.setMessage("Added successfully");
+	            response.setStatus(true);
+	            response.setAddData(addedPrices);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
+	        } else {
+	            response.setMessage("Record already exists or given DlerIdMaterialId not found");
+	            response.setStatus(false);
+	            response.setAddData(null);
+	            return new ResponseEntity<>(response, HttpStatus.OK);
+	        }
+	    } catch (Exception e) {
+	        response.setMessage("Failed to add prices");
+	        response.setStatus(false);
+	        response.setAddData(null);
+	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 
 	@PutMapping("/dlerin-update-DlerMaterialPrice")

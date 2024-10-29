@@ -33,7 +33,7 @@ public class AdminUiEndPointController {
 	private AdminUiEndPointRepo adminUiEndPointRepo;
 	
 	@PostMapping("/dlerin-add-AdminUiEndPoint")
-	@PreAuthorize("hasAuthority('Admin')")
+//	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminUiEndPoint(@RequestBody AdminUiEndPoint adminUiEndPoint) {
 		String updatedBy = adminUiEndPoint.getUpdatedBy();
 		ResponseAdminUiEndPointDto response = new ResponseAdminUiEndPointDto();
@@ -88,7 +88,7 @@ public class AdminUiEndPointController {
 	}
 	
 	@PutMapping("/dlerin-update-AdminUiEndPoint")
-	@PreAuthorize("hasAuthority('Admin')")
+//	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> updateAdminBusinessCategory(@RequestBody AdminUiEndPoint adminUiEndPoint) {
 		ResponseAdminUiEndPointDto response = new ResponseAdminUiEndPointDto();
 		Optional<AdminUiEndPoint> gstExists = Optional.ofNullable(adminUiEndPointRepo.findBySystemId(adminUiEndPoint.getSystemId()));

@@ -240,7 +240,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 	public String sendMail(String dlerEmailId) {
 		Optional<DlerBusinessLogin> userOp = Optional.ofNullable(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
 		if (userOp.isPresent()) {
-			otpService.generateOtp(dlerEmailId);
+			otpService.generateOtp(dlerEmailId,"forgotPassword");
 			return "otp";
 		}
 		return null;

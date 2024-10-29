@@ -9,11 +9,13 @@ import com.dlerin.application.entity.DlerMaterialPrice;
 
 public interface DlerMaterialPriceService {
 
-	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices);
+//	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices);
 
 	public boolean updatePriceAndStoreHistory(DlerMaterialPrice price);
 
 //	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice);
 
 	public DealerStoreMaterialResponse getDealerPriceDetails(String skuId, String dlerId, String materialId);
+	
+	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices, String dlerId);
 }

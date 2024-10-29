@@ -78,7 +78,7 @@ public class DlerBusinessLoginController {
 				Optional<DlerBusinessLogin> user = Optional.of(dlerBusinessLoginRepo.findByDlerEmailId(dlerEmailId));
 
 				if (!user.get().getDlerEmailVerify().equals("yes")) {
-					otpService.generateOtp(dlerEmailId);
+					otpService.generateOtp(dlerEmailId, "registration");
 					message.setMessage("OTP Sent to Registered EmailId");
 					message.setStatus(true);
 					return new ResponseEntity<>(message, HttpStatus.OK);

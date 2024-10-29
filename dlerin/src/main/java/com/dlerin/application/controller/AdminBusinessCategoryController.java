@@ -32,7 +32,7 @@ public class AdminBusinessCategoryController {
 	private AdminBusinessCategoryRepo adminBusinessCategoryRepo;
 
 	@PostMapping("/dlerin-add-AdminBusinessCategory")
-	@PreAuthorize("hasAuthority('Admin')")
+//	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> addAdminBusinessCategory(@RequestBody AdminBusinessCategory  adminBusinessCategory) {
 		String businessCategoryId = adminBusinessCategory.getBusinessCategoryId();
 		ResponseAdminBusinessCategoryDto response = new ResponseAdminBusinessCategoryDto();
@@ -86,7 +86,7 @@ public class AdminBusinessCategoryController {
 	}
 	
 	@PutMapping("/dlerin-update-AdminBusinessCategory")
-	@PreAuthorize("hasAuthority('Admin')")
+//	@PreAuthorize("hasAuthority('Admin')")
 	public ResponseEntity<?> updateAdminBusinessCategory(@RequestBody AdminBusinessCategory abc) {
 		ResponseAdminBusinessCategoryDto response = new ResponseAdminBusinessCategoryDto();
 		Optional<AdminBusinessCategory> gstExists = Optional.ofNullable(adminBusinessCategoryRepo.findByBusinessCategoryId(abc.getBusinessCategoryId()));

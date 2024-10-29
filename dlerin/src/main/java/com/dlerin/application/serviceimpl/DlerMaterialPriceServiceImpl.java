@@ -32,23 +32,42 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 
 	@Autowired
 	private DlerStoreMaterialRepo dlerStoreMaterialRepo;
-
+	
 	@Override
-	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices) {
-		List<DlerMaterialPrice> addedPrices = new ArrayList<>();
-		for (DlerMaterialPrice price : prices) {
-			try {
-				DlerMaterialPrice addedPrice = addPrice(price);
-				if (addedPrice != null) {
-					addedPrices.add(addedPrice);
-				}
-			} catch (Exception e) {
-
-				e.printStackTrace();
-			}
-		}
-		return addedPrices;
+	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices, String dlerId) {
+	    List<DlerMaterialPrice> addedPrices = new ArrayList<>();
+	    for (DlerMaterialPrice price : prices) {
+	        try {
+	            if (price.getDlerIdMaterialId().startsWith(dlerId)) { // Ensure dlerId consistency
+	                DlerMaterialPrice addedPrice = addPrice(price);
+	                if (addedPrice != null) {
+	                    addedPrices.add(addedPrice);
+	                }
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	        }
+	    }
+	    return addedPrices;
 	}
+
+
+//	@Override
+//	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices) {
+//		List<DlerMaterialPrice> addedPrices = new ArrayList<>();
+//		for (DlerMaterialPrice price : prices) {
+//			try {
+//				DlerMaterialPrice addedPrice = addPrice(price);
+//				if (addedPrice != null) {
+//					addedPrices.add(addedPrice);
+//				}
+//			} catch (Exception e) {
+//
+//				e.printStackTrace();
+//			}
+//		}
+//		return addedPrices;
+//	}
 
 	private DlerMaterialPrice addPrice(DlerMaterialPrice price) throws Exception {
 	    Optional<DlerMaterialPrice> priceExists = dlerMaterialPriceRepo.findByDlerIdMaterialIdOne(price.getDlerIdMaterialId());

@@ -15,7 +15,6 @@ public class OtpGenerationServiceImpl {
 
 	@Autowired
 	EmailServiceImpl mailService;
-	
 	@Autowired
 	SmsService smsService;
 	
@@ -24,11 +23,11 @@ public class OtpGenerationServiceImpl {
 	private final Map<String, String> otpStorage = new HashMap<>(); 
 
    
-    public String generateOtp(String mail) {
+    public String generateOtp(String mail,String operation) {
     	int randomNum = (int) (Math.random() * 900000) + 100000;
 		String otp = String.valueOf(randomNum);
         otpStorage.put(mail, otp);
-        mailService.sendMail(mail,otp);
+        mailService.sendMail(mail,otp,operation);
         
         return otp;
     }

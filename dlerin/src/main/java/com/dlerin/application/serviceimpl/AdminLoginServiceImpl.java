@@ -169,7 +169,7 @@ public class AdminLoginServiceImpl implements AdminLoginService {
 	public String sendMail(String emailId) {
 		Optional<AdminLogin> userOp = adminLoginRepo.findByEmailId(emailId);
 		if (userOp.isPresent()) {
-			otpService.generateOtp(emailId);
+			otpService.generateOtp(emailId,"forgotPassword");
 			return "otp";
 		}
 		return null;

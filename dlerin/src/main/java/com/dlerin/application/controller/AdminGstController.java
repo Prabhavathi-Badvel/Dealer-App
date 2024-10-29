@@ -20,7 +20,7 @@ import com.dlerin.application.repository.AdminGstRepo;
 import com.dlerin.application.service.AdminGstService;
 
 @RestController
-@PreAuthorize("hasAuthority('Admin')")
+//@PreAuthorize("hasAuthority('Admin')")
 public class AdminGstController {
 
 	@Autowired
