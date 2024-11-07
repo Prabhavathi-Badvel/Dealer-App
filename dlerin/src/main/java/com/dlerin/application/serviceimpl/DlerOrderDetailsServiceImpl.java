@@ -91,7 +91,7 @@ public class DlerOrderDetailsServiceImpl implements DlerOrderDetailsService {
 	        // Calculate the line item total price
 	        int lineItemTotalPrice = calculateLineItemPrice(order);
 	        order.setOrderTotal(lineItemTotalPrice);
-	        order.setStatus("Pending");
+	        order.setStatus("NEW");
 	        order.setDlerId(material.getDlerId());
 
 	        // Save the order details

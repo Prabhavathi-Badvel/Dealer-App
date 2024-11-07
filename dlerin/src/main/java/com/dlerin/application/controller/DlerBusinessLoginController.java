@@ -1,8 +1,11 @@
 package com.dlerin.application.controller;
 
 
+import java.time.LocalDate;
 import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,9 +14,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.dlerin.application.dto.ChangeForgotdto;
 import com.dlerin.application.dto.DlerBusinessLoginDto;
 import com.dlerin.application.dto.DlerBusinessLoginDto2;
+import com.dlerin.application.dto.DlerBusinessLoginReporterDto;
 import com.dlerin.application.dto.LoginDto;
 import com.dlerin.application.dto.ResponseDlerBusinessLoginDto;
 import com.dlerin.application.dto.ResponseDlerBusinessLoginDto1;
@@ -21,6 +26,7 @@ import com.dlerin.application.dto.ResponseDlerLoginDto;
 import com.dlerin.application.dto.ResponseMessageDto;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+import com.dlerin.application.repository.DlerProfileRepo;
 import com.dlerin.application.service.DlerBusinessLoginService;
 import com.dlerin.application.service.MobileOtpService;
 import com.dlerin.application.serviceimpl.OtpGenerationServiceImpl;
@@ -39,6 +45,9 @@ public class DlerBusinessLoginController {
 
 	@Autowired
 	MobileOtpService MobileOtpService;
+	
+	@Autowired
+	DlerProfileRepo dlerProfileRepo;
 
 	@PostMapping("/dlerin-registration")
 	public ResponseEntity<?> addDlerBusinessLoginProfile(@RequestBody DlerBusinessLogin dlerBusinessl) {
@@ -310,7 +319,18 @@ public class DlerBusinessLoginController {
 			message.setStatus(false);
 			return ResponseEntity.status(HttpStatus.OK).body(message);
 		}
+	}
+	
+	@GetMapping("/get-registered-distributors")
+	public DlerBusinessLoginReporterDto getDealerDetails(
+	        @RequestParam(required = false) String dlerEmailId,
+	        @RequestParam(required = false) String dlerId,
+	        @RequestParam(required = false) String dlerMobileNo,
+	        @RequestParam(required = false) String dlerBusinessLocation,
+	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 
+	    return dlerBusinessLoginService.getDealerDetails(dlerEmailId,dlerId,dlerMobileNo, dlerBusinessLocation, fromDate, toDate);
 	}
 
 }

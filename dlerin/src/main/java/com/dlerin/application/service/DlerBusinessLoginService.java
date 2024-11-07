@@ -1,8 +1,11 @@
 package com.dlerin.application.service;
 
+import java.time.LocalDate;
+
 import com.dlerin.application.dto.DlerBusinessLoginDto;
 import com.dlerin.application.dto.DlerBusinessLoginDto1;
 import com.dlerin.application.dto.DlerBusinessLoginDto2;
+import com.dlerin.application.dto.DlerBusinessLoginReporterDto;
 import com.dlerin.application.dto.ResponseDlerLoginDto;
 import com.dlerin.application.entity.DlerBusinessLogin;
 
@@ -20,4 +23,7 @@ public interface DlerBusinessLoginService {
 	public String forgetPassword(String dlerEmailId, String otp, String newPassword, String confirmPassword,String dlerMobileNo);
 	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId);
 	public String fetchEmailByDlerId(String dlerId);
+	public DlerBusinessLoginReporterDto getDealerDetails(
+	        String dlerUserId, String dlerEmailId, String dlerMobileNo, 
+	        String dlerBusinessLocation, LocalDate fromDate, LocalDate toDate);
 }

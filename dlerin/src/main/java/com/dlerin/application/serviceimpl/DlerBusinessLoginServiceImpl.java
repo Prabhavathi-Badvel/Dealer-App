@@ -1,15 +1,23 @@
 package com.dlerin.application.serviceimpl;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.dlerin.application.dto.DlerBusinessLoginDto;
 import com.dlerin.application.dto.DlerBusinessLoginDto1;
 import com.dlerin.application.dto.DlerBusinessLoginDto2;
+import com.dlerin.application.dto.DlerBusinessLoginReporterDto;
 import com.dlerin.application.dto.ResponseDlerLoginDto;
 import com.dlerin.application.entity.DlerBusinessLogin;
+import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+import com.dlerin.application.repository.DlerProfileRepo;
 import com.dlerin.application.securities.JwtService;
 import com.dlerin.application.service.DlerBusinessLoginService;
 import jakarta.persistence.EntityManager;
@@ -32,6 +40,9 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 
 	@PersistenceContext
 	private EntityManager entityManager;
+	
+	@Autowired
+	private DlerProfileRepo dlerProfileRepo;
 
 	@Override
 	public DlerBusinessLoginDto addDlerBusinessProfile(DlerBusinessLogin dbl) {
@@ -56,7 +67,7 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 			dblDto.setDlerMobileNo(dbl.getDlerMobileNo());
 			dblDto.setDlerName(dbl.getDlerName());
 			dblDto.setDlerRegDate(dbl.getDlerRegDate());
-			dblDto.setUserType(dbl.getUserType());
+			dblDto.setUserType("Dealer");
 			dblDto.setDlerUserId(dbl.getDlerUserId());
 
 			return dblDto;
@@ -303,4 +314,62 @@ public class DlerBusinessLoginServiceImpl implements DlerBusinessLoginService {
 	    Optional<DlerBusinessLogin> businessLogin = dlerBusinessLoginRepo.findById(dlerId);
 	    return businessLogin.map(DlerBusinessLogin::getDlerEmailId).orElse(null);
 	}
+	
+	@Override
+	public DlerBusinessLoginReporterDto getDealerDetails(
+	         String dlerEmailId, String dlerUserId,String dlerMobileNo, 
+	        String dlerBusinessLocation, LocalDate fromDate, LocalDate toDate) {
+
+	    DlerBusinessLoginReporterDto dmr = new DlerBusinessLoginReporterDto();
+
+	    List<DlerBusinessLogin> businessLogins;
+
+	    if (fromDate != null && toDate != null) {
+	        // Convert LocalDate to LocalDateTime for start and end of the day
+	        LocalDateTime startDateTime = fromDate.atStartOfDay();
+	        LocalDateTime endDateTime = toDate.atTime(23, 59, 59);
+	        
+	        // Fetch records within the date range
+	        businessLogins = dlerBusinessLoginRepo.findByDlerRegDateBetween(startDateTime, endDateTime);
+	    } else if(dlerEmailId!=null ||dlerUserId!=null || dlerMobileNo!=null) {
+	    	businessLogins=dlerBusinessLoginRepo.findByDlerEmailIdOrDlerUserIdOrDlerMobileNo(dlerEmailId,dlerUserId,dlerMobileNo);
+	    }
+	    else {
+	        // Fetch all records if no date range is provided
+	        businessLogins = dlerBusinessLoginRepo.findAll();
+	    }
+
+	    if (businessLogins.isEmpty()) {
+	        dmr.setError("No Dler Business Login found for the provided criteria.");
+	        return dmr;
+	    }
+
+	    // Step 2: Extract dlerIds from the fetched businessLogins
+	    List<String> dlerIds = businessLogins.stream()
+	                                         .map(DlerBusinessLogin::getDlerUserId)
+	                                         .distinct()
+	                                         .collect(Collectors.toList());
+
+	    // Step 3: Fetch matching DlerProfile records based on dlerIds
+	    List<DlerProfile> profiles;
+	    if (dlerBusinessLocation != null) {
+	        // If business location is provided, fetch profiles with matching location
+	        profiles = dlerProfileRepo.findByDlerIdInAndDlerBusinessLocation(dlerIds, dlerBusinessLocation);
+	    } else {
+	        // If no location provided, just match based on dlerId
+	        profiles = dlerProfileRepo.findByDlerIdIn(dlerIds);
+	    }
+
+	    if (profiles.isEmpty()) {
+	        dmr.setError("No profiles found for the provided criteria.");
+	        return dmr;
+	    }
+
+	    // Step 4: Set the results in the response DTO
+	    dmr.setDlerBusinessLogin(businessLogins);
+	    dmr.setDlerProfiles(profiles);
+
+	    return dmr;
+	}
 }
+

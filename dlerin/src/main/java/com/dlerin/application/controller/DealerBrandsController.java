@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dlerin.application.dto.DlerBusinessLoginReporterDto;
+import com.dlerin.application.dto.ResponseCombinedDealerBrandsDto;
 import com.dlerin.application.dto.ResponseDealerBrandsDto1;
 import com.dlerin.application.dto.ResponseDealerBrnadsDto;
 import com.dlerin.application.entity.DealerBrands;
@@ -104,4 +107,15 @@ public class DealerBrandsController {
 			return new ResponseEntity<>(e.getMessage(), HttpStatus.OK);
 		}
 	}
+	
+	@GetMapping("/dlerin-get-dealerBrandsAndAdmin")
+    public ResponseEntity<ResponseCombinedDealerBrandsDto> getBrandsAndAdmin(
+            @RequestParam(required = false) String brandId,
+            @RequestParam(required = false) String dlerId,
+            @RequestParam(required = false) String businessType) {
+
+        ResponseCombinedDealerBrandsDto response = dealerBrandsService.getBrandsAndAdmin(brandId, dlerId, businessType);
+        return ResponseEntity.ok(response);
+    }
+
 }

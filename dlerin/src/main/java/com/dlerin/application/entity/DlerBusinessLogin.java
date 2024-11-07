@@ -11,6 +11,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,6 +35,7 @@ public class DlerBusinessLogin implements UserDetails {
 	private String dlerMobileNo;
 	@Column(name = "dler_name")
 	private String dlerName;
+
 	@Column(name = "dler_password")
 	private String dlerPassword;
 
@@ -42,6 +45,7 @@ public class DlerBusinessLogin implements UserDetails {
 
 	@Column(name = "dler_email_otp")
 	private String dlerEmailOtp;
+
 	@Column(name = "dler_mobile_otp")
 	private String dlerMobileOtp;
 	@Column(name = "dler_email_verify")
@@ -81,6 +85,7 @@ public class DlerBusinessLogin implements UserDetails {
 		return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + getUserType()));
 	}
 
+	@JsonIgnore
 	@Override
 	public String getPassword() {
 

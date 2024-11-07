@@ -20,4 +20,7 @@ public interface DlerProfileRepo extends JpaRepository<DlerProfile, String> {
 
 	@Query("SELECT dp FROM DlerProfile dp WHERE dp.dlerId = :dlerId AND dp.dlerBusinessName = :dlerBusinessName")
     List<DlerProfile> findByDlerIdAndDlerBusinessName(@Param("dlerId") String dlerId, @Param("dlerBusinessName") String dlerBusinessName);
+	
+	List<DlerProfile> findByDlerIdInAndDlerBusinessLocation(List<String> dlerIds, String dlerBusinessLocation);
+	List<DlerProfile> findByDlerIdIn(List<String> dlerIds);
 }

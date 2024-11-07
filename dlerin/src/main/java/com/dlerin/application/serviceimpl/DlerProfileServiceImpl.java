@@ -97,6 +97,9 @@ public class DlerProfileServiceImpl implements DlerProfileService {
 		if(dlerBusinessId!=null) {
 			predicates.add(cb.equal(root.get("dlerBusinessId"), dlerBusinessId));
 		}
+		if(dlerId!=null) {
+			predicates.add(cb.equal(root.get("dlerId"), dlerId));
+		}
 		if (dlerBusinessName != null) {
 			predicates.add(cb.equal(root.get("dlerBusinessName"), dlerBusinessName));
 		}

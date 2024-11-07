@@ -15,5 +15,7 @@ public interface AdminBrandMasterRepo extends JpaRepository<AdminBrandMaster, St
 	
 	  @Query("SELECT DISTINCT abm.brandCategory FROM AdminBrandMaster abm")
 	    List<String> findDistinctBrandCategories();
+	  
+	  List<AdminBrandMaster> findByBrandId(String brandId);
 
 }

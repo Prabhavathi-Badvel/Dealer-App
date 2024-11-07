@@ -1,8 +1,12 @@
 package com.dlerin.application.repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.dlerin.application.entity.DlerBusinessLogin;
@@ -24,4 +28,10 @@ public interface DlerBusinessLoginRepo extends JpaRepository<DlerBusinessLogin, 
 //	DlerBusinessLogin findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
 	
 	 Optional<DlerBusinessLogin> findByDlerEmailIdOrDlerMobileNo(String dlerEmailId, String dlerMobileNo);
+	 
+	 List<DlerBusinessLogin> findByDlerEmailIdOrDlerUserIdOrDlerMobileNo(String dlerEmailId,String dlerUserId,
+				String dlerMobileNo);
+	 
+	 @Query("SELECT d FROM DlerBusinessLogin d WHERE STR_TO_DATE(d.dlerRegDate, '%Y-%m-%d %H:%i:%s') BETWEEN :fromDate AND :toDate")
+	 List<DlerBusinessLogin> findByDlerRegDateBetween(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
 }
