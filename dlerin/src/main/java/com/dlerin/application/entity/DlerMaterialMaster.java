@@ -45,7 +45,7 @@ public class DlerMaterialMaster {
 
 	@PrePersist
 	private void prePersist() {
-		this.dlerIdMaterialId = dlerId + "_"+skuId+"_" + materialId;
+		this.dlerIdMaterialId = dlerId +"_"+brandId+"_"+skuId+"_" + materialId;
 		this.weight = weight + unit;
 	}
 }

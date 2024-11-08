@@ -41,8 +41,8 @@ public class AdminMetalMaster {
 	@PrePersist
 	private void prePersist() {
 
-		String subString = materialType.substring(0, Math.min(2, materialType.length()));
-		String subString1 = materialShape.substring(0, Math.min(2, materialShape.length()));
+		String subString = materialType.substring(0, Math.min(10, materialType.length()));
+		String subString1 = materialShape.substring(0, Math.min(10, materialShape.length()));
 		this.materialId = subString + "_" + materialWidth + "_" + materialLength + "_" + materialThickness + "_"
 				+ subString1;
 		this.materialWidth = materialWidth + widthInUnits;
