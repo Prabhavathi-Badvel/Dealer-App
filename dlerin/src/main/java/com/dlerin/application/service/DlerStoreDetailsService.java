@@ -22,4 +22,6 @@ public interface DlerStoreDetailsService {
 
 	public DealerMasterResponse getDealerDetails(String businessType, String location, String brandId,
 			String businessName, String materialName);
+
+	public List<String> getAllStoreLocation();
 }

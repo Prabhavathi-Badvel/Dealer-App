@@ -24,6 +24,6 @@ public interface DlerBusinessLoginService {
 	public DlerBusinessLoginDto2 getBusinessProfile(String dlerEmailId, String dlerMobileNo, String dlerUserId);
 	public String fetchEmailByDlerId(String dlerId);
 	public DlerBusinessLoginReporterDto getDealerDetails(
-	        String dlerUserId, String dlerEmailId, String dlerMobileNo, 
-	        String dlerBusinessLocation, LocalDate fromDate, LocalDate toDate);
+	         String dlerEmailId, String dlerUserId,String dlerMobileNo, 
+	        String dlerBusinessLocation, String fromDate, String toDate);
 }

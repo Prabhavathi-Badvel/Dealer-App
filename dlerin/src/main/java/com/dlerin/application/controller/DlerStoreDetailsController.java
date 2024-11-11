@@ -26,7 +26,6 @@ import com.dlerin.application.repository.DlerStoreDetailsRepo;
 import com.dlerin.application.service.DlerStoreDetailsService;
 
 @RestController
-@PreAuthorize("hasAuthority('Dealer')")
 @RequestMapping("/api")
 public class DlerStoreDetailsController {
 
@@ -61,6 +60,7 @@ public class DlerStoreDetailsController {
 		}
 	}
 
+	@PreAuthorize("hasAuthority('Dealer')")
 	@PutMapping("/dlerin-update-dealerStore")
 	public ResponseEntity<?> updateDealerStore(@RequestBody DlerStoreDetails dealerStore) {
 		ResponseDealerStoreDto response = new ResponseDealerStoreDto();
@@ -140,5 +140,10 @@ public class DlerStoreDetailsController {
 		DealerMasterResponse response = dlerStoreDetailsService.getDealerDetails(businessType, location, brandId,
 				businessName, materialName);
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+
+	@GetMapping("/getStoreLocation")
+	public List<String> getAllStoreLocation() {
+		return dlerStoreDetailsService.getAllStoreLocation();
 	}
 }

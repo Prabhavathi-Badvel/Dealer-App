@@ -232,4 +232,9 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	    return dmr;
 	}
 
+	@Override
+		public List<String> getAllStoreLocation(){
+		return dlerStoreDetailsRepo.findLocation();
+	}
+
 }

@@ -327,8 +327,8 @@ public class DlerBusinessLoginController {
 	        @RequestParam(required = false) String dlerId,
 	        @RequestParam(required = false) String dlerMobileNo,
 	        @RequestParam(required = false) String dlerBusinessLocation,
-	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-	        @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+	        @RequestParam(required = false) String fromDate,
+	        @RequestParam(required = false) String toDate) {
 
 	    return dlerBusinessLoginService.getDealerDetails(dlerEmailId,dlerId,dlerMobileNo, dlerBusinessLocation, fromDate, toDate);
 	}

@@ -1,5 +1,6 @@
 package com.dlerin.application.repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -33,5 +34,5 @@ public interface DlerBusinessLoginRepo extends JpaRepository<DlerBusinessLogin, 
 				String dlerMobileNo);
 	 
 	 @Query("SELECT d FROM DlerBusinessLogin d WHERE STR_TO_DATE(d.dlerRegDate, '%Y-%m-%d %H:%i:%s') BETWEEN :fromDate AND :toDate")
-	 List<DlerBusinessLogin> findByDlerRegDateBetween(@Param("fromDate") LocalDateTime fromDate, @Param("toDate") LocalDateTime toDate);
+	 List<DlerBusinessLogin> findAllByDlerRegDateBetween(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
 }

@@ -5,6 +5,8 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.dlerin.application.entity.AdminStoreVerification;
+
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -78,6 +80,26 @@ public class EmailServiceImpl {
 	        log.error("Failed to send email to {}: {}", toMail, e.getMessage());
 	    }
 	}
+	
+	public void sendAdminStoreToMail(String toMail, String otp, String operation) {
+	    try {
+	        MimeMessage message = mailsender.createMimeMessage();
+	        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+	        helper.setFrom("no_reply@kosuriers.com");
+	        helper.setTo(toMail);
+	        helper.setSubject("Admin store verificatin status.");
+	        // Customize the message based on operation type
+	        String body = "Admin store verificatin status is Verified" ;
+			helper.setText(body, true); // Set to true for HTML content
+
+			mailsender.send(message);
+			log.info("Email sent successfully to {}", toMail);
+		} catch (MessagingException e) {
+			log.error("Failed to send email to {}: {}", toMail, e.getMessage());
+		}
+	}
+	
 	public void sendWebMail(String toMail, String body) {
 
 		MimeMessage message = mailsender.createMimeMessage();
