@@ -32,4 +32,11 @@ public interface DlerStoreDetailsRepo extends JpaRepository<DlerStoreDetails, St
 	@Query("SELECT DISTINCT dsd.location FROM DlerStoreDetails dsd")
 	List<String> findLocation();
 
+	@Query("SELECT d FROM DlerStoreDetails d " + "WHERE (:location IS NULL OR d.location = :location) "
+			+ "AND (:businessType IS NULL OR d.businessType = :businessType) "
+			+ "AND (:storeId IS NULL OR d.storeId = :storeId) " + "AND (:dlerId IS NULL OR d.dlerId = :dlerId)")
+	List<DlerStoreDetails> findByLocationAndBusinessTypeAndStoreId(@Param("location") String location,
+			@Param("businessType") String businessType, @Param("storeId") String storeId,
+			@Param("dlerId") String dlerId);
+
 }

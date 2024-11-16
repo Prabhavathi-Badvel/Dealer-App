@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 public class ResponseUpdateDealerStoreDto {
 
-    private String message;
-    private boolean status;
-    private List<DlerStoreDetails> data;
+	private String message;
+	private boolean status;
+	private List<DealerStoreDetailResponse> data;
 }

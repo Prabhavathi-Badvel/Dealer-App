@@ -1,5 +1,6 @@
 package com.dlerin.application.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,5 +12,7 @@ import com.dlerin.application.entity.AdminStoreVerification;
 public interface AdminStoreVerificationRepo extends JpaRepository<AdminStoreVerification, String>{
 
 	Optional<AdminStoreVerification> findByAdminStatusUpdatedBy(String adminStatusUpdatedBy);
+
+	List<AdminStoreVerification> findByStoreId(String storeId);
 
 }

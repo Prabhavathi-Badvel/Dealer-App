@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dlerin.application.dto.DealerMasterResponse;
+import com.dlerin.application.dto.DealerStoreDetailResponse;
 import com.dlerin.application.dto.DlerResponse;
 import com.dlerin.application.dto.ResponseDealerStoreDto;
 import com.dlerin.application.dto.ResponseUpdateDealerStoreDto;
@@ -95,8 +96,8 @@ public class DlerStoreDetailsController {
 
 		ResponseUpdateDealerStoreDto response = new ResponseUpdateDealerStoreDto();
 		try {
-			List<DlerStoreDetails> dlerProfile = dlerStoreDetailsService.getDlerStoreDetails(location, businessType,
-					storeId, dlerId);
+			List<DealerStoreDetailResponse> dlerProfile = dlerStoreDetailsService.getDlerStoreDetails(location,
+					businessType, storeId, dlerId);
 
 			if (dlerProfile != null || dlerProfile.isEmpty()) {
 				response.setMessage("dler store details");
