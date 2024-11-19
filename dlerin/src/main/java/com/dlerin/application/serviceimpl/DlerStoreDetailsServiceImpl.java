@@ -14,27 +14,26 @@ import org.springframework.stereotype.Service;
 import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DealerStoreDetailResponse;
 import com.dlerin.application.dto.DlerResponse;
+import com.dlerin.application.dto.StoreMembershipResponse;
 import com.dlerin.application.entity.AdminStoreVerification;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerMaterialPrice;
 import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.entity.DlerStoreDetails;
-import com.dlerin.application.repository.AdminBrandMasterRepo;
+import com.dlerin.application.entity.StoreMembership;
+import com.dlerin.application.entity.VerificationStatus;
 import com.dlerin.application.repository.AdminStoreVerificationRepo;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
 import com.dlerin.application.repository.DlerMaterialMasterRepo;
 import com.dlerin.application.repository.DlerMaterialPriceRepo;
 import com.dlerin.application.repository.DlerProfileRepo;
 import com.dlerin.application.repository.DlerStoreDetailsRepo;
+import com.dlerin.application.repository.StoreMembershipRepo;
 import com.dlerin.application.service.DlerStoreDetailsService;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
 
 @Service
 public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
@@ -62,17 +61,47 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 
 	@Autowired
 	private AdminStoreVerificationRepo adminStoreVerificationRepo;
+	
+	@Autowired
+	private StoreMembershipRepo storeMembershipRepo;
 
 	@Override
 	public DlerStoreDetails addStore(DlerStoreDetails store) {
-		Optional<DlerBusinessLogin> dlerIdExists = Optional
-				.ofNullable(dlerBusinessLoginRepo.findByDlerUserId(store.getDlerId()));
-		if (dlerIdExists.isPresent()) {
-			DlerBusinessLogin db = dlerIdExists.get();
-			return dlerStoreDetailsRepo.save(store);
-		}
-		return null;
+	    Optional<DlerBusinessLogin> dlerIdExists = Optional.ofNullable(
+	        dlerBusinessLoginRepo.findByDlerUserId(store.getDlerId())
+	    );
+
+	    if (dlerIdExists.isPresent()) {
+	        DlerBusinessLogin db = dlerIdExists.get();
+
+	        // Create and populate the StoreMembership entity
+	        StoreMembership storeMembership = new StoreMembership();
+	        storeMembership.setStoreId(store.getStoreId());
+	        storeMembership.setStoreIdKey(store.getDlerIdStoreId());
+	        storeMembership.setUpdatedBy(store.getUpdatedBy());
+	        storeMembership.setDlerId(store.getDlerId()); // Set dlerId
+	        storeMembership.setVerificationStatus(VerificationStatus.NEW);
+
+	        // Save StoreMembership (storeIdKey will be set automatically in @PrePersist)
+	        storeMembershipRepo.save(storeMembership);
+	        
+	        // Create and populate the AdminStoreVerification entity
+	        AdminStoreVerification adminStoreVerification = new AdminStoreVerification();
+	        adminStoreVerification.setStoreId(store.getStoreId());
+	        adminStoreVerification.setDlerId(store.getDlerId());
+	        adminStoreVerification.setUpdatedBy(store.getUpdatedBy());
+	        adminStoreVerification.setVerificationStatus(VerificationStatus.NEW);
+	        adminStoreVerification.setVerifcationComment("Initial verification created");
+
+	        // Save AdminStoreVerification
+	        adminStoreVerificationRepo.save(adminStoreVerification);
+
+	        return dlerStoreDetailsRepo.save(store); // Save the DlerStoreDetails entity
+	    }
+
+	    return null;
 	}
+
 
 	@Override
 	public DlerStoreDetails updateStore(DlerStoreDetails store) {
@@ -94,19 +123,31 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 
 	@Override
 	public List<DealerStoreDetailResponse> getDlerStoreDetails(String location, String businessType, String storeId,
-			String dlerId) {
-		List<DlerStoreDetails> storeInfo = dlerStoreDetailsRepo.findByLocationAndBusinessTypeAndStoreId(location,
-				businessType, storeId, dlerId);
+	                                                           String dlerId) {
+	    List<DlerStoreDetails> storeInfo = dlerStoreDetailsRepo.findByLocationAndBusinessTypeAndStoreId(
+	            location, businessType, storeId, dlerId);
 
-		return storeInfo.stream().map(store -> {
-			DealerStoreDetailResponse res = new DealerStoreDetailResponse();
-			res.setDlerStoreDetails(store);
-			List<AdminStoreVerification> asv = adminStoreVerificationRepo.findByStoreId(store.getStoreId());
-			if (!asv.isEmpty()) {
-				res.setAdminStoreVerification(asv);
-			}
-			return res;
-		}).toList();
+	    return storeInfo.stream().map(store -> {
+	        DealerStoreDetailResponse res = new DealerStoreDetailResponse();
+	        res.setDlerStoreDetails(store);
+
+	        List<StoreMembershipResponse> memberships = storeMembershipRepo.findByStoreIdKey(store.getDlerIdStoreId())
+	                .stream()
+	                .map(this::mapToMembershipResponse)
+	                .toList();
+
+	        res.setStoreMemberships(memberships);
+
+	        return res;
+	    }).toList();
+	}
+
+	private StoreMembershipResponse mapToMembershipResponse(StoreMembership membership) {
+	    StoreMembershipResponse response = new StoreMembershipResponse();
+	    response.setStoreExpiryDate(membership.getStoreExpiryDate());
+	    response.setStoreCurrentPlan(membership.getStoreCurrentPlan());
+	    response.setVerificationStatus(membership.getVerificationStatus());
+	    return response;
 	}
 
 	@Override

@@ -12,6 +12,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,12 +25,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Table(name = "store_membership")
 public class StoreMembership {
+
 	@Id
-	@Column(name = "storeid")
-	private String storeId;
-	
 	@Column(name = "storeid_key")
 	private String storeIdKey;
+	
+	@Column(name = "storeid")
+	private String storeId;
 	
 	@Column(name = "store_expiry_date")
 	private String storeExpiryDate;
@@ -51,4 +53,12 @@ public class StoreMembership {
     @Column(name = "created_date", updatable = false)
     private LocalDate createdDate;
 	
+	@Transient
+	private String dlerId;
+
+	@PrePersist
+	private void prePersist() {
+		this.storeIdKey = dlerId + "_" + storeId;
+	}
+
 }

@@ -107,4 +107,9 @@ public class DlerMaterialMasterController {
 		}
 
 	}
+	
+	@GetMapping("/dlermetalmaster-getMaterialName")
+	public List<String> getMaterialName() {
+		return dlerMaterialMasterService.getDistinctMaterialName();
+	}
 }

@@ -10,6 +10,8 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -27,8 +29,8 @@ import lombok.Setter;
 public class AdminStoreVerification {
 
 	@Id
-	@Column(name = "dler_status_updated_by")
-	private String adminStatusUpdatedBy;
+	@Column(name = "admin_store_verification_id")
+	private String adminStoreVerificationId;
 
 	@Column(name = "store id")
 	private String storeId;
@@ -53,10 +55,10 @@ public class AdminStoreVerification {
 	@UpdateTimestamp
 	@Column(name = "updated_date")
 	private LocalDate updatedDate;
-
+	
 	@PrePersist
 	private void prePersist() {
-		this.adminStatusUpdatedBy = updatedBy + "_" + verificationStatus;
+		this.adminStoreVerificationId = dlerId + "_" + storeId;
 	}
 
 }

@@ -42,4 +42,7 @@ public class PlanMembership {
 	@UpdateTimestamp
 	@Column(name="updated_date")
 	private LocalDate updatedDate;
+
+	@Column(name="default_plan")
+	private String defaultPlan;
 }

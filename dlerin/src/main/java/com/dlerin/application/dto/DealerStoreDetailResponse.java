@@ -2,7 +2,6 @@ package com.dlerin.application.dto;
 
 import java.util.List;
 
-import com.dlerin.application.entity.AdminStoreVerification;
 import com.dlerin.application.entity.DlerStoreDetails;
 import com.fasterxml.jackson.annotation.JsonInclude;
 
@@ -14,6 +13,6 @@ public class DealerStoreDetailResponse {
 
 	private DlerStoreDetails dlerStoreDetails;
 
-	private List<AdminStoreVerification> adminStoreVerification;
+	private List<StoreMembershipResponse> storeMemberships;
 
 }

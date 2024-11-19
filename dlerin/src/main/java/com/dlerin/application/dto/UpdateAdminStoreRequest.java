@@ -6,17 +6,20 @@ import lombok.Data;
 
 @Data
 public class UpdateAdminStoreRequest {
-	private String adminStatusUpdatedBy;
+	
+	private String adminStoreVerificationId;
 
 	private String storeId;
 
 	private String dlerId;
-	
+
 	private VerificationStatus verificationStatus;
-	
+
 	private String verifcationComment;
 
 	private String updatedBy;
-	
+
 	private String planId;
+	
+	private String defaultPlan;
 }

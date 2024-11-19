@@ -125,5 +125,10 @@ public class DlerMaterialMasterServiceImpl implements DlerMaterialMasterService 
 
 		return entityManager.createQuery(query).getResultList();
 	}
+	
+	@Override
+	public List<String> getDistinctMaterialName() {
+		return dlerMaterialMasterRepo.getDistinctMaterialName();
+	}
 
 }

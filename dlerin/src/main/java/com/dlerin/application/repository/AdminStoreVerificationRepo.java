@@ -11,7 +11,7 @@ import com.dlerin.application.entity.AdminStoreVerification;
 @Repository
 public interface AdminStoreVerificationRepo extends JpaRepository<AdminStoreVerification, String>{
 
-	Optional<AdminStoreVerification> findByAdminStatusUpdatedBy(String adminStatusUpdatedBy);
+	Optional<AdminStoreVerification> findByAdminStoreVerificationId(String adminStoreVerificationId);
 
 	List<AdminStoreVerification> findByStoreId(String storeId);
 
