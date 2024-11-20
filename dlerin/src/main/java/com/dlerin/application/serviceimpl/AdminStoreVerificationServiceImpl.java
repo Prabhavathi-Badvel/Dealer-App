@@ -87,7 +87,7 @@ public class AdminStoreVerificationServiceImpl implements AdminStoreVerification
 	        if (VerificationStatus.PROCESSING.equals(adminstore.getVerificationStatus())
 	                || VerificationStatus.PENDING.equals(adminstore.getVerificationStatus())) {
 	            membership.setVerificationStatus(adminstore.getVerificationStatus());
-	        }
+	            membership.setVerificationComment(adminstore.getVerifcationComment());	        }
 
 	        if (VerificationStatus.VERIFIED.equals(adminstore.getVerificationStatus())) {
 	            sendAdminStoreToMail(dbVerification);

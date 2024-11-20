@@ -53,6 +53,9 @@ public class StoreMembership {
     @Column(name = "created_date", updatable = false)
     private LocalDate createdDate;
 	
+	@Column(name = "verification_comment")
+	private String verificationComment;
+	
 	@Transient
 	private String dlerId;
 

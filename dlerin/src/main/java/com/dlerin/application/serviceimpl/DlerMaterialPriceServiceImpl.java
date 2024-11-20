@@ -1,7 +1,9 @@
 package com.dlerin.application.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,24 +53,6 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 	    return addedPrices;
 	}
 
-
-//	@Override
-//	public List<DlerMaterialPrice> addPrices(List<DlerMaterialPrice> prices) {
-//		List<DlerMaterialPrice> addedPrices = new ArrayList<>();
-//		for (DlerMaterialPrice price : prices) {
-//			try {
-//				DlerMaterialPrice addedPrice = addPrice(price);
-//				if (addedPrice != null) {
-//					addedPrices.add(addedPrice);
-//				}
-//			} catch (Exception e) {
-//
-//				e.printStackTrace();
-//			}
-//		}
-//		return addedPrices;
-//	}
-
 	private DlerMaterialPrice addPrice(DlerMaterialPrice price) throws Exception {
 	    Optional<DlerMaterialPrice> priceExists = dlerMaterialPriceRepo.findByDlerIdMaterialIdOne(price.getDlerIdMaterialId());
 
@@ -89,39 +73,80 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 	    return null;
 	}
 
+//	@Override
+//	public boolean updatePriceAndStoreHistory(DlerMaterialPrice price) {
+//		try {
+//			Optional<DlerMaterialPrice> idExists = dlerMaterialPriceRepo.findById(price.getDlerIdMaterialId());
+//
+//			if (idExists.isPresent()) {
+//				DlerMaterialPrice existingPrice = idExists.get();
+//
+//				DlerMaterialPriceHistory oldHistoryEntry = new DlerMaterialPriceHistory();
+//				oldHistoryEntry.setCurrency(existingPrice.getCurrency());
+//				oldHistoryEntry.setDiscount(existingPrice.getDiscount());
+//				oldHistoryEntry.setDlerIdMaterialId(existingPrice.getDlerIdMaterialId());
+//				oldHistoryEntry.setGstCode(existingPrice.getGstCode());
+//				oldHistoryEntry.setOrdQty(existingPrice.getOrdQty());
+//				oldHistoryEntry.setPrice(existingPrice.getPrice());
+//				oldHistoryEntry.setPriceUpdatedDate(existingPrice.getPriceUpdatedDate());
+//				oldHistoryEntry.setStockAvailable(existingPrice.getStockAvailable());
+//				dlerMaterialPriceHistoryRepo.save(oldHistoryEntry);
+//
+//				existingPrice.setPrice(price.getPrice());
+//				existingPrice.setPriceUpdatedDate(price.getPriceUpdatedDate());
+//
+//				dlerMaterialPriceRepo.save(existingPrice);
+//
+//				return true;
+//			} else {
+//				return false;
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//			return false;
+//		}
+//	}
 	@Override
-	public boolean updatePriceAndStoreHistory(DlerMaterialPrice price) {
-		try {
-			Optional<DlerMaterialPrice> idExists = dlerMaterialPriceRepo.findById(price.getDlerIdMaterialId());
+	public Map<String, String> updatePricesAndStoreHistory(List<DlerMaterialPrice> materials) {
+	    Map<String, String> response = new HashMap<>();
 
-			if (idExists.isPresent()) {
-				DlerMaterialPrice existingPrice = idExists.get();
+	    for (DlerMaterialPrice material : materials) {
+	        try {
+	            Optional<DlerMaterialPrice> idExists = dlerMaterialPriceRepo.findById(material.getDlerIdMaterialId());
 
-				DlerMaterialPriceHistory oldHistoryEntry = new DlerMaterialPriceHistory();
-				oldHistoryEntry.setCurrency(existingPrice.getCurrency());
-				oldHistoryEntry.setDiscount(existingPrice.getDiscount());
-				oldHistoryEntry.setDlerIdMaterialId(existingPrice.getDlerIdMaterialId());
-				oldHistoryEntry.setGstCode(existingPrice.getGstCode());
-				oldHistoryEntry.setOrdQty(existingPrice.getOrdQty());
-				oldHistoryEntry.setPrice(existingPrice.getPrice());
-				oldHistoryEntry.setPriceUpdatedDate(existingPrice.getPriceUpdatedDate());
-				oldHistoryEntry.setStockAvailable(existingPrice.getStockAvailable());
-				dlerMaterialPriceHistoryRepo.save(oldHistoryEntry);
+	            if (idExists.isPresent()) {
+	                DlerMaterialPrice existingPrice = idExists.get();
 
-				existingPrice.setPrice(price.getPrice());
-				existingPrice.setPriceUpdatedDate(price.getPriceUpdatedDate());
+	                // Save existing data to history
+	                DlerMaterialPriceHistory oldHistoryEntry = new DlerMaterialPriceHistory();
+	                oldHistoryEntry.setCurrency(existingPrice.getCurrency());
+	                oldHistoryEntry.setDiscount(existingPrice.getDiscount());
+	                oldHistoryEntry.setDlerIdMaterialId(existingPrice.getDlerIdMaterialId());
+	                oldHistoryEntry.setGstCode(existingPrice.getGstCode());
+	                oldHistoryEntry.setOrdQty(existingPrice.getOrdQty());
+	                oldHistoryEntry.setPrice(existingPrice.getPrice());
+	                oldHistoryEntry.setPriceUpdatedDate(existingPrice.getPriceUpdatedDate());
+	                oldHistoryEntry.setStockAvailable(existingPrice.getStockAvailable());
+	                dlerMaterialPriceHistoryRepo.save(oldHistoryEntry);
 
-				dlerMaterialPriceRepo.save(existingPrice);
+	                // Update price
+	                existingPrice.setPrice(material.getPrice());
+	                existingPrice.setPriceUpdatedDate(material.getPriceUpdatedDate());
+	                dlerMaterialPriceRepo.save(existingPrice);
 
-				return true;
-			} else {
-				return false;
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
+	                response.put(material.getDlerIdMaterialId(), "Price updated successfully");
+	            } else {
+	                response.put(material.getDlerIdMaterialId(), "Material ID not found");
+	            }
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            response.put(material.getDlerIdMaterialId(), "Error updating price: " + e.getMessage());
+	        }
+	    }
+
+	    return response;
 	}
+
 
 //	@Override
 //	public List<DlerMaterialPrice> getPrice(DlerMaterialPriceDto dprice) {

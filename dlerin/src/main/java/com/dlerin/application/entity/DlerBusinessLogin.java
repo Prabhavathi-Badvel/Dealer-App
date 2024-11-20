@@ -1,5 +1,7 @@
 package com.dlerin.application.entity;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Random;
@@ -11,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
@@ -39,7 +42,7 @@ public class DlerBusinessLogin implements UserDetails {
 	@Column(name = "dler_password")
 	private String dlerPassword;
 
-	@CreationTimestamp
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@Column(name = "dler_reg_date")
 	private String dlerRegDate;
 
@@ -69,6 +72,7 @@ public class DlerBusinessLogin implements UserDetails {
 		long sequenceNumber = generateRandomSixDigitNumber();
 		this.dlerUserId = "DL" + sequenceNumber;
 		this.dlerStatusUpdatedBy = dlerUserId;
+		this.dlerRegDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 	}
 
 	private static final Random random = new Random();

@@ -1,6 +1,7 @@
 package com.dlerin.application.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -30,31 +31,6 @@ public class DlerMaterialPriceController {
 
 	@Autowired
 	DlerMaterialPriceRepo dlerMaterialPriceRepo;
-
-//	@PostMapping("/dlerin-add-DlerMaterialPrices")
-//	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody List<DlerMaterialPrice> dmPrices) {
-//		ResponseDlerMaterialPriceDto response = new ResponseDlerMaterialPriceDto();
-//		try {
-//			List<DlerMaterialPrice> addedPrices = dlerMaterialPriceService.addPrices(dmPrices);
-//
-//			if (!addedPrices.isEmpty()) {
-//				response.setMessage("Added successfully");
-//				response.setStatus(true);
-//				response.setAddData(addedPrices);
-//				return new ResponseEntity<>(response, HttpStatus.OK);
-//			} else {
-//				response.setMessage("Record already exists or given DlerIdMaterialId not found");
-//				response.setStatus(false);
-//				response.setAddData(null);
-//				return new ResponseEntity<>(response, HttpStatus.OK);
-//			}
-//		} catch (Exception e) {
-//			response.setMessage("Failed to add prices");
-//			response.setStatus(false);
-//			response.setAddData(null);
-//			return new ResponseEntity<>(response, HttpStatus.OK);
-//		}
-//	}
 	
 	@PostMapping("/dlerin-add-DlerMaterialPrices")
 	public ResponseEntity<?> addDlerMaterialPrices(@RequestBody DlerMaterialPriceRequest request) {
@@ -93,28 +69,54 @@ public class DlerMaterialPriceController {
 	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 	    }
 	}
-
+//
+//	@PutMapping("/dlerin-update-DlerMaterialPrice")
+//	public ResponseEntity<?> updateDlerMaterialPrice(@RequestBody DlerMaterialPrice price) {
+//		boolean updateSuccess = dlerMaterialPriceService.updatePriceAndStoreHistory(price);
+//		ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
+//		try {
+//
+//			if (updateSuccess) {
+//				response2.setMessage("Updated successfully");
+//				response2.setStatus(true);
+//				return new ResponseEntity<>(response2, HttpStatus.OK);
+//			} else {
+//				response2.setMessage("Failed to update/MaterialIDPriceId not found");
+//				response2.setStatus(false);
+//				return new ResponseEntity<>(response2, HttpStatus.OK);
+//			}
+//		} catch (Exception e) {
+//			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+//
+//		}
+//
+//	}
+	
 	@PutMapping("/dlerin-update-DlerMaterialPrice")
-	public ResponseEntity<?> updateDlerMaterialPrice(@RequestBody DlerMaterialPrice price) {
-		boolean updateSuccess = dlerMaterialPriceService.updatePriceAndStoreHistory(price);
-		ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
-		try {
+	public ResponseEntity<?> updateDlerMaterialPrices(@RequestBody DlerMaterialPriceRequest request) {
+	    ResponseDlerMaterialPriceDto2 response2 = new ResponseDlerMaterialPriceDto2();
 
-			if (updateSuccess) {
-				response2.setMessage("Updated successfully");
-				response2.setStatus(true);
-				return new ResponseEntity<>(response2, HttpStatus.OK);
-			} else {
-				response2.setMessage("Failed to update/MaterialIDPriceId not found");
-				response2.setStatus(false);
-				return new ResponseEntity<>(response2, HttpStatus.OK);
-			}
-		} catch (Exception e) {
-			return ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+	    try {
+	        // Process all materials in the request
+	        Map<String, String> updateResults = dlerMaterialPriceService.updatePricesAndStoreHistory(request.getMaterials());
 
-		}
-
+	        if (!updateResults.isEmpty()) {
+	            response2.setMessage("Processing completed with results");
+	            response2.setStatus(true);
+	            response2.setData(updateResults);
+	            return new ResponseEntity<>(response2, HttpStatus.OK);
+	        } else {
+	            response2.setMessage("Failed to update: No materials processed");
+	            response2.setStatus(false);
+	            return new ResponseEntity<>(response2, HttpStatus.BAD_REQUEST);
+	        }
+	    } catch (Exception e) {
+	        response2.setMessage("An error occurred: " + e.getMessage());
+	        response2.setStatus(false);
+	        return new ResponseEntity<>(response2, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
+
 
 	@GetMapping("/dlerin-get-DlerMaterialPrice")
 	public ResponseEntity<DealerStoreMaterialResponse> getDealerPriceDetails(

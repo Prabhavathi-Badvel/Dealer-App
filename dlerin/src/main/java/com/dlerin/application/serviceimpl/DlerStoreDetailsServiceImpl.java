@@ -81,7 +81,7 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	        storeMembership.setUpdatedBy(store.getUpdatedBy());
 	        storeMembership.setDlerId(store.getDlerId()); // Set dlerId
 	        storeMembership.setVerificationStatus(VerificationStatus.NEW);
-
+	        storeMembership.setVerificationComment("Initial verification created");
 	        // Save StoreMembership (storeIdKey will be set automatically in @PrePersist)
 	        storeMembershipRepo.save(storeMembership);
 	        
@@ -147,6 +147,7 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	    response.setStoreExpiryDate(membership.getStoreExpiryDate());
 	    response.setStoreCurrentPlan(membership.getStoreCurrentPlan());
 	    response.setVerificationStatus(membership.getVerificationStatus());
+	    response.setVerificationComment(membership.getVerificationComment());
 	    return response;
 	}
 

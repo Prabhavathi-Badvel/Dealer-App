@@ -124,6 +124,10 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 
 			}
 		}
+		else {
+	        // Fallback: Get all records if no parameters are provided
+	        orderDetails = dlerOrderDetailsRepo.findAll();
+	    }
 		return orderDetails;
 
 	}

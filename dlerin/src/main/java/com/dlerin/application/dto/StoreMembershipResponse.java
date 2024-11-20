@@ -9,4 +9,5 @@ public class StoreMembershipResponse{
 	private String storeExpiryDate;
 	private String storeCurrentPlan;
 	private VerificationStatus verificationStatus;
+	private String verificationComment;
 }
