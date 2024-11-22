@@ -1,5 +1,10 @@
 package com.dlerin.application.controller;
 
+import java.util.Map;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,23 +21,39 @@ import com.dlerin.application.service.AdminStoreVerificationService;
 
 @RestController
 public class AdminStoreVerificationController {
-	
+
 	@Autowired
 	AdminStoreVerificationService adminStoreVerificationService;
-	
+
 	@Autowired
 	AdminStoreVerificationRepo adminStoreVerificationRepo;
-	
+
 	@PostMapping("/dlerin-add-adminStoreVerification")
 	public ResponseEntity<?> AddAdminStoreVerification(@RequestBody AdminStoreVerification adminStoreVerification) {
-			return new ResponseEntity<>(adminStoreVerificationService.addAdminStore(adminStoreVerification), HttpStatus.OK);
+		return new ResponseEntity<>(adminStoreVerificationService.addAdminStore(adminStoreVerification), HttpStatus.OK);
 	}
-	
+
 	@PutMapping("/dlerin-update-adminStoreVerification")
-	public ResponseEntity<AdminStoreVerificationResponse> updateAdminStoreVerification(
-	        @RequestBody UpdateAdminStoreRequest adminstore) {
-	    AdminStoreVerificationResponse response = adminStoreVerificationService.updateAdminStoreVerification(adminstore);
-	    return ResponseEntity.ok(response);
+	public ResponseEntity<Map<String, Object>> updateAdminStoreVerifications(
+			@RequestBody List<UpdateAdminStoreRequest> adminStoreRequests) {
+		List<AdminStoreVerificationResponse> successResponses = new ArrayList<>();
+		List<String> failureMessages = new ArrayList<>();
+
+		for (UpdateAdminStoreRequest request : adminStoreRequests) {
+			try {
+				AdminStoreVerificationResponse response = adminStoreVerificationService
+						.updateAdminStoreVerification(request);
+				successResponses.add(response);
+			} catch (RuntimeException ex) {
+
+				failureMessages.add("Failed for storeId " + request.getStoreId() + ": " + ex.getMessage());
+			}
+		}
+
+		Map<String, Object> result = new HashMap<>();
+		result.put("success", successResponses);
+		result.put("failures", failureMessages);
+		return ResponseEntity.ok(result);
 	}
 
 }

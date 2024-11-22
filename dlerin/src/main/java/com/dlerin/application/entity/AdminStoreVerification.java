@@ -1,19 +1,14 @@
 package com.dlerin.application.entity;
 
 import java.time.LocalDate;
-import java.util.Random;
-
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +27,7 @@ public class AdminStoreVerification {
 	@Column(name = "admin_store_verification_id")
 	private String adminStoreVerificationId;
 
-	@Column(name = "store id")
+	@Column(name = "store_id")
 	private String storeId;
 
 	@Column(name = "dler_id")
@@ -48,17 +43,23 @@ public class AdminStoreVerification {
 	@Column(name = "updated_by")
 	private String updatedBy;
 
-	@CreationTimestamp
 	@Column(name = "created_date", updatable = false)
 	private LocalDate createdDate;
 
-	@UpdateTimestamp
 	@Column(name = "updated_date")
 	private LocalDate updatedDate;
-	
+
 	@PrePersist
-	private void prePersist() {
-		this.adminStoreVerificationId = dlerId + "_" + storeId;
+	private void onCreate() {
+		if (this.adminStoreVerificationId == null) {
+			this.adminStoreVerificationId = dlerId + "_" + storeId;
+		}
+		this.createdDate = LocalDate.now();
+		this.updatedDate = LocalDate.now();
 	}
 
+	@PreUpdate
+	private void onUpdate() {
+		this.updatedDate = LocalDate.now();
+	}
 }

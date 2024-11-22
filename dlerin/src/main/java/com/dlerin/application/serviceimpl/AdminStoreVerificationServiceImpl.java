@@ -16,7 +16,7 @@ import com.dlerin.application.entity.DlerStoreDetails;
 import com.dlerin.application.entity.PlanMembership;
 import com.dlerin.application.entity.StoreMembership;
 import com.dlerin.application.entity.VerificationStatus;
-import com.dlerin.application.exception.DlerNotFoundException;
+
 import com.dlerin.application.exception.ResourceNotFoundException;
 import com.dlerin.application.repository.AdminStoreVerificationRepo;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
@@ -25,7 +25,6 @@ import com.dlerin.application.repository.PlanMembershipRepo;
 import com.dlerin.application.repository.StoreMembershipRepo;
 import com.dlerin.application.service.AdminStoreVerificationService;
 
-import jakarta.annotation.Resource;
 
 @Service
 public class AdminStoreVerificationServiceImpl implements AdminStoreVerificationService {
@@ -44,96 +43,104 @@ public class AdminStoreVerificationServiceImpl implements AdminStoreVerification
 
 	@Autowired
 	private StoreMembershipRepo storeMembershipRepo;
-	
+
 	@Autowired
 	private PlanMembershipRepo planMembershipRepo;
 
 	@Override
 	public AdminStoreVerification addAdminStore(AdminStoreVerification adminstore) {
 		DlerStoreDetails dlerIdExists = dlerStoreDetailsRepo.findByDlerIdAndStoreId(adminstore.getDlerId(),
-				adminstore.getStoreId()).orElseThrow(() -> new ResourceNotFoundException("Dler store not found"+adminstore.getDlerId()+","+adminstore.getStoreId()));
+				adminstore.getStoreId())
+				.orElseThrow(() -> new ResourceNotFoundException(
+						"Dler store not found" + adminstore.getDlerId() + "," + adminstore.getStoreId()));
 
 		return adminStoreVerificationRepo.save(adminstore);
 	}
 
 	@Override
 	public AdminStoreVerificationResponse updateAdminStoreVerification(UpdateAdminStoreRequest adminstore) {
-	    Optional<AdminStoreVerification> idExists = adminStoreVerificationRepo
-	            .findByAdminStoreVerificationId(adminstore.getAdminStoreVerificationId());
+		Optional<AdminStoreVerification> idExists = adminStoreVerificationRepo
+				.findByAdminStoreVerificationId(adminstore.getAdminStoreVerificationId());
 
-	    if (!idExists.isPresent()) {
-	        throw new RuntimeException("AdminStoreVerification ID not found: " + adminstore.getAdminStoreVerificationId());
-	    }
+		AdminStoreVerification dbVerification;
+		if (!idExists.isPresent()) {
 
-	    AdminStoreVerification dbVerification = idExists.get();
+			dbVerification = new AdminStoreVerification();
+			dbVerification.setAdminStoreVerificationId(adminstore.getAdminStoreVerificationId());
+			dbVerification.setCreatedDate(LocalDate.now());
+		} else {
+			dbVerification = idExists.get();
 
-	    if (VerificationStatus.VERIFIED.equals(dbVerification.getVerificationStatus())) {
-	        throw new RuntimeException("This store has already been activated and cannot be updated.");
-	    }
+			if (VerificationStatus.VERIFIED.equals(dbVerification.getVerificationStatus())) {
+				throw new RuntimeException("This store has already been activated and cannot be updated.");
+			}
 
-	    dbVerification.setDlerId(adminstore.getDlerId());
-	    dbVerification.setStoreId(adminstore.getStoreId());
-	    dbVerification.setVerifcationComment(adminstore.getVerifcationComment());
-	    dbVerification.setVerificationStatus(adminstore.getVerificationStatus());
+			dbVerification.setUpdatedDate(LocalDate.now());
+		}
 
-	    String planId = null;
-	    String expiryDate = null;
+		dbVerification.setDlerId(adminstore.getDlerId());
+		dbVerification.setStoreId(adminstore.getStoreId());
+		dbVerification.setVerifcationComment(adminstore.getVerifcationComment());
+		dbVerification.setVerificationStatus(adminstore.getVerificationStatus());
+		dbVerification.setUpdatedBy(adminstore.getUpdatedBy());
+		dbVerification.setUpdatedDate(LocalDate.now());
 
-	    Optional<StoreMembership> storeMembershipOptional = storeMembershipRepo.findByStoreId(adminstore.getStoreId());
+		String planId = null;
+		String expiryDate = null;
 
-	    if (storeMembershipOptional.isPresent()) {
-	        StoreMembership membership = storeMembershipOptional.get();
+		Optional<StoreMembership> storeMembershipOptional = storeMembershipRepo.findByStoreId(adminstore.getStoreId());
 
-	        if (VerificationStatus.PROCESSING.equals(adminstore.getVerificationStatus())
-	                || VerificationStatus.PENDING.equals(adminstore.getVerificationStatus())) {
-	            membership.setVerificationStatus(adminstore.getVerificationStatus());
-	            membership.setVerificationComment(adminstore.getVerifcationComment());	        }
+		if (!storeMembershipOptional.isPresent()) {
+			throw new RuntimeException("StoreMembership not found for provided storeId: " + adminstore.getStoreId());
+		}
 
-	        if (VerificationStatus.VERIFIED.equals(adminstore.getVerificationStatus())) {
-	            sendAdminStoreToMail(dbVerification);
+		StoreMembership membership = storeMembershipOptional.get();
+		membership.setUpdatedDate(LocalDate.now());
 
-	            // Fetch all default plans
-	            List<PlanMembership> planMembershipList = planMembershipRepo.findByDefaultPlan("x");
+		if (VerificationStatus.PROCESSING.equals(adminstore.getVerificationStatus())
+				|| VerificationStatus.PENDING.equals(adminstore.getVerificationStatus())) {
+			membership.setVerificationStatus(adminstore.getVerificationStatus());
+			membership.setVerificationComment(adminstore.getVerifcationComment());
+		}
 
-	            if (planMembershipList.isEmpty()) {
-	                throw new RuntimeException("No default plans found.");
-	            }
+		if (VerificationStatus.VERIFIED.equals(adminstore.getVerificationStatus())) {
+			sendAdminStoreToMail(dbVerification);
 
-	            // Pick the first plan from the list (or add your own logic to choose)
-	            PlanMembership selectedPlan = planMembershipList.get(0);
+			List<PlanMembership> planMembershipList = planMembershipRepo.findByDefaultPlan("x");
 
-	            membership.setVerificationStatus(adminstore.getVerificationStatus());
-	            membership.setStoreCurrentPlan(selectedPlan.getPlanId());
-	            expiryDate = LocalDate.now().plusDays(selectedPlan.getNumberOfDays()).toString();
-	            membership.setStoreExpiryDate(expiryDate);
+			if (planMembershipList.isEmpty()) {
+				throw new RuntimeException("No default plans found.");
+			}
 
-	            planId = selectedPlan.getPlanId();
-	        }
+			PlanMembership selectedPlan = planMembershipList.get(0);
 
-	        storeMembershipRepo.save(membership);
-	    } else {
-	        throw new RuntimeException("StoreMembership not found for provided storeId: " + adminstore.getStoreId());
-	    }
+			membership.setVerificationStatus(adminstore.getVerificationStatus());
+			membership.setStoreCurrentPlan(selectedPlan.getPlanId());
+			expiryDate = LocalDate.now().plusDays(selectedPlan.getNumberOfDays()).toString();
+			membership.setStoreExpiryDate(expiryDate);
 
-	    adminStoreVerificationRepo.save(dbVerification);
+			planId = selectedPlan.getPlanId();
+		}
 
-	    AdminStoreVerificationResponse response = new AdminStoreVerificationResponse();
-	    BeanUtils.copyProperties(dbVerification, response);
-	    response.setPlanId(planId);
-	    response.setExpiryDate(expiryDate);
+		storeMembershipRepo.save(membership);
+		adminStoreVerificationRepo.save(dbVerification);
 
-	    return response;
+		AdminStoreVerificationResponse response = new AdminStoreVerificationResponse();
+		BeanUtils.copyProperties(dbVerification, response);
+		response.setPlanId(planId);
+		response.setExpiryDate(expiryDate);
+
+		return response;
 	}
 	private void sendAdminStoreToMail(AdminStoreVerification storeVerification) {
-	    Optional<DlerBusinessLogin> sendDlerId = businessLoginRepo.findById(storeVerification.getDlerId());
-	    if (sendDlerId.isPresent()) {
-	        String sendDlerIdByEmail = sendDlerId.get().getDlerEmailId();
-	        String subject = "Store Verification Status Updated";
-	        String message = "Your store verification status has been updated to: " 
-	                + storeVerification.getVerificationStatus();
-	        emailServiceImpl.sendAdminStoreToMail(sendDlerIdByEmail, subject, message);
-	    }
+		Optional<DlerBusinessLogin> sendDlerId = businessLoginRepo.findById(storeVerification.getDlerId());
+		if (sendDlerId.isPresent()) {
+			String sendDlerIdByEmail = sendDlerId.get().getDlerEmailId();
+			String subject = "Store Verification Status Updated";
+			String message = "Your store verification status has been updated to: "
+					+ storeVerification.getVerificationStatus();
+			emailServiceImpl.sendAdminStoreToMail(sendDlerIdByEmail, subject, message);
+		}
 	}
-
 
 }
