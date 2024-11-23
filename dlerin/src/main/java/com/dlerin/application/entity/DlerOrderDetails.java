@@ -1,5 +1,7 @@
 package com.dlerin.application.entity;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -53,4 +55,7 @@ public class DlerOrderDetails {
 
 	@Transient
 	private String orderTo;
+
+	@Transient
+	private LocalDate orderDate;
 }

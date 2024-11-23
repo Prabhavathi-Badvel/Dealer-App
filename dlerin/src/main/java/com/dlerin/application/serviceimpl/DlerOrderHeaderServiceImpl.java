@@ -119,6 +119,7 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 			if (header != null) {
 				detail.setDlerId(header.getOrderBy());
 				detail.setOrderTo(header.getOrderTo());
+				detail.setOrderDate(header.getOrderDate());
 			}
 		}
 	}
