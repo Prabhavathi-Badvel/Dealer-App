@@ -58,4 +58,10 @@ public class DlerOrderDetails {
 
 	@Transient
 	private LocalDate orderDate;
+
+	@Transient
+	private String materialName;
+
+	@Transient
+	private String materialId;
 }

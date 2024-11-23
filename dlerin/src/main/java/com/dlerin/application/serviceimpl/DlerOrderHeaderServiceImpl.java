@@ -1,6 +1,7 @@
 package com.dlerin.application.serviceimpl;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -13,9 +14,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerOrderDetails;
 import com.dlerin.application.entity.DlerOrderHeader;
 import com.dlerin.application.repository.DlerBusinessLoginRepo;
+import com.dlerin.application.repository.DlerMaterialMasterRepo;
 import com.dlerin.application.repository.DlerOrderDetailsRepo;
 import com.dlerin.application.repository.DlerOrderHeaderRepo;
 import com.dlerin.application.service.DlerOrderHeaderService;
@@ -34,6 +37,9 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 
 	@Autowired
 	private JavaMailSender mailSender;
+	
+	@Autowired
+	private DlerMaterialMasterRepo dlerMaterialMasterRepo;
 
 	@Override
 	public DlerOrderHeader updateHeaderDetails(DlerOrderHeader header) {
@@ -87,41 +93,54 @@ public class DlerOrderHeaderServiceImpl implements DlerOrderHeaderService {
 
 	@Override
 	public List<DlerOrderDetails> getOrderData(String orderId, String orderBy, String fromDate, String toDate,
-			String orderTo) {
+	                                           String orderTo) {
 
-		LocalDate fromLocalDate = fromDate != null ? LocalDate.parse(fromDate) : null;
-		LocalDate toLocalDate = toDate != null ? LocalDate.parse(toDate) : null;
+	    LocalDate fromLocalDate = null;
+	    LocalDate toLocalDate = null;
+	    try {
+	        if (fromDate != null) {
+	            fromLocalDate = LocalDate.parse(fromDate);
+	        }
+	        if (toDate != null) {
+	            toLocalDate = LocalDate.parse(toDate);
+	        }
+	    } catch (DateTimeParseException e) {
+	        throw new IllegalArgumentException("Invalid date format. Please use YYYY-MM-DD.");
+	    }
+	    List<DlerOrderHeader> headers = dlerOrderHeaderRepo.findOrdersByFilters(orderId, orderBy, orderTo,
+	            fromLocalDate, toLocalDate);
 
-		List<DlerOrderHeader> headers = dlerOrderHeaderRepo.findOrdersByFilters(
-				orderId, orderBy, orderTo, fromLocalDate, toLocalDate);
-
-		List<String> orderIds = headers.stream()
-				.map(DlerOrderHeader::getOrderId)
-				.collect(Collectors.toList());
-
-		List<DlerOrderDetails> orderDetails = new ArrayList<>();
-		if (!orderIds.isEmpty()) {
-			orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
-			setDlerIdAndOrderTo(orderDetails, headers);
-		}
-
-		return orderDetails;
-
+	    if (headers.isEmpty()) {
+	        return Collections.emptyList();
+	    }
+	    List<String> orderIds = headers.stream().map(DlerOrderHeader::getOrderId).collect(Collectors.toList());
+	    List<DlerOrderDetails> orderDetails = dlerOrderDetailsRepo.findByOrderIdIn(orderIds);
+	    if (!orderDetails.isEmpty()) {
+	        // Fetch material masters and set additional data
+	        List<DlerMaterialMaster> dlerMaterialMasters = dlerMaterialMasterRepo.findAll(); // Ensure this is implemented
+	        setDlerIdAndOrderTo(orderDetails, headers, dlerMaterialMasters);
+	    }
+	    return orderDetails;
 	}
-
-	private void setDlerIdAndOrderTo(List<DlerOrderDetails> orderDetails, List<DlerOrderHeader> headers) {
-
-		Map<String, DlerOrderHeader> headerMap = headers.stream()
-				.collect(Collectors.toMap(DlerOrderHeader::getOrderId, header -> header));
-
-		for (DlerOrderDetails detail : orderDetails) {
-			DlerOrderHeader header = headerMap.get(detail.getOrderId());
-			if (header != null) {
-				detail.setDlerId(header.getOrderBy());
-				detail.setOrderTo(header.getOrderTo());
-				detail.setOrderDate(header.getOrderDate());
-			}
-		}
+	private void setDlerIdAndOrderTo(List<DlerOrderDetails> orderDetails, List<DlerOrderHeader> headers,
+	                                 List<DlerMaterialMaster> dlerMaterialMasters) {
+	    Map<String, DlerOrderHeader> headerMap = headers.stream()
+	            .collect(Collectors.toMap(DlerOrderHeader::getOrderId, header -> header));
+	    Map<String, DlerMaterialMaster> materialMasterMap = dlerMaterialMasters.stream()
+	            .collect(Collectors.toMap(DlerMaterialMaster::getDlerIdMaterialId, master -> master));
+	    for (DlerOrderDetails detail : orderDetails) {
+	        DlerOrderHeader header = headerMap.get(detail.getOrderId());
+	        if (header != null) {
+	            detail.setDlerId(header.getOrderBy());
+	            detail.setOrderTo(header.getOrderTo());
+	            detail.setOrderDate(header.getOrderDate());
+	        }
+	        DlerMaterialMaster materialMaster = materialMasterMap.get(detail.getDlerIdMaterialId());
+	        if (materialMaster != null) {
+	            detail.setMaterialId(materialMaster.getMaterialId());
+	            detail.setMaterialName(materialMaster.getMaterialName());
+	        }
+	    }
 	}
 
 	@Override
