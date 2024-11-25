@@ -2,6 +2,9 @@ package com.dlerin.application.service;
 
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
 import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DealerStoreDetailResponse;
 import com.dlerin.application.dto.DlerResponse;
@@ -25,4 +28,6 @@ public interface DlerStoreDetailsService {
 			String businessName, String materialName);
 
 	public List<String> getAllStoreLocation();
+	
+	public ResponseEntity<?> uploadStoreGstDocs(String dlerIdStoreId, MultipartFile gstDocument, MultipartFile tradeLicense);
 }

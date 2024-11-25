@@ -3,6 +3,7 @@ package com.dlerin.application.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
@@ -32,5 +33,8 @@ public class DlerProfile {
 	@Column(name = "dler_business_contact_no")
 	private String dlerBusinessContactNo;
 
-
+	@PrePersist
+	private void prePersist() {
+		this.dlerBusinessId = dlerId + "_" + dlerBusinessId;
+	}
 }

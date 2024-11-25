@@ -54,9 +54,12 @@ public class DlerStoreDetails {
 	@Column(name="updated_by")
 	private String updatedBy;
 
+	@Column(name="businessid")
+	private String businessId;
+	
 	@PrePersist
 	private void prePersist() {
-		this.dlerIdStoreId = dlerId + "_" + storeId;
+		this.dlerIdStoreId = dlerId+ "_" + businessId+ "_" + storeId;
 	}
 		
 }

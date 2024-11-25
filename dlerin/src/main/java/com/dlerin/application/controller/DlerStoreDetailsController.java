@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DealerStoreDetailResponse;
@@ -59,6 +60,13 @@ public class DlerStoreDetailsController {
 			response.setData(null);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
+	}
+	
+	@PostMapping("/uploadGstDocuments")
+	public ResponseEntity<?> uploadStoreGstDocs(@RequestParam("dlerIdStoreId") String dlerIdStoreId,
+			@RequestParam(value = "gstDocument", required = false) MultipartFile gstDocument,
+			@RequestParam(value = "tradeLicense", required = false) MultipartFile tradeLicense) {
+		return dlerStoreDetailsService.uploadStoreGstDocs(dlerIdStoreId, gstDocument, tradeLicense);
 	}
 
 	@PreAuthorize("hasAuthority('Dealer')")

@@ -2,15 +2,21 @@ package com.dlerin.application.serviceimpl;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.dlerin.application.config.AWSConfig;
 import com.dlerin.application.dto.DealerMasterResponse;
 import com.dlerin.application.dto.DealerStoreDetailResponse;
 import com.dlerin.application.dto.DlerResponse;
@@ -21,6 +27,7 @@ import com.dlerin.application.entity.DlerMaterialMaster;
 import com.dlerin.application.entity.DlerMaterialPrice;
 import com.dlerin.application.entity.DlerProfile;
 import com.dlerin.application.entity.DlerStoreDetails;
+import com.dlerin.application.entity.ResponseModel;
 import com.dlerin.application.entity.StoreMembership;
 import com.dlerin.application.entity.VerificationStatus;
 import com.dlerin.application.repository.AdminStoreVerificationRepo;
@@ -64,6 +71,9 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	
 	@Autowired
 	private StoreMembershipRepo storeMembershipRepo;
+	
+	@Autowired
+	private AWSConfig awsConfig;
 
 	@Override
 	public DlerStoreDetails addStore(DlerStoreDetails store) {
@@ -102,6 +112,33 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	    return null;
 	}
 
+	public ResponseEntity<?> uploadStoreGstDocs(String dlerIdStoreId, MultipartFile gstDocument, MultipartFile tradeLicense) {
+		DlerStoreDetails dsd = dlerStoreDetailsRepo.findById(dlerIdStoreId).orElse(null);
+
+		if (dsd == null) {
+			return new ResponseEntity<ResponseModel>(new ResponseModel("Something went wrong", null),
+					HttpStatus.BAD_REQUEST);
+		}
+
+		String directoryPath = "store_docs/" + dlerIdStoreId + "/";
+		Map<String, MultipartFile> docMap = new HashMap<>();
+		String rdDocumentPath = null;
+		if (gstDocument != null) {
+			rdDocumentPath = directoryPath + gstDocument.getOriginalFilename();
+			String gstLink=awsConfig.uploadFileToS3Bucket(rdDocumentPath,gstDocument);
+			dsd.setGstDocument(gstLink);			
+		}
+
+		String insuranceDocPath = null;
+		if (tradeLicense != null) {
+			insuranceDocPath = directoryPath + tradeLicense.getOriginalFilename();
+			String tradeLink=awsConfig.uploadFileToS3Bucket(insuranceDocPath,tradeLicense);
+			dsd.setTradeLicense(tradeLink);			
+		}
+		dlerStoreDetailsRepo.save(dsd);
+		ResponseModel response = new ResponseModel();
+		return new ResponseEntity<ResponseModel>(response, HttpStatus.OK);
+	}
 
 	@Override
 	public DlerStoreDetails updateStore(DlerStoreDetails store) {
