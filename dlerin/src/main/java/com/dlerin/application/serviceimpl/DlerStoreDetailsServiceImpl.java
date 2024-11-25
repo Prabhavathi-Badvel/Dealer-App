@@ -112,32 +112,39 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	    return null;
 	}
 
-	public ResponseEntity<?> uploadStoreGstDocs(String dlerIdStoreId, MultipartFile gstDocument, MultipartFile tradeLicense) {
+	public ResponseEntity<?> uploadStoreGstDocs(String dlerIdStoreId, MultipartFile gstDocument,
+			MultipartFile tradeLicense) {
 		DlerStoreDetails dsd = dlerStoreDetailsRepo.findById(dlerIdStoreId).orElse(null);
 
-		if (dsd == null) {
-			return new ResponseEntity<ResponseModel>(new ResponseModel("Something went wrong", null),
-					HttpStatus.BAD_REQUEST);
-		}
-
-		String directoryPath = "store_docs/" + dlerIdStoreId + "/";
-		Map<String, MultipartFile> docMap = new HashMap<>();
-		String rdDocumentPath = null;
-		if (gstDocument != null) {
-			rdDocumentPath = directoryPath + gstDocument.getOriginalFilename();
-			String gstLink=awsConfig.uploadFileToS3Bucket(rdDocumentPath,gstDocument);
-			dsd.setGstDocument(gstLink);			
-		}
-
-		String insuranceDocPath = null;
-		if (tradeLicense != null) {
-			insuranceDocPath = directoryPath + tradeLicense.getOriginalFilename();
-			String tradeLink=awsConfig.uploadFileToS3Bucket(insuranceDocPath,tradeLicense);
-			dsd.setTradeLicense(tradeLink);			
-		}
-		dlerStoreDetailsRepo.save(dsd);
 		ResponseModel response = new ResponseModel();
-		return new ResponseEntity<ResponseModel>(response, HttpStatus.OK);
+		if (dsd == null) {
+			response.setError("Store not found");
+			response.setMsg("Invalid dlerIdStoreId provided.");
+			return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+		}
+
+		try {
+	        String directoryPath = "store_docs/" + dlerIdStoreId + "/";
+	        if (gstDocument != null) {
+	            String gstDocumentPath = directoryPath + gstDocument.getOriginalFilename();
+	            String gstLink = awsConfig.uploadFileToS3Bucket(gstDocumentPath, gstDocument);
+	            dsd.setGstDocument(gstLink);
+	        }
+	        if (tradeLicense != null) {
+	            String tradeLicensePath = directoryPath + tradeLicense.getOriginalFilename();
+	            String tradeLink = awsConfig.uploadFileToS3Bucket(tradeLicensePath, tradeLicense);
+	            dsd.setTradeLicense(tradeLink);
+	        }
+	        dlerStoreDetailsRepo.save(dsd);
+	        response.setError(null);//No error
+	        response.setMsg("Documents uploaded successfully.");
+	        return new ResponseEntity<>(response, HttpStatus.OK);
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        response.setError("Document upload failed");
+	        response.setMsg("An error occurred while uploading the documents: " + e.getMessage());
+	        return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+	    }
 	}
 
 	@Override
