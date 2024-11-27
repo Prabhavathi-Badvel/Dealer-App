@@ -10,9 +10,11 @@ import com.dlerin.application.entity.DlerMaterialImages;
 @Repository
 public interface DlerMaterialImagesRepo extends JpaRepository<DlerMaterialImages, String> {
 
-	DlerMaterialImages findByDlerIdMaterialId(String dlerIdMaterialId);
+	List<DlerMaterialImages> findByDlerIdMaterialId(String dlerIdMaterialId);
 
-	List<DlerMaterialImages> findByImageIdOrDlerIdMaterialId(String imageId, String dlerIdMaterialId);
+//	List<DlerMaterialImages> findByMaterialIddlerIdBusinessIdStoreId(String materialIddlerIdBusinessIdStoreId);
+
+//	List<DlerMaterialImages> findByImageIdOrDlerIdMaterialId(String imageId, String dlerIdMaterialId);
 
 }
 

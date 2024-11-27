@@ -136,7 +136,7 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 	            dsd.setTradeLicense(tradeLink);
 	        }
 	        dlerStoreDetailsRepo.save(dsd);
-	        response.setError(null);//No error
+	        response.setError("No Error");//No error
 	        response.setMsg("Documents uploaded successfully.");
 	        return new ResponseEntity<>(response, HttpStatus.OK);
 	    } catch (Exception e) {
