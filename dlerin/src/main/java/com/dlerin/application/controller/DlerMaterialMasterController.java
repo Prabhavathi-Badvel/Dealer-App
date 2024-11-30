@@ -83,23 +83,24 @@ public class DlerMaterialMasterController {
 	}
 
 	@GetMapping("/dlerin-get-dlermaterialmaster")
-	public ResponseEntity<?> getMaterialMaster(@RequestParam(required = false) String brandId,
+	public ResponseEntity<?> getMaterialMaster(@RequestParam(required = false) String dlerIdMaterialId,@RequestParam(required = false) String brandId,
 			@RequestParam(required = false) String materialType, @RequestParam(required = false) String materialId,
 			@RequestParam(required = false) String dlerId, @RequestParam(required = false) String materialName) {
 		ResponseDlerMaterialMasterDto1 response1 = new ResponseDlerMaterialMasterDto1();
 		try {
 
-			List<DlerMaterialMaster> dlerprofile = dlerMaterialMasterService.getDlerMaterialProfile(brandId,
+			List<DlerMaterialMaster> dlerMaterialMaster = 
+					dlerMaterialMasterService.getMaterialMaster(dlerIdMaterialId,brandId,
 					materialType, materialId, dlerId, materialName);
-			if (dlerprofile != null && !dlerprofile.isEmpty()) {
+			if (dlerMaterialMaster != null && !dlerMaterialMaster.isEmpty()) {
 				response1.setMessage("dler material master details");
 				response1.setStatus(true);
-				response1.setGetData(dlerprofile);
+				response1.setGetData(dlerMaterialMaster);
 				return new ResponseEntity<>(response1, HttpStatus.OK);
 			} else {
 				response1.setMessage("No details found for given parameters/check your parameters");
 				response1.setStatus(false);
-				response1.setGetData(dlerprofile);
+				response1.setGetData(dlerMaterialMaster);
 				return new ResponseEntity<>(response1, HttpStatus.OK);
 			}
 		} catch (Exception e) {

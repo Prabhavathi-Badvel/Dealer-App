@@ -131,12 +131,15 @@ public class DlerMaterialImagesServiceImpl implements DlerMaterialImagesService 
 	}
 
 	@Override
-	public List<DlerMaterialImages> getDlerMaterailDetails(String dlerId, String materialId) {
+	public List<DlerMaterialImages> getDlerMaterailDetails(String dlerIdMaterialId,String dlerId, String materialId) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DlerMaterialImages> query = cb.createQuery(DlerMaterialImages.class);
 		Root<DlerMaterialImages> root = query.from(DlerMaterialImages.class);
 		List<Predicate> predicates = new ArrayList<>();
 
+		if (dlerIdMaterialId != null) {
+			predicates.add(cb.equal(root.get("dlerIdMaterialId"), dlerIdMaterialId));
+		}
 		if (dlerId != null) {
 			predicates.add(cb.equal(root.get("dlerId"), dlerId));
 		}

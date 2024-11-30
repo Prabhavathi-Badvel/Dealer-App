@@ -1,6 +1,7 @@
 package com.dlerin.application.serviceimpl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,8 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.dlerin.application.dto.AdminStoreVerificationResponse;
+import com.dlerin.application.dto.ResponseCombinedAdminStorAndStorMem;
+import com.dlerin.application.dto.ResponseCombinedDealerBrandsDto;
 import com.dlerin.application.dto.UpdateAdminStoreRequest;
+import com.dlerin.application.entity.AdminBrandMaster;
 import com.dlerin.application.entity.AdminStoreVerification;
+import com.dlerin.application.entity.DealerBrands;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.entity.DlerStoreDetails;
 import com.dlerin.application.entity.PlanMembership;
@@ -24,6 +29,13 @@ import com.dlerin.application.repository.DlerStoreDetailsRepo;
 import com.dlerin.application.repository.PlanMembershipRepo;
 import com.dlerin.application.repository.StoreMembershipRepo;
 import com.dlerin.application.service.AdminStoreVerificationService;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 
 
 @Service
@@ -46,6 +58,9 @@ public class AdminStoreVerificationServiceImpl implements AdminStoreVerification
 
 	@Autowired
 	private PlanMembershipRepo planMembershipRepo;
+	
+	@PersistenceContext
+	private EntityManager entityManager;
 
 	@Override
 	public AdminStoreVerification addAdminStore(AdminStoreVerification adminstore) {
@@ -142,5 +157,42 @@ public class AdminStoreVerificationServiceImpl implements AdminStoreVerification
 			emailServiceImpl.sendAdminStoreToMail(sendDlerIdByEmail, subject, message);
 		}
 	}
+	@Override
+	public ResponseCombinedAdminStorAndStorMem getadminStoreVerificationService(String adminStoreVerificationId,
+			String storeId, String dlerId, String verificationStatus) {
+		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<AdminStoreVerification> query = cb.createQuery(AdminStoreVerification.class);
+        Root<AdminStoreVerification> root = query.from(AdminStoreVerification.class);
+        List<Predicate> predicates = new ArrayList<>();
 
+        if (adminStoreVerificationId != null) {
+            predicates.add(cb.equal(root.get("adminStoreVerificationId"), adminStoreVerificationId));
+        }
+        if (storeId != null) {
+            predicates.add(cb.equal(root.get("storeId"), storeId));
+        }
+        if (dlerId != null) {
+            predicates.add(cb.equal(root.get("dlerId"), dlerId));
+        }
+        query.where(predicates.toArray(new Predicate[0]));
+        List<AdminStoreVerification> adminStoreVerification = entityManager.createQuery(query).getResultList();
+
+        List<StoreMembership> storeMembership = new ArrayList<>();
+        if (adminStoreVerificationId != null) {
+        	storeMembership = storeMembershipRepo.findByStoreIdKey(adminStoreVerificationId);
+        }
+
+        ResponseCombinedAdminStorAndStorMem response = new ResponseCombinedAdminStorAndStorMem();
+        if (!adminStoreVerification.isEmpty() || !storeMembership.isEmpty()) {
+            response.setMessage("Dealer and Admin Brand details found.");
+            response.setStatus(true);
+            response.setDealerStore(adminStoreVerification);
+            response.setDlerStoreMem(storeMembership);
+        } else {
+            response.setMessage("No records found for the provided parameters.");
+            response.setStatus(false);
+        }
+
+        return response;
+	}
 }

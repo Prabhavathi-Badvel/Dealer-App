@@ -95,14 +95,14 @@ public class DlerStoreMaterialController {
 	}
     
     @GetMapping("/dler-store-material")
-    public ResponseEntity<?> getDlerStoreMaterial(
+    public ResponseEntity<?> getDlerStoreMaterial( @RequestParam(required = false) String storeIdSkuId,
             @RequestParam(required = false) String skuId,
             @RequestParam(required = false) String dlerId ,@RequestParam(required = false) String  storeId) {
         
     	ResponseUpdateDlerStoreMaterialDto response=new ResponseUpdateDlerStoreMaterialDto();
        
     	try {
-    	List<DlerStoreMaterial> dlerstorematerial = dlerStoreMaterialService.getDlerStoreMaterial(skuId, dlerId,storeId);
+    	List<DlerStoreMaterial> dlerstorematerial = dlerStoreMaterialService.getDlerStoreMaterial(storeIdSkuId,skuId, dlerId,storeId);
         if (dlerstorematerial != null || dlerstorematerial.isEmpty() ) {
         	response.setMessage("dler store material  details");
         	response.setStatus(true);

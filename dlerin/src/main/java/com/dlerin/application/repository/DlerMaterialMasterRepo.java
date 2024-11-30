@@ -52,5 +52,7 @@ public interface DlerMaterialMasterRepo extends JpaRepository<DlerMaterialMaster
 	
 	@Query("SELECT DISTINCT dmm.materialName FROM DlerMaterialMaster dmm")
 	public List<String> getDistinctMaterialName();
+	
+	
 
 }

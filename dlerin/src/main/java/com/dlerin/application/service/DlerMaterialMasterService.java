@@ -8,6 +8,6 @@ public interface DlerMaterialMasterService {
 
 	public DlerMaterialMaster add(DlerMaterialMaster dlerMaterialMaster);
 	public DlerMaterialMaster update(DlerMaterialMaster dlerMaterialMaster);
-	public List<DlerMaterialMaster> getDlerMaterialProfile(String brandId,String materialType,String materialId,String dlerId,String materialName) ;
+	public List<DlerMaterialMaster> getMaterialMaster(String dlerIdMaterialId,String brandId,String materialType,String materialId,String dlerId,String materialName) ;
 	public List<String> getDistinctMaterialName();
 }

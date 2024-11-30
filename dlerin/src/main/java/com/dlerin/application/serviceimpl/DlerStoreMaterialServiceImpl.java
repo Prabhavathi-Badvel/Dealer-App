@@ -70,13 +70,16 @@ public class DlerStoreMaterialServiceImpl implements DlerStoreMaterialService{
 	}
 	
 	@Override
-	public List<DlerStoreMaterial> getDlerStoreMaterial(String skuId, String dlerId,String storeId) {
+	public List<DlerStoreMaterial> getDlerStoreMaterial(String storeIdSkuId,String skuId, String dlerId,String storeId) {
 		
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DlerStoreMaterial> query = cb.createQuery(DlerStoreMaterial.class);
 		Root<DlerStoreMaterial> root = query.from(DlerStoreMaterial.class);
 		List<Predicate> predicates = new ArrayList<>();
 		
+		if (storeIdSkuId != null) {
+			predicates.add(cb.equal(root.get("storeIdSkuId"), storeIdSkuId));
+		}
 		if (skuId != null) {
 			predicates.add(cb.equal(root.get("skuId"), skuId));
 		}

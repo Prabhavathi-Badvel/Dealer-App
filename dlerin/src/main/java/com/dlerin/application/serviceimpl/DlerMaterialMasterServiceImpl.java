@@ -98,13 +98,16 @@ public class DlerMaterialMasterServiceImpl implements DlerMaterialMasterService 
 	}
 
 	@Override
-	public List<DlerMaterialMaster> getDlerMaterialProfile(String brandId, String materialType, String materialId,
+	public List<DlerMaterialMaster> getMaterialMaster(String dlerIdMaterialId,String brandId, String materialType, String materialId,
 			String dlerId, String materialName) {
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<DlerMaterialMaster> query = cb.createQuery(DlerMaterialMaster.class);
 		Root<DlerMaterialMaster> root = query.from(DlerMaterialMaster.class);
 		List<Predicate> predicates = new ArrayList<>();
 
+		if (dlerIdMaterialId != null) {
+			predicates.add(cb.equal(root.get("dlerIdMaterialId"), dlerIdMaterialId));
+		}
 		if (brandId != null) {
 			predicates.add(cb.equal(root.get("brandId"), brandId));
 		}

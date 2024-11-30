@@ -79,12 +79,12 @@ public class DlerMaterialImagesController {
 	}
 
 	@GetMapping("/dler-material-details")
-	public ResponseEntity<?> getDlerIdMaterialId(@RequestParam(required = false) String dlerId,
+	public ResponseEntity<?> getDlerIdMaterialId(@RequestParam(required = false) String dlerIdMaterialId,@RequestParam(required = false) String dlerId,
 			@RequestParam(required = false) String materialId) {
 		ResponseDlerMaterialImagesAddDto2 response1 = new ResponseDlerMaterialImagesAddDto2();
 
 		try {
-			List<DlerMaterialImages> getdlerId = dlerMaterialImagesServiceImpl.getDlerMaterailDetails(dlerId,
+			List<DlerMaterialImages> getdlerId = dlerMaterialImagesServiceImpl.getDlerMaterailDetails(dlerIdMaterialId,dlerId,
 					materialId);
 			if (getdlerId != null && !getdlerId.isEmpty()) {
 

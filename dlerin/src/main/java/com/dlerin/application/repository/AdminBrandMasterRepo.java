@@ -12,10 +12,20 @@ import com.dlerin.application.entity.AdminBrandMaster;
 public interface AdminBrandMasterRepo extends JpaRepository<AdminBrandMaster, String> {
 
 	AdminBrandMaster findByBrandCatSubCat(String brandCatSubCat);
-	
-	  @Query("SELECT DISTINCT abm.brandCategory FROM AdminBrandMaster abm")
-	    List<String> findDistinctBrandCategories();
-	  
-	  List<AdminBrandMaster> findByBrandId(String brandId);
+
+	@Query("SELECT DISTINCT abm.brandCategory FROM AdminBrandMaster abm")
+	List<String> findDistinctBrandCategories();
+
+	@Query("SELECT DISTINCT abm.brandCategory FROM AdminBrandMaster abm")
+	List<AdminBrandMaster> findByBrandId(String brandId);
+
+	@Query("SELECT DISTINCT abm.brandSubcategory, abm.brandId FROM AdminBrandMaster abm")
+	List<Object[]> findDistinctBrandSubcategoryAndIds();
+
+	@Query("SELECT DISTINCT abm.brandSubcategory FROM AdminBrandMaster abm")
+	List<String> findDistinctBrandSubcategory();
+
+	@Query("SELECT DISTINCT abm.brandId FROM AdminBrandMaster abm")
+	List<String> findDistinctBrandIds();
 
 }

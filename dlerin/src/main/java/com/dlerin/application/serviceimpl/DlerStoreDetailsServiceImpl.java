@@ -318,6 +318,10 @@ public class DlerStoreDetailsServiceImpl implements DlerStoreDetailsService {
 		return dmr;
 	}
 
+	public List<String> getDistinctLocationsByBusinessType(String businessType) {
+        return dlerStoreDetailsRepo.findDistinctLocationsByBusinessType(businessType);
+    }
+	
 	@Override
 	public List<String> getAllStoreLocation() {
 		return dlerStoreDetailsRepo.findLocation();

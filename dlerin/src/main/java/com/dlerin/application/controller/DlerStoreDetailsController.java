@@ -151,8 +151,19 @@ public class DlerStoreDetailsController {
 		return new ResponseEntity<>(response, HttpStatus.OK);
 	}
 
-	@GetMapping("/getStoreLocation")
+	@GetMapping("/getDistinctStoreLocation")
 	public List<String> getAllStoreLocation() {
 		return dlerStoreDetailsService.getAllStoreLocation();
 	}
+
+	@GetMapping("/getStoreLocation")
+    public ResponseEntity<List<String>> getDistinctLocations(@RequestParam String businessType) {
+        List<String> distinctLocations = dlerStoreDetailsService.getDistinctLocationsByBusinessType(businessType);
+
+        if (distinctLocations.isEmpty()) {
+            return ResponseEntity.noContent().build();  // Return 204 if no data found
+        }
+
+        return ResponseEntity.ok(distinctLocations);  // Return 200 OK with the list of locations
+    }
 }

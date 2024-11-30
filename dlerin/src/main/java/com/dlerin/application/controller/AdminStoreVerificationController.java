@@ -8,12 +8,16 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dlerin.application.dto.AdminStoreVerificationResponse;
+import com.dlerin.application.dto.ResponseCombinedAdminStorAndStorMem;
+import com.dlerin.application.dto.ResponseCombinedDealerBrandsDto;
 import com.dlerin.application.dto.UpdateAdminStoreRequest;
 import com.dlerin.application.entity.AdminStoreVerification;
 import com.dlerin.application.repository.AdminStoreVerificationRepo;
@@ -56,4 +60,15 @@ public class AdminStoreVerificationController {
 		return ResponseEntity.ok(result);
 	}
 
+	@GetMapping("/dlerin-get-adminStoreVerification")
+    public ResponseEntity<ResponseCombinedAdminStorAndStorMem> getadminStoreVerificationService(
+            @RequestParam(required = false) String adminStoreVerificationId,
+            @RequestParam(required = false) String storeId,
+            @RequestParam(required = false) String dlerId,
+            @RequestParam(required = false) String verificationStatus) {
+
+		ResponseCombinedAdminStorAndStorMem response = adminStoreVerificationService.getadminStoreVerificationService(adminStoreVerificationId, storeId,
+        		dlerId,verificationStatus);
+        return ResponseEntity.ok(response);
+    }
 }

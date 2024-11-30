@@ -3,9 +3,12 @@ package com.dlerin.application.serviceimpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import com.dlerin.application.dto.BrandCategoryAndIdDto;
 import com.dlerin.application.entity.AdminBrandMaster;
 import com.dlerin.application.entity.DlerBusinessLogin;
 import com.dlerin.application.repository.AdminBrandMasterRepo;
@@ -61,13 +64,16 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 	}
 
 	@Override
-	public List<AdminBrandMaster> getBrands(String brandName, String brandCategory, String brandSubcategory) {
+	public List<AdminBrandMaster> getBrands(String brandCatSubCat,String brandName, String brandCategory, String brandSubcategory) {
 
 		CriteriaBuilder cb = entityManager.getCriteriaBuilder();
 		CriteriaQuery<AdminBrandMaster> query = cb.createQuery(AdminBrandMaster.class);
 		Root<AdminBrandMaster> root = query.from(AdminBrandMaster.class);
 		List<Predicate> predicates = new ArrayList<>();
 
+		if (brandCatSubCat != null) {
+			predicates.add(cb.equal(root.get("brandCatSubCat"), brandCatSubCat));
+		}
 		if (brandName != null) {
 			predicates.add(cb.equal(root.get("brandName"), brandName));
 		}
@@ -88,5 +94,22 @@ public class AdminBrandMasterImpl implements AdminBrandMasterService {
 		return admindBrandMaterRepo.findDistinctBrandCategories();
 	}
 
+	@Override
+	public List<String> getBrandSubcategory() {
+		return admindBrandMaterRepo.findDistinctBrandSubcategory();
+	}
+
+	@Override
+	public List<String> getDistinctBrandIds() {
+		return admindBrandMaterRepo.findDistinctBrandIds();
+	}
+
+	@Override
+	public List<BrandCategoryAndIdDto> getDistinctBrandCategoriesAndIds() {
+	    List<Object[]> results = admindBrandMaterRepo.findDistinctBrandSubcategoryAndIds();
+	    return results.stream()
+	                  .map(result -> new BrandCategoryAndIdDto((String) result[0], (String) result[1]))
+	                  .collect(Collectors.toList());
+	}
 
 }

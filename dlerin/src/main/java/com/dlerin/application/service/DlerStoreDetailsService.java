@@ -30,4 +30,6 @@ public interface DlerStoreDetailsService {
 	public List<String> getAllStoreLocation();
 	
 	public ResponseEntity<?> uploadStoreGstDocs(String dlerIdStoreId, MultipartFile gstDocument, MultipartFile tradeLicense);
+	
+	public List<String> getDistinctLocationsByBusinessType(String businessType);
 }

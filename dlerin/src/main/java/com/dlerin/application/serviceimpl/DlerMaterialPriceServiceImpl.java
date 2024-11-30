@@ -227,7 +227,16 @@ public class DlerMaterialPriceServiceImpl implements DlerMaterialPriceService {
 
 			// Find matching prices
 			List<DlerMaterialPrice> materialPrices = dlerMaterialPriceRepo.findByDlerIdMaterialId(dlerIdMaterialId);
+			
+			for (DlerMaterialPrice price : materialPrices) {
+	            if (price.getSkuId() == null) {
+	                price.setSkuId(materialMaster.getSkuId());
+	            }
+	            if (price.getMaterialId() == null) {
+	                price.setMaterialId(materialMaster.getMaterialId());
+	            }
 			dlerMaterialPrices.addAll(materialPrices);
+		}
 		}
 		response.setDlerMaterialPrices(dlerMaterialPrices);
 		return response;

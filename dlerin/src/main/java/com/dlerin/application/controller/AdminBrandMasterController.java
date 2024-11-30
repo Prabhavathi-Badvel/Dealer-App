@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.dlerin.application.dto.BrandCategoryAndIdDto;
 import com.dlerin.application.dto.ResponseAdminBrandDto;
 import com.dlerin.application.dto.ResponseAdminBrandMasterDto;
 import com.dlerin.application.dto.ResponseAdminBrandMasterDto1;
@@ -77,13 +79,13 @@ public class AdminBrandMasterController {
 
 	@GetMapping("/dlerin-get-adminbrands")
 //	@PreAuthorize("hasAuthority('Admin')")
-	public ResponseEntity<?> getAdminBrandMaster(@RequestParam(required = false) String brandName,
+	public ResponseEntity<?> getAdminBrandMaster(@RequestParam(required = false) String brandCatSubCat,@RequestParam(required = false) String brandName,
 			@RequestParam(required = false) String brandCategory,
 			@RequestParam(required = false) String brandSubcategory) {
 		ResponseAdminBrandDto response = new ResponseAdminBrandDto();
 
 		try {
-			List<AdminBrandMaster> brands = adminBrandService.getBrands(brandName, brandCategory, brandSubcategory);
+			List<AdminBrandMaster> brands = adminBrandService.getBrands(brandCatSubCat,brandName, brandCategory, brandSubcategory);
 			if (brands != null && !brands.isEmpty()) {
 				response.setMessage("Successfully receieved brands");
 				response.setStatus(true);
@@ -105,4 +107,18 @@ public class AdminBrandMasterController {
 	public List<String> getDistinctBrandCategories() {
 		return adminBrandService.getDistinctBrandCategories();
 	}
+	
+	@GetMapping("/getDistinctBrandSubcategoryOnly")
+    public List<String> getDistinctBrandSubcategory() {
+        return adminBrandService.getBrandSubcategory();
+    }
+	
+	@GetMapping("/getDistinctBrandIdsOnly")
+    public List<String> getDistinctBrandIds() {
+        return adminBrandService.getDistinctBrandIds();
+    }
+	@GetMapping("/getDistinctBrandCategoriesAndBrandIds")
+    public List<BrandCategoryAndIdDto> getDistinctCategoriesAndIds() {
+        return adminBrandService.getDistinctBrandCategoriesAndIds();
+    }
 }

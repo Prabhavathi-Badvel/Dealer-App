@@ -14,5 +14,5 @@ public interface DlerMaterialImagesService {
 	public DlerMaterialImages addDlerIdBusinessIdStoreIdImages(DlerMaterialImages images);
 	public ResponseEntity<?> uploadDlerIdMaterialId(String materialIddlerIdBusinessIdStoreId,
 			MultipartFile imageUrl1, MultipartFile imageUrl2, MultipartFile imageUrl3);
-	public List<DlerMaterialImages> getDlerMaterailDetails(String dlerId,String materialId);
+	public List<DlerMaterialImages> getDlerMaterailDetails(String dlerIdMaterialId,String dlerId,String materialId);
 	}

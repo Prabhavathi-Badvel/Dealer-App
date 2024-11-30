@@ -10,7 +10,7 @@ public interface DlerStoreMaterialService {
 
 	public DlerStoreMaterial updateStore(DlerStoreMaterial storeMaterial);
 
-	public List<DlerStoreMaterial> getDlerStoreMaterial(String skuId, String dlerId, String storeId);
+	public List<DlerStoreMaterial> getDlerStoreMaterial(String storeIdSkuId,String skuId, String dlerId, String storeId);
 
 	public List<DlerStoreMaterial> getAllDlerStoreMaterial();
 
