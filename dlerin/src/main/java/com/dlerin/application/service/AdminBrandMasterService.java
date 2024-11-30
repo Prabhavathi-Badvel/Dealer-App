@@ -2,7 +2,6 @@ package com.dlerin.application.service;
 
 import java.util.List;
 
-import com.dlerin.application.dto.BrandCategoryAndIdDto;
 import com.dlerin.application.entity.AdminBrandMaster;
 
 public interface AdminBrandMasterService {
@@ -14,8 +13,6 @@ public interface AdminBrandMasterService {
 	public List<AdminBrandMaster> getBrands(String brandCatSubCat,String brandName, String brandCategory, String brandSubcategory);
 
 	public List<String> getDistinctBrandCategories();
-
-	public List<BrandCategoryAndIdDto> getDistinctBrandCategoriesAndIds();
 
 	public List<String> getBrandSubcategory();
 
