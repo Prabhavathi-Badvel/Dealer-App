@@ -31,7 +31,7 @@ public class PlanMembership {
 	private String planName;
 	
 	@Column(name = "amount")
-	private double amount;
+	private int amount;
 	
 	@Column(name = "number_of_days")
 	private long numberOfDays;
